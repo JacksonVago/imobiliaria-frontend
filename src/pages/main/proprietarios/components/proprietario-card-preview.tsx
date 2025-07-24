@@ -1,0 +1,138 @@
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Proprietario } from '@/interfaces/proprietario'
+import { cn } from '@/lib/utils'
+import { Home } from 'lucide-react'
+
+export const ProprietarioCardPreviewRoot = ({
+  children,
+  className
+}: {
+  children: React.ReactNode
+  className?: string
+}) => {
+  return <Card className={cn('flex flex-col', className)}>{children}</Card>
+}
+
+export const ProprietarioCardPreviewHeader = ({
+  proprietario,
+  classname
+}: {
+  classname?: string
+  proprietario: Proprietario
+}) => {
+  return (
+    <CardHeader className={cn(classname)}>
+      <CardTitle className="flex items-center justify-between">
+        <span className="truncate">{proprietario?.nome}</span>
+        {proprietario?.imoveis?.length && (
+          <Badge variant="secondary">{proprietario?.imoveis?.length} imóveis</Badge>
+        )}
+      </CardTitle>
+    </CardHeader>
+  )
+}
+
+export const ProprietarioCardPreviewInfoContent = ({
+  classname,
+  proprietario
+}: {
+  proprietario: Proprietario
+  classname?: string
+}) => {
+  return (
+    <CardContent className={cn('flex-grow', classname)}>
+      <dl className="grid grid-cols-2 gap-1 text-sm">
+        <dt className="font-semibold">CPF/CNPJ:</dt>
+        <dd className="truncate">{proprietario.documento}</dd>
+        <dt className="font-semibold">Profissão:</dt>
+        <dd className="truncate">{proprietario.profissao || 'N/A'}</dd>
+        <dt className="font-semibold">Estado Civil:</dt>
+        <dd>{proprietario.estadoCivil || 'N/A'}</dd>
+        <dt className="font-semibold">Email:</dt>
+        <dd className="truncate">{proprietario.email || 'N/A'}</dd>
+        <dt className="font-semibold">Telefone:</dt>
+        <dd>{proprietario.telefone || 'N/A'}</dd>
+      </dl>
+    </CardContent>
+  )
+}
+
+export const ProprietarioCardImoveisContent = ({
+  classname,
+  proprietario
+}: {
+  proprietario: Proprietario
+  classname?: string
+}) => {
+  return (
+    <CardContent className={cn('flex-grow', classname)}>
+      <div>
+        <h4 className="mb-2 font-semibold">Imóveis:</h4>
+        <ul className="space-y-2">
+          {proprietario?.imoveis?.slice(0, 3).map((imovel) => (
+            <li key={imovel.id} className="flex items-center justify-between text-sm">
+              <span className="flex items-center">
+                <Home className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{imovel?.title}</span>
+              </span>
+              <span className="whitespace-nowrap font-semibold">
+                R$ {imovel?.valor_aluguel?.toLocaleString('pt-BR')}
+              </span>
+            </li>
+          ))}
+
+          {!!proprietario?.imoveis?.length && proprietario?.imoveis?.length > 3 && (
+            <li className="text-sm text-muted-foreground">
+              + {proprietario?.imoveis?.length - 3} imóveis
+            </li>
+          )}
+        </ul>
+      </div>
+    </CardContent>
+  )
+}
+
+export const ProprietarioCardPreviewFooter = ({
+  proprietario,
+  classname,
+  onSelectImovel,
+  handleClickVerDetalhes
+}: {
+  classname?: string
+  proprietario: Proprietario
+  handleClickVerDetalhes: (id: number) => () => void
+  onSelectImovel?: (imovelId: number) => void
+}) => {
+  return (
+    <CardFooter className={cn(classname)}>
+      <Button
+        variant="secondary"
+        size="sm"
+        className="w-full"
+        onClick={handleClickVerDetalhes(proprietario.id)}
+      >
+        Ver detalhes
+      </Button>
+      {onSelectImovel && (
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full"
+          onClick={() => onSelectImovel(proprietario.id)}
+        >
+          Vincular proprietário
+        </Button>
+      )}
+    </CardFooter>
+  )
+}
+
+export const ProprietarioPreviewCard = {
+  Root: ProprietarioCardPreviewRoot,
+  Header: ProprietarioCardPreviewHeader,
+  InfoContent: ProprietarioCardPreviewInfoContent,
+  imoveisContent: ProprietarioCardImoveisContent,
+  Footer: ProprietarioCardPreviewFooter
+}

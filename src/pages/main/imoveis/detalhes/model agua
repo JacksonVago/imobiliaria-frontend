@@ -1,0 +1,6 @@
+model agua
+id
+valor agua
+id imovel
+id locatario
+data de registro
