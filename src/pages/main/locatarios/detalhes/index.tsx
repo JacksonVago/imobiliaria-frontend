@@ -48,8 +48,9 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { LocatarioForm } from '../components/locatario-form'
 import { Imovel } from '@/interfaces/imovel'
-import { ImovelTipo } from '@/enums/imovel/tipo-imovel'
+//import { ImovelTipo } from '@/enums/imovel/tipo-imovel'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
+import { Pessoa } from '@/interfaces/pessoa'
 // Mock data for demonstration
 const locatario = {
   id: 'loc001',
@@ -96,7 +97,7 @@ const locatario = {
   ]
 }
 
-/*const fetchDocumentFiles = async (documents: Locatario['documentos']) => {
+const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc:any) => {
       try {
@@ -123,7 +124,7 @@ const locatario = {
     }) || []
   const resolvedFiles = await Promise.all(documentFilesPromises)
   return resolvedFiles.filter(Boolean)
-}*/
+}
 
 export const DetalhesLocatarioForm = ({
   id,
@@ -148,13 +149,13 @@ export const DetalhesLocatarioForm = ({
     enabled: !!id
   })
 
-  /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
-    queryKey: ['documentFiles', id, locatario?.documentos],
-    queryFn: () => fetchDocumentFiles(locatario?.documentos),
-    enabled: !!locatario?.documentos?.length
-  })*/
+  const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
+    queryKey: ['documentFiles', id, locatario?.pessoa?.documentos],
+    queryFn: () => fetchDocumentFiles(locatario?.pessoa?.documentos),
+    enabled: !!locatario?.pessoa?.documentos?.length
+  })
 
-  //const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
+  const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
 
   const updateLocatario = useMutation({
     mutationFn: async (data: FormData) => {
@@ -271,7 +272,7 @@ export const DetalhesLocatarioForm = ({
   console.log(locatario)
 
   //default values
-  const enderecoData = transformNullToUndefined(locatario?.endereco || {})
+  const enderecoData = transformNullToUndefined(locatario?.pessoa?.endereco || {})
   const defaultValues = React.useMemo(
     () => ({
       ...transformNullToUndefined(locatario || {}),
@@ -362,8 +363,8 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
   const params = useParams()
   const { id } = defaultId ? defaultId : useParams<{ id: string }>()
 
-  const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
-  const [formInitialized, setFormInitialized] = React.useState(false) // Controle de inicialização
+  //const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
+  //const [formInitialized, setFormInitialized] = React.useState(false) // Controle de inicialização
 
   const { data: locatario } = useQuery({
     queryKey: ['locatario', id],
@@ -385,9 +386,9 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
   })
 
   const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
-    queryKey: ['documentFiles', id, locatario?.documentos],
-    queryFn: () => fetchDocumentFiles(locatario?.documentos),
-    enabled: !!locatario?.documentos?.length
+    queryKey: ['documentFiles', id, locatario?.pessoa?.documentos],
+    queryFn: () => fetchDocumentFiles(locatario?.pessoa?.documentos),
+    enabled: !!locatario?.pessoa?.documentos?.length
   })
 
   const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
@@ -424,7 +425,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
   })
 
   //default values
-  const enderecoData = transformNullToUndefined(locatario?.endereco || {})
+  const enderecoData = transformNullToUndefined(locatario?.pessoa?.endereco || {})
   const defaultValues = React.useMemo(
     () => ({
       ...transformNullToUndefined(locatario || {}),
@@ -441,20 +442,20 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
   )
 
   React.useEffect(() => {
-    if (locatario) locatarioMethods.reset(defaultValues)
+    //if (locatario) locatarioMethods.reset(defaultValues)
   }, [defaultValues])
 
   //react hook form
 
   const locatarioMethods = useForm<LocatarioSchema>({
     resolver: zodResolver(proprietarioSchema),
-    defaultValues,
+    //defaultValues,
     mode: 'onBlur'
   })
 
   React.useEffect(() => {
     if (locatario) {
-      locatarioMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
+      //locatarioMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
     }
   }, [id, locatario, documentFiles])
 

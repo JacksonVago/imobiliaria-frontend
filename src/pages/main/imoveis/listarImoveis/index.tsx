@@ -8,7 +8,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
@@ -26,10 +25,9 @@ import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { Imovel } from '@/interfaces/imovel'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
-import { Value } from '@radix-ui/react-select'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { MapPin, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -95,14 +93,14 @@ export const useGetImoveisQueryOptions = ({
   })
 }
 
-const mockedImages = [
+/*const mockedImages = [
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww',
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww',
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww',
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww',
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww',
   'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2FzYSUyMDIlMjBhbmFkcmVzfGVufDB8fDB8fHww'
-]
+]*/
 
 // Component
 export default function ListarImoveis({
@@ -142,13 +140,13 @@ export default function ListarImoveis({
   const imoveis = data?.data?.data || []
   const totalPages = data?.data?.totalPages
 
-  const hasTotalPages = !!totalPages
-  const canGoToNextPage = hasTotalPages && page < totalPages
-  const canGoToPreviousPage = hasTotalPages && page > totalPages
+  //const hasTotalPages = !!totalPages
+  //const canGoToNextPage = hasTotalPages && page < totalPages
+  //const canGoToPreviousPage = hasTotalPages && page > totalPages
 
 
   //Leitura das imagens
-  const LoadImage = async (id: number, url: string) => {
+  /*const LoadImage = async (id: number, url: string) => {
 
     const response = await fetch(
       'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + url
@@ -163,7 +161,7 @@ export default function ListarImoveis({
       preview: URL.createObjectURL(file),
       id: id
     }
-  }
+  }*/
 
   //always that we go to out of the total pages, we will go to the first page
   useEffect(() => {
@@ -269,7 +267,7 @@ export default function ListarImoveis({
         )}
 
         {/* Imoveis Cards */}
-        {imoveis?.map((imovel, index) => (
+        {imoveis?.map((imovel) => (
           <Card key={imovel.id} className="">
             {(imovel?.imovelPhotos?.length ? imovel?.imovelPhotos?.length : 0) > 0 ? (
               <Carousel  autoplay={true}>

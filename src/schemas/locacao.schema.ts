@@ -1,10 +1,8 @@
-import { EstadoCivil } from '@/enums/estado-civil'
 import { GarantiaLocacao } from '@/enums/locacao/enums-locacao'
 import { LocacaoStatus } from '@/interfaces/locacao'
 import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
 import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
-import path from 'path'
-import { string, z } from 'zod'
+import { z } from 'zod'
 import moment from 'moment';
 
 export const fiadorSchema = z.object({
@@ -240,7 +238,13 @@ export const locacaoSchema = z.object({
       const num = Number(val)
       return isNaN(num) ? undefined : num
     }),*/
-  locatarios: z.array(z.unknown()
+  locatarios: z.array(    z.object(
+      {
+        nome: z.string(),
+        id: z.number()
+      }
+    )
+
   ).min(1, 'Locatário é obrigatório'),
   fiadores: z.array(
     z.object(

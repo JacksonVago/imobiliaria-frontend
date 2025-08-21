@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import moment from "moment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { ROUTE } from '@/enums/routes.enum'
@@ -414,7 +415,7 @@ export default function DetalhesCliente() {
 
   //Globals
   const glb_params = useGlobalParams();
-  const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
+  //const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
 
   const { data: cliente } = useQuery({
     queryKey: ['cliente', id],
@@ -438,7 +439,7 @@ export default function DetalhesCliente() {
     },
   })
 
-  const { data } = useQuery({
+  /*const { data } = useQuery({
     queryKey: [],
     queryFn: async () => {
       const response = await api.get<Pessoa[]>(`/pessoas`)
@@ -446,7 +447,7 @@ export default function DetalhesCliente() {
     },
   });
 
-  const fiadores = data?.data || [];
+  const fiadores = data?.data || [];*/
 
   const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, cliente?.documentos],
@@ -563,8 +564,8 @@ export default function DetalhesCliente() {
     const formData = new FormData();
 
     formData.append('pessoaId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', data.cota_imovel.toString());
-    formData.append('imovelId', data.imovelId.toString());
+    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString(): ""));
+    formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
     //Gravar dados das propriedades
     api.put(`proprietarios/${id}/vincular-imovel/${data.imovelId}`, formData, {
@@ -627,8 +628,8 @@ export default function DetalhesCliente() {
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
       formData.append('pessoaId', propEdit.pessoaId.toString());
-      formData.append('cota_imovel', data.cota_imovel.toString());
-      formData.append('imovelId', data.imovelId.toString());
+      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString(): ""));
+      formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
       console.log(formData);
 
@@ -654,7 +655,7 @@ export default function DetalhesCliente() {
     setPropImovelId(0);
     locacaoMethods.reset();
     locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
-    locacaoMethods.setValue('pessoaId', (id! ? id : 0));
+    locacaoMethods.setValue('imovelId', (id! ? id : 0));
     console.log((id! ? id : 0));
   }
 
@@ -669,7 +670,7 @@ export default function DetalhesCliente() {
       //setSelImovelAlt(proprietario.imovelId.toString());
       //setPropImovelIdAlt(proprietario.imovelId);
       imovelLocAlt.setValue('dataInicio', locacao.dataInicio);
-      imovelLocAlt.setValue('dataFim', (locacao.dataFim ? locacao.dataFim : ''));
+      imovelLocAlt.setValue('dataFim', new Date(moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD")));
       imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       imovelLocAlt.setValue('status', locacao.status);
       imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
@@ -727,18 +728,18 @@ export default function DetalhesCliente() {
 
 
     formData.append('dataInicio', data.dataInicio);
-    formData.append('dataFim', data.dataFim);
-    formData.append('valor_aluguel', data.valor_aluguel.toString());
+    formData.append('dataFim', moment((data.dataFim ? data.dataFim : '')).format("YYYY-MM-DD"));
+    formData.append('valor_aluguel', ( data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', data.dia_vencimento.toString());
+    formData.append('dia_vencimento', moment((data.dia_vencimento ? data.dia_vencimento : '')).format("YYYY-MM-DD"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
     formData.append('numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
     formData.append('valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito.toString() : '0'));
     formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
-    formData.append('pessoaId', (data.pessoaId! ? data.pessoaId.toString() : '0'));
+    formData.append('locatario', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
 
     console.log(formData.values());
 
@@ -868,7 +869,8 @@ export default function DetalhesCliente() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading file:', error.message);
+      //console.error('Error downloading file:', error.message);
+      console.error('Error downloading file:', error);
     }
   };
 
@@ -1520,7 +1522,9 @@ export default function DetalhesCliente() {
                                 <Input type="date"
                                   {...imovelLocAlt.register('dataFim')}
                                   helperText={imovelLocAlt.formState?.errors?.dataFim?.message}
-                                  onChange={(e) => { imovelLocAlt.setValue('dataFim', e.target.value) }}
+                                  onChange={(e) => { imovelLocAlt.setValue('dataFim',                                     
+                                    new Date(moment(e.target.value).format("YYYY-MM-DD"))
+                                  ) }}
                                 />
                               </div>
                               <div className='mt-2'>

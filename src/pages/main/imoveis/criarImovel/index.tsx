@@ -39,7 +39,7 @@ import { hasValues } from '@/utils/has-valuest'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@radix-ui/react-label'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { UserMinus, X } from 'lucide-react'
+import { UserMinus } from 'lucide-react'
 import * as React from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -161,8 +161,8 @@ export const CriarImovel = () => {
       if (data.finalidade) {
         form.append('finalidade', data.finalidade)
       }
-      if (hasValues(data.porcentagem_lucro_imobiliaria)) {
-        form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria.toString())
+      if (hasValues(data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria : "")) {
+        form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria.toString() : "")
       }
       if (data.valor_aluguel) {
         form.append('valor_aluguel', data.valor_aluguel.toString())
@@ -303,7 +303,8 @@ export const CriarImovel = () => {
       })
     },
     onError: (error) => {
-      if (IMOVEL_KNOWN_ERRORS.includes(error?.response?.data?.message)) {
+      //if (IMOVEL_KNOWN_ERRORS.includes(error?.response?.data?.message)) {
+      if (IMOVEL_KNOWN_ERRORS.includes(error.message)) {
         toast({
           title: 'Erro ao criar proprietário',
           description: 'Já existe um proprietário com este documento!'
@@ -759,7 +760,8 @@ export const CriarImovel = () => {
                                   const response = await api.get<ApiCep>(`cep/${cleanedCep}`)
                                   const data = response.data
 
-                                  if (!data.erro) {
+                                  //if (!data.erro) {
+                                  if (data) {
                                     // Preenche os campos com os dados retornados
                                     createProprietarioMethods.setValue(
                                       'logradouro',

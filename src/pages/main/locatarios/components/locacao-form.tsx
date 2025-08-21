@@ -27,6 +27,7 @@ import { cleanPhoneNumber } from '@/utils/clean-phone'
 import { FileUp } from 'lucide-react'
 import { Controller, FieldErrors, FormProvider, UseFormReturn } from 'react-hook-form'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
+import { Card } from '@/components/ui/card'
 
 export const LocacaoFormRoot = ({
   locacaoMethods,
@@ -65,6 +66,8 @@ export const LocacaoFormContent = ({
   console.log(locacaoMethods.getValues())
   return (
     <Form {...locacaoMethods}>
+      <Card></Card>
+      {/*
       <RadioGroup
         defaultValue={optionsRadio[0]}
         className="grid grid-cols-2 gap-4"
@@ -128,7 +131,6 @@ export const LocacaoFormContent = ({
         <div className="flex flex-row gap-8"></div>
         <>
           <Accordion type="single" collapsible className="w-full">
-            {/* Fiador */}
             <AccordionItem value="item-3">
               <AccordionTrigger type="button">
                 {locacaoMethods.getValues('garantiaLocacaoTipo') === 'fiador' && 'Fiador'}
@@ -143,7 +145,6 @@ export const LocacaoFormContent = ({
                   'Título de Capitalização'}
               </AccordionTrigger>
               <AccordionContent className="px-2 py-4">
-                {/* //escolher o tipo de garantia de locacao */}
                 {locacaoMethods.watch('garantiaLocacaoTipo') === 'fiador' && (
                   <>
                     <FormProvider {...locacaoMethods}>
@@ -153,6 +154,7 @@ export const LocacaoFormContent = ({
                         disabled={disabled}
                       />
                     </FormProvider>
+                    
                     <div className="space-y-4">
                       <Label>
                         Nome
@@ -422,7 +424,7 @@ export const LocacaoFormContent = ({
                               locacaoMethods.formState.errors as FieldErrors<
                                 LocacaoSchema & { garantiaLocacaoTipo: 'fiador' }
                               >
-                            )?.fiador?.cep?.message
+                            )?.fiadores?.cep?.message
                           }
                         />
                       </Label>
@@ -472,7 +474,6 @@ export const LocacaoFormContent = ({
                 {locacaoMethods.watch('garantiaLocacaoTipo') === 'seguro-fianca' && (
                   <>
                     <FormProvider {...locacaoMethods}>
-                      {/* numero do titulo  */}
                       <Label>
                         Número do contrato da seguradora
                         <Input
@@ -502,7 +503,6 @@ export const LocacaoFormContent = ({
                 )}
                 {locacaoMethods.watch('garantiaLocacaoTipo') === 'titulo-capitalizacao' && (
                   <FormProvider {...locacaoMethods}>
-                    {/* numero do titulo  */}
                     <Label>
                       Número do contrato da seguradora
                       <Input
@@ -581,7 +581,6 @@ export const LocacaoFormContent = ({
                 </table>
               </AccordionContent>
             </AccordionItem>
-            {/* agua */}
             <AccordionItem value="item-2">
               <AccordionTrigger type="button">Água</AccordionTrigger>
               <AccordionContent>
@@ -631,8 +630,7 @@ export const LocacaoFormContent = ({
             </AccordionItem>
           </Accordion>
         </>
-        {/* )} */}
-      </div>
+      </div>*/}
     </Form>
   )
 }

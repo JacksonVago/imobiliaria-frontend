@@ -102,7 +102,7 @@ export const RoutesComponent = () => {
             path={ROUTE.IMOVEIS}
             element={
               <ProtectedRoute permission="VIEW_IMOVELS">
-                <ListarImoveis limitView={3} exclude='' />
+                <ListarImoveis limitView={3} exclude='' onSelectImovel={()=>{}} />
               </ProtectedRoute>
             }
           />
@@ -128,7 +128,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCACOES}
             element={
               <ProtectedRoute permission="VIEW_LOCACOES">
-                <ListarLocacoes exclude='' limitView={3} txtVinc='' />
+                <ListarLocacoes exclude='' limitView={3} txtVinc='' onSelectLocacao={()=>{}} />
               </ProtectedRoute>
             }
           />
@@ -136,7 +136,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCACOES_CRIAR}
             element={
               <ProtectedRoute permission="CREATE_LOCACAO">
-                <CriarLocacao />
+                <CriarLocacao imovelId={0}/>
               </ProtectedRoute>
             }
           />
@@ -172,7 +172,7 @@ export const RoutesComponent = () => {
             path={ROUTE.PROPRIETARIOS_DETALHES}
             element={
               <ProtectedRoute permission="VIEW_PROPRIETARIOS">
-                <DetalhesProprietario />
+                <DetalhesProprietario defaultId={{id:""}} />
               </ProtectedRoute>
             }
           />
@@ -182,7 +182,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCATARIOS}
             element={
               <ProtectedRoute permission="VIEW_LOCATARIOS">
-                <ListarLocatarios />
+                <ListarLocatarios onSelectLocatario={()=>{}} />
               </ProtectedRoute>
             }
           />
@@ -191,7 +191,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCATARIOS_DETALHES}
             element={
               <ProtectedRoute permission="VIEW_LOCATARIOS">
-                <DetalhesLocatario />
+                <DetalhesLocatario defaultId={{id:""}} />
               </ProtectedRoute>
             }
           />
@@ -209,7 +209,7 @@ export const RoutesComponent = () => {
             path={ROUTE.CLIENTES}
             element={
               <ProtectedRoute permission="VIEW_CLIENTES">
-                <ListarClientes exclude='' limitView={3} txtVinc='' />
+                <ListarClientes exclude='' limitView={3} txtVinc='' onSelectCliente={()=>{}} />
               </ProtectedRoute>
             }
           />

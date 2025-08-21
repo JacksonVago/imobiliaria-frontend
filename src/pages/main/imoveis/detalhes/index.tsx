@@ -553,8 +553,8 @@ export const DetalhesImovel = () => {
     if (data.finalidade) {
       form.append('finalidade', data.finalidade)
     }
-    if (hasValues(data.porcentagem_lucro_imobiliaria)) {
-      form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria.toString())
+    if (hasValues(data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria : "")) {
+      form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria.toString() : "")
     }
     if (data.valor_aluguel) {
       form.append('valor_aluguel', data.valor_aluguel.toString())
@@ -644,17 +644,25 @@ export const DetalhesImovel = () => {
   const locacaoAtiva = imovel?.locacoes?.find((locacao) => locacao.status === 'ATIVA')
 
   const initialDefaultValues = {
+    dataFim: (locacaoAtiva?.dataFim ? new Date(locacaoAtiva?.dataFim) : new Date()),
+    dataInicio: (locacaoAtiva?.dataInicio ? new Date(locacaoAtiva?.dataInicio) : new Date()),
+    valor_aluguel: locacaoAtiva?.valor_aluguel,
+    dia_vencimento: locacaoAtiva?.dia_vencimento,
+    status: locacaoAtiva?.status,
     garantiaLocacaoTipo: locacaoAtiva?.garantiaLocacaoTipo
       ? mappGarantyType(locacaoAtiva.garantiaLocacaoTipo)
       : 'fiador',
-    dataFim: (locacaoAtiva?.dataFim ? new Date(locacaoAtiva?.dataFim) : new Date()),
-    dataInicio: (locacaoAtiva?.dataInicio ? new Date(locacaoAtiva?.dataInicio) : new Date()),
-    /*depositoCalcao: locacaoAtiva?.depositoCalcao,
-    documentos: locacaoAtiva?.documentos,
-    fiador: locacaoAtiva?.fiador,
-    seguroFianca: locacaoAtiva?.seguroFianca,
-    tituloCapitalizacao: locacaoAtiva?.tituloCapitalizacao,*/
-    valor_aluguel: locacaoAtiva?.valor_aluguel
+    imovelId : locacaoAtiva?.imovelId,
+    locatarios : locacaoAtiva?.locatarios,
+    fiadores : locacaoAtiva?.fiadores,
+    imoveis : { nome : locacaoAtiva?.imovel?.description , id : locacaoAtiva?.imovel?.id },    
+    tituloCap: {numeroTitulo: locacaoAtiva?.garantiaTituloCapitalizacao?.numeroTitulo },
+    seguroFianca:{ numeroSeguro: locacaoAtiva?.garantiaSeguroFianca?.numeroSeguro },
+    depCalcao : { 
+      valorDeposito : locacaoAtiva?.garantiaDepositoCalcao?.valorDeposito,
+      quantidadeMeses: locacaoAtiva?.garantiaDepositoCalcao?.quantidadeMeses
+    },
+    documentos: locacaoAtiva?.documentos    
   }
 
 
@@ -705,8 +713,8 @@ export const DetalhesImovel = () => {
     }
 
     formData.append('imovelId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', data.cota_imovel.toString());
-    formData.append('pessoaId', data.pessoaId.toString());
+    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+    formData.append('pessoaId', (data.pessoaId ? data.pessoaId.toString() : ""));
 
     linkProprietarioMutation.mutate({ data: formData });
   }
@@ -748,8 +756,8 @@ export const DetalhesImovel = () => {
 
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
-      formData.append('pessoaId', data.pessoaId.toString());
-      formData.append('cota_imovel', data.cota_imovel.toString());
+      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+      formData.append('pessoaId', (data.pessoaId ? data.pessoaId.toString() : ""));
       formData.append('imovelId', propEdit.imovelId.toString());
 
       console.log(formData);
@@ -799,7 +807,7 @@ export const DetalhesImovel = () => {
             locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
             locacaoMethods.setValue('imovelId', (id! ? id : 0));
             locacaoMethods.setValue('valor_aluguel', (imovel?.valor_aluguel ? imovel?.valor_aluguel : 0))
-            locacaoMethods.setValue('pessoaId', proprietario.id);
+            //locacaoMethods.setValue('pessoaId', proprietario.id);
             locacaoMethods.setValue('imovelId', id!);
           }
           if (glb_params.origin_url === 'imoveis') {
@@ -823,7 +831,7 @@ export const DetalhesImovel = () => {
     if (imovelLocatarios.fields.length > 0) {
       imovelLocatarios.remove(0);
     }
-    
+
     locacaoMethods.reset();
     locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
     locacaoMethods.setValue('imovelId', (id! ? id : 0));
@@ -843,8 +851,8 @@ export const DetalhesImovel = () => {
         locacaoFiadores.remove(0);
       }
       locacaoMethodsAlt.setValue('locatarios', (locacao.locatarios ? locacao.locatarios.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
-      locacaoMethodsAlt.setValue('dataInicio', new Date(moment(locacao.dataInicio).format("YYYY-MM-DD")));
-      locacaoMethodsAlt.setValue('dataFim', (locacao.dataFim ? moment(locacao.dataFim).format("YYYY-MM-DD") : ''));
+      locacaoMethodsAlt.setValue('dataInicio', moment(locacao.dataInicio).format("YYYY-MM-DD"));
+      locacaoMethodsAlt.setValue('dataFim', new Date(moment(locacao.dataFim).format("YYYY-MM-DD")));
       locacaoMethodsAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       locacaoMethodsAlt.setValue('dia_vencimento', locacao.dia_vencimento);
       locacaoMethodsAlt.setValue('status', locacao.status);
@@ -874,7 +882,7 @@ export const DetalhesImovel = () => {
 
     if (locEdit) {
       locacaoMethodsAlt.setValue('dataInicio', data.dataInicio);
-      locacaoMethodsAlt.setValue('dataFim', (data.dataFim ? data.dataFim : ''));
+      locacaoMethodsAlt.setValue('dataFim', new Date(moment(data.dataFim).format("YYYY-MM-DD")));
       locacaoMethodsAlt.setValue('valor_aluguel', data.valor_aluguel);
       locacaoMethodsAlt.setValue('status', data.status);
       locacaoMethodsAlt.setValue('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
@@ -884,7 +892,7 @@ export const DetalhesImovel = () => {
       locacaoMethodsAlt.setValue('seguroFianca.numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
       locacaoMethodsAlt.setValue('depCalcao.valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito : 0));
       locacaoMethodsAlt.setValue('depCalcao.quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses : 0));
-      locacaoMethodsAlt.setValue('pessoaId', (data.pessoaId! ? data.pessoaId : 0));
+      //locacaoMethodsAlt.setValue('pessoaId', (data.pessoaId! ? data.pessoaId : 0));
 
       console.log(formData);
 
@@ -900,18 +908,18 @@ export const DetalhesImovel = () => {
 
 
     formData.append('dataInicio', data.dataInicio);
-    formData.append('dataFim', data.dataFim);
-    formData.append('valor_aluguel', data.valor_aluguel.toString());
+    formData.append('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
+    formData.append('valor_aluguel', (data.valor_aluguel  ? data.valor_aluguel.toString(): "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', data.dia_vencimento.toString());
+    formData.append('dia_vencimento', (data.dia_vencimento? data.dia_vencimento.toString() :"0"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
     formData.append('numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
     formData.append('valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito.toString() : '0'));
     formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
-    formData.append('pessoaId', (data.pessoaId! ? data.pessoaId.toString() : '0'));
+    //formData.append('pessoaId', (data.pessoaId! ? data.pessoaId.toString() : '0'));
 
     console.log(formData.values());
 
@@ -1788,7 +1796,7 @@ export const DetalhesImovel = () => {
                               <Input type="date"
                                 {...locacaoMethodsAlt.register('dataFim')}
                                 helperText={locacaoMethodsAlt.formState?.errors?.dataFim?.message}
-                                onChange={(e) => { locacaoMethodsAlt.setValue('dataFim', e.target.value) }}
+                                onChange={(e) => { locacaoMethodsAlt.setValue('dataFim', new Date(moment(e.target.value).format("YYYY-MM-DD"))) }}
                               />
                             </div>
                             <div className='mt-2'>

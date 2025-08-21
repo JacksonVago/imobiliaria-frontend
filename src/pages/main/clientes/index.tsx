@@ -108,6 +108,7 @@ export default function ListarClientes({
   // const canGoToNextPage = hasTotalPages && page < totalPages
   // const canGoToPreviousPage = hasTotalPages && page > totalPages
   //always that we go to out of the total pages, we will go to the first page
+
   useEffect(() => {
     glb_params.updTitle_form('Clientes');
     if (totalPages && page > totalPages) {
@@ -229,7 +230,7 @@ export default function ListarClientes({
                 >
                   Ver detalhes
                 </Button>
-                {onSelectCliente && (
+                {txtVinc !== '' && (
                   <Button
                     variant="secondary"
                     size="sm"
@@ -243,7 +244,7 @@ export default function ListarClientes({
                     }}
 
                   >
-                    {txtVinc !== '' ? txtVinc : 'Vincular Imóvel'}
+                    {txtVinc}
                   </Button>
                 )}
               </div>

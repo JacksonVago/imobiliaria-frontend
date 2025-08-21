@@ -21,23 +21,19 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Bold, Calendar, Edit, Link2Off, Mail, Phone, Plus, Trash2, X } from 'lucide-react'
+import { Edit, Link2Off, Mail, Phone, Plus, Trash2, X } from 'lucide-react'
 import * as React from 'react'
-import { useForm, Controller, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { Pessoa } from '@/interfaces/pessoa'
 import { PropImovelSchema, propImoveSchema, ProprietarioSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Imovel } from '@/interfaces/imovel'
-import { DialogClose } from '@radix-ui/react-dialog'
 import { Proprietario } from '@/interfaces/proprietario'
-import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
-import Listarlocacaos from '..'
 import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
 import { locacaoSchema, LocacaoSchema } from '@/schemas/locacao.schema'
 import { Locacao } from '@/interfaces/locacao'
-import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { LocacaoFormContent, LocacaoFormRoot } from '../components/locacao-form';
 import { useMediaQuery } from 'react-responsive';
 import moment from 'moment';
@@ -138,7 +134,7 @@ export const DetalhesLocacaoForm = ({
   const navigate = useNavigate();
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
-  const params = useParams();
+  //const params = useParams();
 
   console.log(id);
   const { data: locacao } = useQuery({
@@ -209,10 +205,10 @@ export const DetalhesLocacaoForm = ({
 
       formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
       formData.append('dataFim', moment(data.dataFim).format('YYYY-MM-DD'));
-      formData.append('valor_aluguel', data.valor_aluguel.toString());
+      formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : '0'));
       formData.append('status', data.status);
       formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-      formData.append('dia_vencimento', data.dia_vencimento.toString());
+      formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : ""));
       formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
       formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
       formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -250,9 +246,9 @@ export const DetalhesLocacaoForm = ({
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
       documentos: documentFiles?.filter((doc) => doc !== null),
-      imoveis: [{nome: locacao?.imovel?.description, id: locacao?.imovel?.id}],
-      fiadores: locacao?.fiadores?.map((fiador)=>{
-        return {nome:fiador.pessoa?.nome, id: fiador.pessoa?.id }
+      imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
+      fiadores: locacao?.fiadores?.map((fiador) => {
+        return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
       }),
       locatarios: locacao?.locatarios,
     }),
@@ -379,7 +375,7 @@ export default function DetalhesLocacao() {
     },
   });
 
-  const fiadores = data?.data || [];
+  //const fiadores = data?.data || [];
 
   const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, locacao?.documentos],
@@ -401,7 +397,7 @@ export default function DetalhesLocacao() {
       cidade: enderecoData?.cidade,
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
-      documentos: documentFiles?.filter((doc) => doc !== null)      
+      documentos: documentFiles?.filter((doc) => doc !== null)
     }),
     [locacao, documentFiles]
   )
@@ -492,8 +488,8 @@ export default function DetalhesLocacao() {
     const formData = new FormData();
 
     formData.append('pessoaId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', data.cota_imovel.toString());
-    formData.append('imovelId', data.imovelId.toString());
+    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+    formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
     //Gravar dados das propriedades
     api.put(`proprietarios/${id}/vincular-imovel/${data.imovelId}`, formData, {
@@ -554,8 +550,8 @@ export default function DetalhesLocacao() {
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
       formData.append('pessoaId', propEdit.pessoaId.toString());
-      formData.append('cota_imovel', data.cota_imovel.toString());
-      formData.append('imovelId', data.imovelId.toString());
+      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+      formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
       console.log(formData);
 
@@ -596,7 +592,7 @@ export default function DetalhesLocacao() {
       //setCotaImovelAlt(proprietario.cota_imovel);
       //setSelImovelAlt(proprietario.imovelId.toString());
       //setPropImovelIdAlt(proprietario.imovelId);
-      imovelLocAlt.setValue('dataInicio', new Date(moment(locacao.dataInicio).format("YYYY-MM-DD")));
+      imovelLocAlt.setValue('dataInicio', moment(locacao.dataInicio).format("YYYY-MM-DD"));
       imovelLocAlt.setValue('dataFim', new Date(moment(locacao.dataFim).format("YYYY-MM-DD")));
       imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       imovelLocAlt.setValue('status', locacao.status);
@@ -656,10 +652,10 @@ export default function DetalhesLocacao() {
 
     formData.append('dataInicio', moment(data.dataInicio).format("YYYY-MM-DD"));
     formData.append('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
-    formData.append('valor_aluguel', data.valor_aluguel.toString());
+    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : ""));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', data.dia_vencimento.toString());
+    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : ""));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -796,7 +792,8 @@ export default function DetalhesLocacao() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading file:', error.message);
+      //console.error('Error downloading file:', error.message);
+      console.error('Error downloading file:', error);
     }
   };
 

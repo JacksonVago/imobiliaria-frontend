@@ -80,7 +80,7 @@ export const DetalhesProprietarioForm = ({
     })
   )
 
-  const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
+  /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, proprietario?.documentos],
     queryFn: () => fetchDocumentFiles(proprietario?.documentos),
     enabled: !!proprietario?.documentos?.length
@@ -270,8 +270,13 @@ export const DetalhesProprietarioForm = ({
     alert('Vincular imóveis')
   }
 
-  const disabled = isEditingPersonalInfo
-  return (
+  const disabled = isEditingPersonalInfo*/
+
+  return(
+    <Card></Card>
+
+  )
+  /*return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
@@ -318,7 +323,7 @@ export const DetalhesProprietarioForm = ({
         </ProprietarioForm.Root>
       </CardContent>
     </Card>
-  )
+  )*/
 }
 
 export default function DetalhesProprietario({ defaultId }: { defaultId: { id: string } }) {
@@ -334,7 +339,7 @@ export default function DetalhesProprietario({ defaultId }: { defaultId: { id: s
     })
   )
 
-  const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
+  /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, proprietario?.documentos],
     queryFn: () => fetchDocumentFiles(proprietario?.documentos),
     enabled: !!proprietario?.documentos?.length
@@ -503,7 +508,6 @@ export default function DetalhesProprietario({ defaultId }: { defaultId: { id: s
                     <Label>Tipo</Label>
                     <p>{imovel.tipo}</p>
                   </div>
-                  {/* TODO: test if has the properties */}
                   <div>
                     <Label>Valor do Aluguel</Label>
                     <p className="font-semibold">
@@ -528,10 +532,6 @@ export default function DetalhesProprietario({ defaultId }: { defaultId: { id: s
                 <Button variant="outline" size="sm">
                   Ver detalhes
                 </Button>
-                {/* <Button variant="destructive" size="sm">
-                    <Link2Off className="mr-2 h-4 w-4" />
-                    Desvincular
-                  </Button> */}
 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -563,7 +563,10 @@ export default function DetalhesProprietario({ defaultId }: { defaultId: { id: s
         </TabsContent>
       </Tabs>
     </div>
-  )
+  )*/
+ return(
+  <Card></Card>
+ )
 }
 
 {
