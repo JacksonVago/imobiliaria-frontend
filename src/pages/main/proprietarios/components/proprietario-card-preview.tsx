@@ -1,9 +1,7 @@
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Proprietario } from '@/interfaces/proprietario'
 import { cn } from '@/lib/utils'
-import { Home } from 'lucide-react'
 
 export const ProprietarioCardPreviewRoot = ({
   children,
@@ -25,10 +23,10 @@ export const ProprietarioCardPreviewHeader = ({
   return (
     <CardHeader className={cn(classname)}>
       <CardTitle className="flex items-center justify-between">
-        <span className="truncate">{proprietario?.nome}</span>
-        {proprietario?.imoveis?.length && (
+        <span className="truncate">{proprietario?.pessoa?.nome}</span>
+        {/*proprietario?.imoveis?.length && (
           <Badge variant="secondary">{proprietario?.imoveis?.length} imóveis</Badge>
-        )}
+        )*/}
       </CardTitle>
     </CardHeader>
   )
@@ -45,15 +43,15 @@ export const ProprietarioCardPreviewInfoContent = ({
     <CardContent className={cn('flex-grow', classname)}>
       <dl className="grid grid-cols-2 gap-1 text-sm">
         <dt className="font-semibold">CPF/CNPJ:</dt>
-        <dd className="truncate">{proprietario.documento}</dd>
+        <dd className="truncate">{proprietario.pessoa?.documento}</dd>
         <dt className="font-semibold">Profissão:</dt>
-        <dd className="truncate">{proprietario.profissao || 'N/A'}</dd>
+        <dd className="truncate">{proprietario.pessoa?.profissao || 'N/A'}</dd>
         <dt className="font-semibold">Estado Civil:</dt>
-        <dd>{proprietario.estadoCivil || 'N/A'}</dd>
+        <dd>{proprietario.pessoa?.estadoCivil || 'N/A'}</dd>
         <dt className="font-semibold">Email:</dt>
-        <dd className="truncate">{proprietario.email || 'N/A'}</dd>
+        <dd className="truncate">{proprietario.pessoa?.email || 'N/A'}</dd>
         <dt className="font-semibold">Telefone:</dt>
-        <dd>{proprietario.telefone || 'N/A'}</dd>
+        <dd>{proprietario.pessoa?.telefone || 'N/A'}</dd>
       </dl>
     </CardContent>
   )
@@ -71,7 +69,7 @@ export const ProprietarioCardImoveisContent = ({
       <div>
         <h4 className="mb-2 font-semibold">Imóveis:</h4>
         <ul className="space-y-2">
-          {proprietario?.imoveis?.slice(0, 3).map((imovel) => (
+          {/*proprietario?.imoveis?.slice(0, 3).map((imovel) => (
             <li key={imovel.id} className="flex items-center justify-between text-sm">
               <span className="flex items-center">
                 <Home className="mr-2 h-4 w-4 flex-shrink-0" />
@@ -81,11 +79,16 @@ export const ProprietarioCardImoveisContent = ({
                 R$ {imovel?.valor_aluguel?.toLocaleString('pt-BR')}
               </span>
             </li>
-          ))}
+          ))*/}
 
-          {!!proprietario?.imoveis?.length && proprietario?.imoveis?.length > 3 && (
+          {/*!!proprietario?.imovel?.length && proprietario?.imovel?.length > 3 && (
             <li className="text-sm text-muted-foreground">
               + {proprietario?.imoveis?.length - 3} imóveis
+            </li>
+          )*/}
+          {!!proprietario?.imovel && (
+            <li className="text-sm text-muted-foreground">
+              + 1 imóveis
             </li>
           )}
         </ul>

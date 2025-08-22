@@ -112,15 +112,15 @@ enum QueryKeys {
 }
 
 import { PageLoader } from '@/pages/assistant/page-loader'
-import { z } from 'zod'
+//import { z } from 'zod'
 
-const createUserSchema = z.object({
+/*const createUserSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório.'),
   email: z.string().email('Insira um e-mail válido.'),
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.')
-})
+})*/
 
-const updateUserSchema = z.object({
+/*const updateUserSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'O nome é obrigatório.'),
   email: z.string().email('Insira um e-mail válido.'),
@@ -145,7 +145,7 @@ const updateUserSchema = z.object({
       'VIEW_LOCACOES'
     ])
   )
-})
+})*/
 
 export const ListarColaboradores = () => {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null)

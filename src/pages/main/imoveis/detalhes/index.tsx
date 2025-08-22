@@ -1,10 +1,4 @@
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from '@/components/ui/accordion'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -19,14 +13,14 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { Calendar, CircleDollarSign, Edit, House, Mail, Phone, Plus, Search, Trash2, X } from 'lucide-react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Calendar, CircleDollarSign, Edit, Mail, Phone, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -36,7 +30,7 @@ import moment from "moment";
 import { ROUTE } from '@/enums/routes.enum'
 import { Imovel } from '@/interfaces/imovel'
 import { BackendGarantiaLocacaoTypes, Locacao, LocacaoStatus } from '@/interfaces/locacao'
-import { Locatario } from '@/interfaces/locatario'
+//import { Locatario } from '@/interfaces/locatario'
 import { Proprietario } from '@/interfaces/proprietario'
 import { PageLoader } from '@/pages/assistant/page-loader'
 import { ImovelSchema, imovelSchema } from '@/schemas/imovel.schema'
@@ -46,8 +40,8 @@ import { queryClient } from '@/services/react-query/query-client'
 import { hasValues } from '@/utils/has-valuest'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ImovelForm, ImovelFormContent, ImovelFormRoot } from '../criarImovel/components/imovel-form'
-import { useGetProprietariosSearchQueryOptions } from '../hooks/use-get-proprietarios-search-query-options'
+import { ImovelForm } from '../criarImovel/components/imovel-form'
+//import { useGetProprietariosSearchQueryOptions } from '../hooks/use-get-proprietarios-search-query-options'
 import { BasePaginationData } from '../listarImoveis'
 import ListarClientes from '../../clientes'
 import {
@@ -58,24 +52,22 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Pessoa } from '@/interfaces/pessoa'
-import { log } from 'node:console'
 import { PropImovelSchema, propImoveSchema } from '@/schemas/proprietario.schema'
 import { GarantiaLocacao } from '@/enums/locacao/enums-locacao'
 import { Textarea } from '@/components/ui/textarea'
 import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
-import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 
 //REFACTOR: move to another directory
-const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
-const mapLocatarioErrorMessages = (message?: string) => {
+//const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
+/*const mapLocatarioErrorMessages = (message?: string) => {
   if (!message) return message
   if (LOCATARIO_ERROR_MESSAGES.includes(message)) {
     return 'Já existe uma locação para este imóvel'
   }
   return message
-}
+}*/
 
 
 const createLocacaoSchema = z.object({
@@ -116,12 +108,12 @@ export const searchProprietarios = async (
 }
 
 //Pesquisa locatários
-const searchLocatarios = async (query: string): Promise<BasePaginationData<Locatario>> => {
+/*const searchLocatarios = async (query: string): Promise<BasePaginationData<Locatario>> => {
   const response = await api.get<BasePaginationData<Locatario>>('locatarios', {
     params: { search: query }
   })
   return response.data
-}
+}*/
 
 //Cria proprietário do imóvel
 const createProprietario = async (data: FormData): Promise<void> => {
@@ -194,7 +186,6 @@ export const getFormattedDefaultValues = (imovel: Imovel | undefined) => {
 
 
 export const DetalhesImovel = () => {
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
@@ -204,10 +195,10 @@ export const DetalhesImovel = () => {
   const id = dataParams.id ? parseInt(dataParams.id) : undefined
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = useState(false)
   const [activeTab, setActiveTab] = useState('personal-info')
-  const [proprietariosSearchQuery, setProprietariosSearchQuery] = useState('')
-  const [locatariosSearchQuery, setLocatariosSearchQuery] = useState('')
-  const [isCreateLocacaoOpen, setIsCreateLocacaoOpen] = useState(false)
-  const [selectedLocatario, setSelectedLocatario] = useState<Locatario | null>(null)
+  //const [proprietariosSearchQuery, setProprietariosSearchQuery] = useState('')
+  //const [locatariosSearchQuery, setLocatariosSearchQuery] = useState('')
+  //const [isCreateLocacaoOpen, setIsCreateLocacaoOpen] = useState(false)
+  //const [selectedLocatario, setSelectedLocatario] = useState<Locatario | null>(null)
   const { toast } = useToast()
 
   const [propEdit, setPropEdit] = useState<Proprietario>();
@@ -220,7 +211,7 @@ export const DetalhesImovel = () => {
 
   //Globals
   const glb_params = useGlobalParams();
-  const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
+  const { pessoa } = usePessoa();
 
   //Mutations
   //Excluir imóveis
@@ -358,12 +349,12 @@ export const DetalhesImovel = () => {
   // const [selectedEndLocacaoId, setSelectedEndLocacaoId] = useState<number>()
 
   //Pesquisa proprietário
-  const { data: proprietariosSearchResultsData } = useQuery(
+  /*const { data: proprietariosSearchResultsData } = useQuery(
     useGetProprietariosSearchQueryOptions(proprietariosSearchQuery)
-  )
+  )*/
 
   //Pesquisa proprietário
-  const proprietariosSearchResults = proprietariosSearchResultsData?.data?.filter(
+  /*const proprietariosSearchResults = proprietariosSearchResultsData?.data?.filter(
     (proprietario) => !imovel?.proprietarios?.some((p) => p.id === proprietario.id)
   )
 
@@ -372,12 +363,12 @@ export const DetalhesImovel = () => {
     queryKey: ['locatarios', locatariosSearchQuery],
     queryFn: () => searchLocatarios(locatariosSearchQuery),
     enabled: !!locatariosSearchQuery
-  })
+  })*/
 
   //Pesquisa locatários
-  const locatariosSearchResults = locatariosSearchResultsData?.data?.filter(
+  /*const locatariosSearchResults = locatariosSearchResultsData?.data?.filter(
     (locatario) => !imovel?.locacoes?.some((l) => l.id === locatario.id)
-  )
+  )*/
 
   //Consulta imóvel
   const {
@@ -482,10 +473,12 @@ export const DetalhesImovel = () => {
   });
 
   useEffect(() => {
+    //setProprietariosSearchQuery('');
+    //setLocatariosSearchQuery('');
     glb_params.updTitle_form('Imóveis');
     if (imovel && locacaoAtiva) {
       //set the default values for the form
-      const value = transformNullToUndefined(locacaoAtiva)
+      transformNullToUndefined(locacaoAtiva)
     }
 
     console.log(glb_params.pastaOrig);
@@ -645,7 +638,7 @@ export const DetalhesImovel = () => {
 
   const initialDefaultValues = {
     dataFim: (locacaoAtiva?.dataFim ? new Date(locacaoAtiva?.dataFim) : new Date()),
-    dataInicio: (locacaoAtiva?.dataInicio ? new Date(locacaoAtiva?.dataInicio) : new Date()),
+    dataInicio: (locacaoAtiva?.dataInicio ? moment(locacaoAtiva?.dataInicio).format("DD/MM/YYYY") : moment(new Date()).format("DD/MM/YYYY")),
     valor_aluguel: locacaoAtiva?.valor_aluguel,
     dia_vencimento: locacaoAtiva?.dia_vencimento,
     status: locacaoAtiva?.status,
@@ -653,9 +646,13 @@ export const DetalhesImovel = () => {
       ? mappGarantyType(locacaoAtiva.garantiaLocacaoTipo)
       : 'fiador',
     imovelId : locacaoAtiva?.imovelId,
-    locatarios : locacaoAtiva?.locatarios,
-    fiadores : locacaoAtiva?.fiadores,
-    imoveis : { nome : locacaoAtiva?.imovel?.description , id : locacaoAtiva?.imovel?.id },    
+    locatarios : locacaoAtiva?.locatarios?.map((locatario)=>{
+      return { nome: locatario.pessoa?.nome, id : locatario.pessoaId}
+    }),
+    fiadores : locacaoAtiva?.fiadores?.map((fiador)=>{
+      return { nome: fiador.pessoa?.nome, id : fiador.pessoaId}
+    }),
+    imoveis : [{ nome : locacaoAtiva?.imovel?.description , id : locacaoAtiva?.imovel?.id }],    
     tituloCap: {numeroTitulo: locacaoAtiva?.garantiaTituloCapitalizacao?.numeroTitulo },
     seguroFianca:{ numeroSeguro: locacaoAtiva?.garantiaSeguroFianca?.numeroSeguro },
     depCalcao : { 
@@ -678,10 +675,14 @@ export const DetalhesImovel = () => {
     resolver: zodResolver(locacaoSchema),
   })
 
-  const {
+  /*const {
     control: CTLlocacaoMethods,
     handleSubmit,
     formState: { errors },
+  } = locacaoMethods;*/
+
+  const {
+    control: CTLlocacaoMethods,
   } = locacaoMethods;
 
   //Lista de Fiadores
@@ -827,7 +828,7 @@ export const DetalhesImovel = () => {
   }
 
   //Locação
-  const handlerNewLoc = () => {
+  /*const handlerNewLoc = () => {
     if (imovelLocatarios.fields.length > 0) {
       imovelLocatarios.remove(0);
     }
@@ -837,7 +838,7 @@ export const DetalhesImovel = () => {
     locacaoMethods.setValue('imovelId', (id! ? id : 0));
     locacaoMethods.setValue('valor_aluguel', (imovel?.valor_aluguel ? imovel?.valor_aluguel : 0))
     setOpenLoc(!openLoc);
-  }
+  }*/
 
   const handlerEditLocacao = (locacao: Locacao) => {
     if (locacao) {
@@ -1105,7 +1106,7 @@ export const DetalhesImovel = () => {
               >
                 <ImovelForm.FormContent
                   createImovelMethods={imovelMethods}
-                  disabled={!isEditingPersonalInfo}
+                  disabled={!isEditingPersonalInfo || isLoadingImages}
                 />
                 <div className="mt-6">
                   {isEditingPersonalInfo && (
@@ -1392,7 +1393,7 @@ export const DetalhesImovel = () => {
                                     className='border bg-zinc-200 hover:bg-zinc-400'
                                     type="button"
                                     onClick={() => {
-                                      locacaoMethods.setValue('pessoaId', 0);
+                                      //locacaoMethods.setValue('pessoaId', 0);
                                       imovelLocatarios.remove(index);
                                     }}
                                   >
@@ -1402,8 +1403,8 @@ export const DetalhesImovel = () => {
                               ))}
                             </div>
                           )}
-                          {!!locacaoMethods?.formState?.errors?.pessoaId?.message && (
-                            <span>{locacaoMethods?.formState?.errors?.pessoaId?.message}</span>
+                          {!!locacaoMethods?.formState?.errors?.locatarios?.message && (
+                            <span>{locacaoMethods?.formState?.errors?.locatarios?.message}</span>
                           )}
 
                         </div>
@@ -1451,7 +1452,7 @@ export const DetalhesImovel = () => {
                           <Input id="dataFim" type="date"
                             {...locacaoMethods.register('dataFim')}
                             helperText={locacaoMethods.formState?.errors?.dataFim?.message}
-                            onChange={(e) => { locacaoMethods.setValue('dataFim', e.target.value) }}
+                            onChange={(e) => { locacaoMethods.setValue('dataFim', new Date(moment(e.target.value).format("YYYY-MM-DD"))) }}
                           />
                         </div>
                         <div className='mt-2'>
@@ -1741,7 +1742,7 @@ export const DetalhesImovel = () => {
                                         className='border bg-zinc-200 hover:bg-zinc-400'
                                         type="button"
                                         onClick={() => {
-                                          locacaoMethodsAlt.setValue('pessoaId', 0);
+                                          //locacaoMethodsAlt.setValue('pessoaId', 0);
                                           imovelLocatarios.remove(index);
                                         }}
                                       >
@@ -1751,8 +1752,8 @@ export const DetalhesImovel = () => {
                                   ))}
                                 </div>
                               )}
-                              {!!locacaoMethodsAlt?.formState?.errors?.pessoaId?.message && (
-                                <span>{locacaoMethodsAlt?.formState?.errors?.pessoaId?.message}</span>
+                              {!!locacaoMethodsAlt?.formState?.errors?.locatarios?.message && (
+                                <span>{locacaoMethodsAlt?.formState?.errors?.locatarios?.message}</span>
                               )}
 
                             </div>
@@ -1768,7 +1769,9 @@ export const DetalhesImovel = () => {
                                   <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
                                 </CardHeader>
                                 <CardContent className='mt-2 h-120'>
-                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ? imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString() : ''} onSelectCliente={handleSelectProp} />
+                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ? 
+                                    imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString() 
+                                    : ''} onSelectCliente={handleSelectProp} />
                                 </CardContent>
                               </Card>
                             </div>
@@ -1958,8 +1961,8 @@ export const DetalhesImovel = () => {
                                     </Select>
                                   )}
                                 />
-                                {!!locacaoMethodsAlt?.formState?.errors?.pessoaId?.message && (
-                                  <span>{locacaoMethodsAlt?.formState?.errors?.pessoaId?.message}</span>
+                                {!!locacaoMethodsAlt?.formState?.errors?.status?.message && (
+                                  <span>{locacaoMethodsAlt?.formState?.errors?.status?.message}</span>
                                 )}
                               </div>
                             </Label>

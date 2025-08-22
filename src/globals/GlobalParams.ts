@@ -1,5 +1,5 @@
 import { Pessoa } from '@/interfaces/pessoa';
-import { useEffect } from 'react';
+//import { useEffect } from 'react';
 import {create} from 'zustand'
 
 /*Global use para parametros globais  */

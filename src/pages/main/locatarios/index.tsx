@@ -156,7 +156,7 @@ export default function ListarLocatarios({
           <Card key={locatario.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span className="truncate">{locatario?.nome}</span>
+                <span className="truncate">{locatario?.pessoa?.nome}</span>
                 <Badge variant="secondary">
                   {locatario?.locacoes?.length}
                   {locatario?.locacoes?.length && locatario?.locacoes?.length > 1
@@ -168,15 +168,15 @@ export default function ListarLocatarios({
             <CardContent className="flex-grow">
               <dl className="grid grid-cols-2 gap-1 text-sm">
                 <dt className="font-semibold">CPF/CNPJ:</dt>
-                <dd className="truncate">{locatario?.documento}</dd>
+                <dd className="truncate">{locatario?.pessoa?.documento}</dd>
                 <dt className="font-semibold">Profissão:</dt>
-                <dd className="truncate">{locatario?.profissao || 'N/A'}</dd>
+                <dd className="truncate">{locatario?.pessoa?.profissao || 'N/A'}</dd>
                 <dt className="font-semibold">Estado Civil:</dt>
-                <dd>{locatario?.estadoCivil || 'N/A'}</dd>
+                <dd>{locatario?.pessoa?.estadoCivil || 'N/A'}</dd>
                 <dt className="font-semibold">Email:</dt>
-                <dd className="truncate">{locatario?.email || 'N/A'}</dd>
+                <dd className="truncate">{locatario?.pessoa?.email || 'N/A'}</dd>
                 <dt className="font-semibold">Telefone:</dt>
-                <dd>{locatario?.telefone || 'N/A'}</dd>
+                <dd>{locatario?.pessoa?.telefone || 'N/A'}</dd>
               </dl>
             </CardContent>
             <CardFooter>

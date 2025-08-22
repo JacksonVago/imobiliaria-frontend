@@ -52,7 +52,7 @@ import { Imovel } from '@/interfaces/imovel'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Pessoa } from '@/interfaces/pessoa'
 // Mock data for demonstration
-const locatario = {
+/*const locatario = {
   id: 'loc001',
   nome: 'Ana Oliveira',
   documento: '123.456.789-00',
@@ -95,7 +95,7 @@ const locatario = {
       status: 'Encerrado'
     }
   ]
-}
+}*/
 
 const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
@@ -137,8 +137,8 @@ export const DetalhesLocatarioForm = ({
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
   const disabled = isEditingPersonalInfo
 
-  const navigate = useNavigate()
-  const params = useParams()
+  //const navigate = useNavigate()
+  //const params = useParams()
 
   const { data: locatario } = useQuery({
     queryKey: ['locatario', id],
@@ -170,7 +170,7 @@ export const DetalhesLocatarioForm = ({
     }
   })
 
-  const deleteLocatarioMutation = useMutation({
+  /*const deleteLocatarioMutation = useMutation({
     mutationFn: async () => {
       return await api.delete(`/locatarios/${id}`)
     },
@@ -186,7 +186,7 @@ export const DetalhesLocatarioForm = ({
 
       navigate(ROUTE.LOCATARIOS)
     }
-  })
+  })*/
 
   const onSubmitLocatarioData = async (data: LocatarioSchema) => {
     try {
@@ -306,9 +306,9 @@ export const DetalhesLocatarioForm = ({
     }
   }, [id, locatario, documentFiles])
 
-  const handleDeleteProprietario = () => {
+  /*const handleDeleteProprietario = () => {
     deleteLocatarioMutation.mutate()
-  }
+  }*/
 
   const hasLocatario = !!locatario
 
@@ -360,7 +360,7 @@ export const DetalhesLocatarioForm = ({
 
 export default function DetalhesLocatario({ defaultId }: { defaultId: { id: string } }) {
   const navigate = useNavigate()
-  const params = useParams()
+  //const params = useParams()
   const { id } = defaultId ? defaultId : useParams<{ id: string }>()
 
   //const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
@@ -393,7 +393,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
 
   const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
 
-  const updateLocatario = useMutation({
+  /*const updateLocatario = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.put<Locatario>(`/locatarios/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -404,7 +404,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
-  })
+  })*/
 
   const deleteLocatarioMutation = useMutation({
     mutationFn: async () => {
@@ -447,11 +447,11 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
 
   //react hook form
 
-  const locatarioMethods = useForm<LocatarioSchema>({
+  /*const locatarioMethods = useForm<LocatarioSchema>({
     resolver: zodResolver(proprietarioSchema),
     //defaultValues,
     mode: 'onBlur'
-  })
+  })*/
 
   React.useEffect(() => {
     if (locatario) {

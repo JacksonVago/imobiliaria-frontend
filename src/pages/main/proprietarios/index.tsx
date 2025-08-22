@@ -12,17 +12,16 @@ import {
 } from '@/components/ui/pagination'
 import { Separator } from '@/components/ui/separator'
 import { ROUTE } from '@/enums/routes.enum'
-import { Pessoa } from '@/interfaces/pessoa'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { Home, Plus, Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import {
   ProprietarioCardPreviewFooter,
   ProprietarioCardPreviewHeader,
-  ProprietarioCardPreviewInfoContent,
+  //ProprietarioCardPreviewInfoContent,
   ProprietarioCardPreviewRoot
 } from './components/proprietario-card-preview'
 import { Proprietario } from '@/interfaces/proprietario'
@@ -90,9 +89,9 @@ export default function ListarProprietarios({
 
   console.log(proprietarios);
   
-  const hasTotalPages = !!totalPages
-  const canGoToNextPage = hasTotalPages && page < totalPages
-  const canGoToPreviousPage = hasTotalPages && page > totalPages
+  //const hasTotalPages = !!totalPages
+  //const canGoToNextPage = hasTotalPages && page < totalPages
+  //const canGoToPreviousPage = hasTotalPages && page > totalPages
   //always that we go to out of the total pages, we will go to the first page
   useEffect(() => {
     if (totalPages && page > totalPages) {
@@ -163,7 +162,7 @@ export default function ListarProprietarios({
         {proprietarios.map((proprietario) => (
           <ProprietarioCardPreviewRoot>
             <ProprietarioCardPreviewHeader proprietario={proprietario} />
-            <ProprietarioCardPreviewInfoContent proprietario={proprietario} />
+            {/*<ProprietarioCardPreviewInfoContent proprietario={proprietario} />*/}
             {/* <Separator className="my-4" /> */}
 
             {/* <ProprietarioCardImoveisContent proprietario={proprietario} /> */}

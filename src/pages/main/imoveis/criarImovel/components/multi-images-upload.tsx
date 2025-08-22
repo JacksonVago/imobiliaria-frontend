@@ -18,9 +18,8 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
-  const { register, watch, setValue } = useFormContext()
+  const { watch, setValue } = useFormContext()
   const images = watch('images') || []
   console.log('propter img', images)
   const fileInputRef = useRef<HTMLInputElement>(null)

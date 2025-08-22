@@ -1,6 +1,4 @@
-'use client'
-
-import {
+/*import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -12,17 +10,18 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'*/
+import { Card } from '@/components/ui/card'
+//import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+/*import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTE } from '@/enums/routes.enum'
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
-import { toast } from '@/hooks/use-toast'
+import { toast } from '@/hooks/use-toast'*/
 import { Proprietario } from '@/interfaces/proprietario'
-import { ProprietarioSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
+//import { ProprietarioSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
 import api from '@/services/axios/api'
-import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
+/*import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Edit, Link2Off, Trash2 } from 'lucide-react'
@@ -30,7 +29,7 @@ import * as React from 'react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ProprietarioForm } from '../components/proprietario-form'
+import { ProprietarioForm } from '../components/proprietario-form'*/
 
 export const putProprietario = async (id: number, data: FormData) => {
   return await api.put<Proprietario>(`/proprietarios/${id}`, data, {
@@ -63,22 +62,22 @@ export const useGetProprietarioQueryOptions = ({
 //break in components: 1 page component, form component
 
 export const DetalhesProprietarioForm = ({
-  id,
-  desvincularProprietarioImovel
+  //id,
+  //desvincularProprietarioImovel
 }: {
-  id: number
-  disabled?: boolean
-  desvincularProprietarioImovel?: () => void
+  //id: number
+  //disabled?: boolean
+  //desvincularProprietarioImovel?: () => void
 }) => {
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
   // Get the initial data from the API
-  const { data: proprietario, isLoading } = useQuery(
+  /*const { data: proprietario, isLoading } = useQuery(
     useGetProprietarioQueryOptions({
       enabled: !!id,
       id: id
     })
-  )
+  )*/
 
   /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, proprietario?.documentos],
@@ -326,18 +325,18 @@ export const DetalhesProprietarioForm = ({
   )*/
 }
 
-export default function DetalhesProprietario({ defaultId }: { defaultId: { id: string } }) {
-  const navigate = useNavigate()
+export default function DetalhesProprietario() {
+//export default function DetalhesProprietario({ defaultId }: { defaultId: { id: string } }) {
 
-  const { id } = defaultId ? defaultId : useParams<{ id: string }>()
+  //const { id } = defaultId ? defaultId : useParams<{ id: string }>()
 
   // Get the initial data from the API
-  const { data: proprietario, isLoading } = useQuery(
+  /*const { data: proprietario, isLoading } = useQuery(
     useGetProprietarioQueryOptions({
       enabled: !!id,
       id: parseInt(id!)
     })
-  )
+  )*/
 
   /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, proprietario?.documentos],

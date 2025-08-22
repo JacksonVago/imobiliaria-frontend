@@ -2,17 +2,17 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ROUTE } from '@/enums/routes.enum'
 import { toast } from '@/hooks/use-toast'
 import { Pessoa } from '@/interfaces/pessoa'
-import { clienteSchema, ClienteSchema } from '@/schemas/cliente.schema'
+//import { clienteSchema, ClienteSchema } from '@/schemas/cliente.schema'
 import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { LocacaoFormContent, LocacaoFormRoot, LocacaoFormSubmitButton } from '../components/locacao-form'
-import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
+//import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useEffect } from 'react'
-import { useMediaQuery } from 'react-responsive'
+//import { useMediaQuery } from 'react-responsive'
 import { LocacaoSchema, locacaoSchema } from '@/schemas/locacao.schema'
 import { Locacao } from '@/interfaces/locacao'
 import moment from 'moment';
@@ -26,14 +26,15 @@ const createLocacao = async (data: FormData): Promise<Locacao | any> => {
 export default function CriarLocacao(
   { imovelId }:
     { imovelId: number | undefined }) {
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  
+  /*const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })*/
 
   //Globals
   const glb_params = useGlobalParams();
-  const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
+  const { pessoa, addPessoa } = usePessoa();
   const navigate = useNavigate()
 
   const locacaoMethods = useForm<LocacaoSchema>({
@@ -91,10 +92,10 @@ export default function CriarLocacao(
 
     formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
     formData.append('dataFim', moment(data.dataFim).format('YYYY-MM-DD'));
-    formData.append('valor_aluguel', data.valor_aluguel.toString());
+    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', data.dia_vencimento.toString());
+    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() :"0"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));

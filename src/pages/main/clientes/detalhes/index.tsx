@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+//import { createClient } from '@supabase/supabase-js';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,14 +41,14 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Bold, Calendar, Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
+import {  Calendar, Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { Pessoa } from '@/interfaces/pessoa'
 import { ClienteSchema } from '@/schemas/cliente.schema'
-import { PropImovelSchema, propImoveSchema, ProprietarioSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
+import { PropImovelSchema, propImoveSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
 import { ClienteFormContent, ClienteFormRoot } from '../components/cliente-form'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Imovel } from '@/interfaces/imovel'
@@ -60,13 +60,13 @@ import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
 import { locacaoSchema, LocacaoSchema } from '@/schemas/locacao.schema'
 import { Locacao } from '@/interfaces/locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
-import { useGlobalParams, usePessoa } from '@/globals/GlobalParams';
-import { boolean } from 'zod';
+import { useGlobalParams } from '@/globals/GlobalParams';
+//import { boolean } from 'zod';
 import ListarImoveis from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 
 // Mock data for demonstration
-const cliente = {
+/*const cliente = {
   id: 'cli001',
   nome: 'Ana Oliveira',
   documento: '123.456.789-00',
@@ -110,7 +110,7 @@ const cliente = {
       status: 'Encerrado'
     }
   ]
-}
+}*/
 
 const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
@@ -154,10 +154,10 @@ export const DetalhesClienteForm = ({
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
   const disabled = isEditingPersonalInfo
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
-  const params = useParams();
+  //const params = useParams();
   
   //Globals
   const glb_params = useGlobalParams();
@@ -194,7 +194,7 @@ export const DetalhesClienteForm = ({
     }
   })
 
-  const deleteClienteMutation = useMutation({
+  /*const deleteClienteMutation = useMutation({
     mutationFn: async () => {
       return await api.delete(`/pessoas/${id}`)
     },
@@ -210,7 +210,7 @@ export const DetalhesClienteForm = ({
 
       navigate(ROUTE.CLIENTES)
     }
-  })
+  })*/
 
   const onSubmitClienteData = async (data: ClienteSchema) => {
     try {
@@ -336,9 +336,9 @@ export const DetalhesClienteForm = ({
     }
   }, [id, cliente, documentFiles])
 
-  const handleDeleteProprietario = () => {
+  /*const handleDeleteProprietario = () => {
     deleteClienteMutation.mutate()
-  }
+  }*/
 
   const hasLocatario = !!cliente?.proprietarios?.length;
 
@@ -390,23 +390,23 @@ export const DetalhesClienteForm = ({
 }
 
 export default function DetalhesCliente() {
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  //const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
   const navigate = useNavigate()
-  const [formInitialized, setFormInitialized] = React.useState(false) // Controle de inicialização
+  //const [formInitialized, setFormInitialized] = React.useState(false) // Controle de inicialização
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
-  const [proImovelId, setPropImovelId] = React.useState<number>(0);
-  const [cotaImovel, setCotaImovel] = React.useState<number>(0);
+  //const [proImovelId, setPropImovelId] = React.useState<number>(0);
+  //const [cotaImovel, setCotaImovel] = React.useState<number>(0);
   const [selImovel, setSelImovel] = React.useState<boolean>(false);
   const [proImovelIdAlt, setPropImovelIdAlt] = React.useState<number>(0);
-  const [cotaImovelAlt, setCotaImovelAlt] = React.useState<number>(0);
-  const [selImovelAlt, setSelImovelAlt] = React.useState('');
+  //const [cotaImovelAlt, setCotaImovelAlt] = React.useState<number>(0);
+  //const [selImovelAlt, setSelImovelAlt] = React.useState('');
   const [propEdit, setPropEdit] = React.useState<Proprietario>();
-  const [locEdit, setLocEdit] = React.useState<Locacao>();
+  //const [locEdit, setLocEdit] = React.useState<Locacao>();
   const [selGarantia, setSelGarantia] = React.useState<GarantiaLocacao>();
   const [selFiador, setSelFiador] = React.useState<boolean>(false);
   const [openImovel, setOpenImovel] = React.useState<boolean>(false);
@@ -457,7 +457,7 @@ export default function DetalhesCliente() {
 
   const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
 
-  const updateCliente = useMutation({
+  /*const updateCliente = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.put<Pessoa>(`/pessoas/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -468,7 +468,7 @@ export default function DetalhesCliente() {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
-  })
+  })*/
 
   const deleteClienteMutation = useMutation({
     mutationFn: async () => {
@@ -526,8 +526,8 @@ export default function DetalhesCliente() {
 
   const {
     control,
-    handleSubmit,
-    formState: { errors },
+    //handleSubmit,
+    //formState: { errors },
   } = locacaoMethods;
 
   const locacaoFiadores = useFieldArray({
@@ -578,13 +578,16 @@ export default function DetalhesCliente() {
           title: 'Propriedade adicionada com sucesso',
           description: `Propriedade adicionada com sucesso`
         });
+
+        let tst = "";
+        tst = result.statusText + " " + tst;
       });
 
 
   }
 
   const handlerNewProp = () => {
-    setCotaImovel(0);
+    //setCotaImovel(0);
     if (clientePropers.fields.length > 0) {
       clientePropers.remove(0);
     }
@@ -595,13 +598,13 @@ export default function DetalhesCliente() {
 
   const handlerEditPropriedade = (proprietario: Proprietario) => {
     if (proprietario) {
-      setCotaImovelAlt(0);
+      //setCotaImovelAlt(0);
       setPropImovelIdAlt(0);
-      setSelImovelAlt('');
+      //setSelImovelAlt('');
       clientePropAlt.reset();
       setPropEdit(proprietario);
-      setCotaImovelAlt(proprietario.cota_imovel);
-      setSelImovelAlt(proprietario.imovelId.toString());
+      //setCotaImovelAlt(proprietario.cota_imovel);
+      //setSelImovelAlt(proprietario.imovelId.toString());
       setPropImovelIdAlt(proprietario.imovelId);
       clientePropAlt.setValue('imovelId', proprietario.imovelId);
       clientePropAlt.setValue('cota_imovel', proprietario.cota_imovel);
@@ -616,6 +619,8 @@ export default function DetalhesCliente() {
           title: 'Propriedade excluída com sucesso',
           description: `Propriedade excluída com sucesso`
         });
+        let tst = "";
+        tst = result.statusText + " " + tst;
       });
   }
 
@@ -643,29 +648,30 @@ export default function DetalhesCliente() {
             title: 'Propriedade altarada com sucesso',
             description: `Propriedade altarada com sucesso`
           });
-
+          let tst = "";
+          tst = result.statusText + tst;
         });
     }
 
   }
 
   //Locação 
-  const handlerNewLoc = () => {
+  /*const handlerNewLoc = () => {
     setCotaImovel(0);
     setPropImovelId(0);
     locacaoMethods.reset();
     locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
     locacaoMethods.setValue('imovelId', (id! ? id : 0));
     console.log((id! ? id : 0));
-  }
+  }*/
 
   const handlerEditLocacao = (locacao: Locacao) => {
     if (locacao) {
-      setCotaImovelAlt(0);
+      //setCotaImovelAlt(0);
       setPropImovelIdAlt(0);
-      setSelImovelAlt('');
+      //setSelImovelAlt('');
       imovelLocAlt.reset();
-      setLocEdit(locacao);
+      //setLocEdit(locacao);
       //setCotaImovelAlt(proprietario.cota_imovel);
       //setSelImovelAlt(proprietario.imovelId.toString());
       //setPropImovelIdAlt(proprietario.imovelId);
@@ -679,7 +685,7 @@ export default function DetalhesCliente() {
     }
   }
 
-  const handleDeleteLocacao = (propriedade: Proprietario) => {
+  /*const handleDeleteLocacao = (propriedade: Proprietario) => {
     //Gravar dados das propriedades
     api.delete(`locacoes/${propriedade.id}`).
       then(result => {
@@ -697,25 +703,12 @@ export default function DetalhesCliente() {
     console.log(data);
 
     if (locEdit) {
-      /*formData.append('id', locEdit.id.toString());
+      formData.append('id', locEdit.id.toString());
       formData.append('pessoaId', locEdit.pessoaId.toString());
       formData.append('cota_imovel', data.cota_imovel.toString());
-      formData.append('imovelId', data.imovelId.toString());*/
+      formData.append('imovelId', data.imovelId.toString());
 
       console.log(formData);
-
-      /*api.put(`locacoes/${locEdit.id}/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).
-        then(result => {
-          toast({
-            title: 'Locação altarada com sucesso',
-            description: `Locação altarada com sucesso`
-          });
-
-        });*/
     }
 
   }
@@ -753,9 +746,11 @@ export default function DetalhesCliente() {
           title: 'Locação criada com sucesso',
           description: `Locação criada com sucesso`
         });
-
+        let tst =result.statusText;
+        tst = "";
       });
-  }
+  }*/
+ 
   const handlerDetailImovel = (id: number) => {
     navigate(`${ROUTE.IMOVEIS}/${id}`)
   }
@@ -843,14 +838,14 @@ export default function DetalhesCliente() {
 
   }
 
-  const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
+  //const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
   //SUPABASE_URL="https://jrseqfittadsxfbmlwvz.supabase.co"
   //SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg"
-  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
+  //const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  //const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-  const handleDownload = async (filePath: string, fileName: string) => {
+  /*const handleDownload = async (filePath: string, fileName: string) => {
     try {
       const { data, error } = await supabase.storage
         .from('your-bucket-name') // Replace with your bucket name
@@ -872,7 +867,7 @@ export default function DetalhesCliente() {
       //console.error('Error downloading file:', error.message);
       console.error('Error downloading file:', error);
     }
-  };
+  };*/
 
   const handlerSelImovel = (origin: string) => {
 
@@ -1120,7 +1115,7 @@ export default function DetalhesCliente() {
                           <Select
                             value={proImovelIdAlt.toString()}
                             onValueChange={(e) => {
-                              setPropImovelId(parseInt(e));
+                              //setPropImovelId(parseInt(e));
                               clientePropAlt.setValue('imovelId', parseInt(e))
                             }}
                             {...clientePropAlt.register('imovelId')}

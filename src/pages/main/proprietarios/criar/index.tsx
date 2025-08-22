@@ -66,7 +66,7 @@ export const CriarProprietario = () => {
   const createProprietarioMutation = useMutation({
     mutationFn: (data: FormData) => postCriarProprietario(data),
     onError: (error) => {
-      if (PROPRIETARIO_KNOWN_ERRORS.includes(error?.response?.data?.message)) {
+      if (PROPRIETARIO_KNOWN_ERRORS.includes(error?.message)) {
         toast({
           title: 'Erro ao criar proprietário',
           description: 'Já existe um proprietário com este documento!'

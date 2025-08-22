@@ -250,8 +250,8 @@ export const ImovelFormContent = ({
             type="number"
             disabled={disabled}
             placeholder="Valor de venda"
-            {...createImovelMethods.register('valorVenda')}
-            helperText={createImovelMethods.formState?.errors?.valor_aluguel?.message}
+            {...createImovelMethods.register('valor_venda')}
+            helperText={createImovelMethods.formState?.errors?.valor_venda?.message}
           />
         </Label>
       </div>
@@ -264,8 +264,8 @@ export const ImovelFormContent = ({
             type="number"
             disabled={disabled}
             placeholder="Valor da água"
-            {...createImovelMethods.register('valorAgua')}
-            helperText={createImovelMethods.formState?.errors?.valorAgua?.message}
+            {...createImovelMethods.register('valor_agua')}
+            helperText={createImovelMethods.formState?.errors?.valor_agua?.message}
           />
         </Label>
         <Label>
@@ -275,8 +275,8 @@ export const ImovelFormContent = ({
             type="number"
             disabled={disabled}
             placeholder="Valor da taxa de lixo"
-            {...createImovelMethods.register('valorTaxaLixo')}
-            helperText={createImovelMethods.formState?.errors?.valorTaxaLixo?.message}
+            {...createImovelMethods.register('valor_taxa_lixo')}
+            helperText={createImovelMethods.formState?.errors?.valor_taxa_lixo?.message}
           />
         </Label>
       </div>
@@ -288,8 +288,8 @@ export const ImovelFormContent = ({
             type="number"
             disabled={disabled}
             placeholder="Valor do condomínio"
-            {...createImovelMethods.register('valorCondominio')}
-            helperText={createImovelMethods.formState?.errors?.valorCondominio?.message}
+            {...createImovelMethods.register('valor_condominio')}
+            helperText={createImovelMethods.formState?.errors?.valor_condominio?.message}
           />
         </Label>
         <Label>
@@ -299,8 +299,8 @@ export const ImovelFormContent = ({
             type="number"
             disabled={disabled}
             placeholder="Valor do IPTU"
-            {...createImovelMethods.register('valorIptu')}
-            helperText={createImovelMethods.formState?.errors?.valorIptu?.message}
+            {...createImovelMethods.register('valor_iptu')}
+            helperText={createImovelMethods.formState?.errors?.valor_iptu?.message}
           />
         </Label>
       </div>

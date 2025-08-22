@@ -2,7 +2,6 @@ import { EstadoCivil } from '@/enums/estado-civil'
 import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
 import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
 import { z } from 'zod'
-import { LocacaoSchema, locacaoSchema } from './locacao.schema'
 
 export const locatarioSchema = z.object({
   nome: z.string().min(1, 'Nome do locatário é obrigatório'),

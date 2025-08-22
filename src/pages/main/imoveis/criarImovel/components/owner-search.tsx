@@ -15,7 +15,7 @@ interface ProprietarioSearchProps {
   onCreateNew: () => void
 }
 
-export function ProprietarioSearch({ onSelect, onCreateNew }: ProprietarioSearchProps) {
+export function ProprietarioSearch({ onSelect }: ProprietarioSearchProps) {
   const [proprietariosSearchQuery, setProprietariosSearchQuery] = useState<string>('')
 
   const { data: proprietariosSearchResultsData } = useQuery(

@@ -9,7 +9,6 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { ClienteFormContent, ClienteFormRoot, ClienteFormSubmitButton } from '../components/cliente-form'
-import { log } from 'console'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useEffect } from 'react'
@@ -23,7 +22,7 @@ const createCliente = async (data: FormData): Promise<Pessoa | any> => {
 export const CriarCliente = () => {
   //Globals
   const glb_params = useGlobalParams();
-  const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
+  const { pessoa, addPessoa } = usePessoa();
   const navigate = useNavigate()
 
   useEffect(() => {    

@@ -118,7 +118,7 @@ export const CriarImovel = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [currentStep, setCurrentStep] = React.useState<Step['id']>('imovel')
-  const [completedSteps, setCompletedSteps] = React.useState<Set<Step['id']>>(new Set())
+  //const [completedSteps, setCompletedSteps] = React.useState<Set<Step['id']>>(new Set())
 
   //TODO: create the created imovel state
   //======CREATE IMOVEL METHODS======
@@ -138,7 +138,8 @@ export const CriarImovel = () => {
     resolver: zodResolver(imovelSchema),
     defaultValues: {
       status: ImovelStatus.DISPONIVEL,
-      images: imovelData?.imovelPhotos?.map((photo) => ({}))
+      //images: imovelData?.imovelPhotos?.map((photo) => ({}))
+      images: (imovelData?.imovelPhotos ? imovelData?.imovelPhotos : [])
     },
     mode: 'all'
   })
@@ -229,7 +230,7 @@ export const CriarImovel = () => {
       })
 
       setCreatedImovel(response.data)
-      setCompletedSteps(new Set([currentStep]))
+      //setCompletedSteps(new Set([currentStep]))
       setCurrentStep('proprietario')
 
       //
@@ -910,7 +911,7 @@ export const CriarImovel = () => {
                   type="button"
                   className=""
                   onClick={() => {
-                    setCompletedSteps(new Set([currentStep]))
+                    //setCompletedSteps(new Set([currentStep]))
                     setCurrentStep('locatario')
                   }}
                 >
@@ -925,16 +926,16 @@ export const CriarImovel = () => {
   )
 }
 
-const IconButton = () => {
-  return (
-    <button className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-black drop-shadow-sm transition-colors duration-150 hover:bg-gray-200">
-      <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-        <path
-          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-          clip-rule="evenodd"
-          fill-rule="evenodd"
-        ></path>
-      </svg>
-    </button>
-  );
-};
+// const IconButton = () => {
+//   return (
+//     <button className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-black drop-shadow-sm transition-colors duration-150 hover:bg-gray-200">
+//       <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+//         <path
+//           d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+//           clip-rule="evenodd"
+//           fill-rule="evenodd"
+//         ></path>
+//       </svg>
+//     </button>
+//   );
+// };

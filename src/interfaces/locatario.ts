@@ -1,5 +1,3 @@
-import { Endereco } from './endereco'
-import { GenericAnexo } from './generic-anexo'
 import { Locacao } from './locacao'
 import { Pagamento } from './pagamento';
 import { Pessoa } from './pessoa'

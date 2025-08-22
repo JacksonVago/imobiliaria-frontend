@@ -1,6 +1,6 @@
 'use client'
 
-import { House, Lock, LogOut, User, Users } from 'lucide-react'
+import { House, Lock, LogOut, Users } from 'lucide-react'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -54,11 +54,12 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, logout, isAdmin } = useAuth()
+  //const { user, logout, isAdmin } = useAuth()
+  const { user, logout } = useAuth()
 
   const navMainData = React.useMemo(() => {
     return data.navMain.filter((item) => {
-      const isAdmin = user?.role === 'ADMIN'
+      const isAdmin = user?.role === 'ADMIN';
       if (item.url === ROUTE.COLABORADORES && isAdmin) {
         return true
       }

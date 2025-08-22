@@ -1,7 +1,7 @@
 import { ImovelStatus, ImovelTipo } from '@/enums/imovel/enums-imovel'
 import { Endereco } from './endereco'
 import { Locacao } from './locacao'
-import { Locatario } from './locatario'
+//import { Locatario } from './locatario'
 import { Proprietario } from './proprietario'
 
 export interface Imovel {

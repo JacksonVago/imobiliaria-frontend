@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { ESTADO_CIVIL_OPTIONS } from '@/constants/estado-civil'
+/*import { ESTADO_CIVIL_OPTIONS } from '@/constants/estado-civil'
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
-import api from '@/services/axios/api'
+import api from '@/services/axios/api'*/
 import { Controller, FormProvider, useFieldArray, UseFormReturn } from 'react-hook-form'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { LocacaoSchema } from '@/schemas/locacao.schema'
@@ -23,15 +23,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
 import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { DialogTitle } from '@radix-ui/react-dialog'
+//import { DialogTitle } from '@radix-ui/react-dialog'
 import ListarClientes from '../../clientes'
 import { Pessoa } from '@/interfaces/pessoa'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
-import { log } from 'node:console'
 import { Imovel } from '@/interfaces/imovel'
 import ListarImoveis from '../../imoveis/listarImoveis'
-import { useQuery } from '@tanstack/react-query'
-import { getImovel } from '../../imoveis/detalhes'
+//import { useQuery } from '@tanstack/react-query'
+//import { getImovel } from '../../imoveis/detalhes'
 
 export const LocacaoFormRoot = ({
   children,
@@ -54,10 +53,10 @@ export const LocacaoFormContent = ({
   createLocacaoMethods: UseFormReturn<LocacaoSchema>
   disabled?: boolean
 }) => {
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  //const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
-  const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  //const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
+  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
 
   //Globals
@@ -93,7 +92,7 @@ export const LocacaoFormContent = ({
 
   //Pega imóvel quando informado
     //Consulta imóvel
-  const {
+  /*const {
     data: imovel,
   } = useQuery({
     queryKey: ['imovel', createLocacaoMethods.getValues('imovelId')],
@@ -107,7 +106,7 @@ export const LocacaoFormContent = ({
       return data
     }
       //getImovel(createLocacaoMethods.getValues('imovelId'))
-  });
+  });*/
 
   const handlerSelProp = (origin: string) => {
 
@@ -332,7 +331,7 @@ export const LocacaoFormContent = ({
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
                     {locacaoLocatarios.fields.map((field, index) => (
                       <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                        <Label >{field.pessoa?.nome}</Label>
+                        <Label >{field.nome}</Label>
                         <button disabled={disabled}
                           className='border bg-zinc-200 hover:bg-zinc-400'
                           type="button"

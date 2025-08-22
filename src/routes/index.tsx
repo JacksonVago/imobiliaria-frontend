@@ -172,7 +172,7 @@ export const RoutesComponent = () => {
             path={ROUTE.PROPRIETARIOS_DETALHES}
             element={
               <ProtectedRoute permission="VIEW_PROPRIETARIOS">
-                <DetalhesProprietario defaultId={{id:""}} />
+                <DetalhesProprietario />
               </ProtectedRoute>
             }
           />

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/carousel'
 import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
 import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
-import { Download, DownloadCloudIcon, File, FileText, FileUp, Image, X } from 'lucide-react'
+import { Download, File, FileText, FileUp, Image, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
@@ -30,9 +30,9 @@ export function DocumentUpload({
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
-  const { watch, setValue, setError, formState } = useFormContext()
+  const { watch, setValue, setError } = useFormContext()
   const documents = watch(documentField) || []
   const fileInputRef = useRef<HTMLInputElement>(null)
   console.log('document field', documentField)

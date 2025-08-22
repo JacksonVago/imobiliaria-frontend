@@ -5,9 +5,7 @@ import { Input } from '@/components/ui/input'
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
@@ -20,7 +18,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { Pessoa } from '@/interfaces/pessoa'
 import { useMediaQuery } from 'react-responsive'
-import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
+import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 
 // Types
@@ -80,7 +78,7 @@ export default function ListarClientes({
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
-  const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+  //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
 
   const navigate = useNavigate()
 
