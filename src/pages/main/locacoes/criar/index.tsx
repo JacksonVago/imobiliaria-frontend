@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router-dom'
 import { LocacaoFormContent, LocacaoFormRoot, LocacaoFormSubmitButton } from '../components/locacao-form'
 //import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
-import { useEffect } from 'react'
 //import { useMediaQuery } from 'react-responsive'
 import { LocacaoSchema, locacaoSchema } from '@/schemas/locacao.schema'
 import { Locacao } from '@/interfaces/locacao'
@@ -34,7 +33,7 @@ export default function CriarLocacao (){
 
   //Globals
   const glb_params = useGlobalParams();
-  const { pessoa, addPessoa } = usePessoa();
+  const { addPessoa } = usePessoa();
   const navigate = useNavigate()
 
   const locacaoMethods = useForm<LocacaoSchema>({

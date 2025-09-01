@@ -678,7 +678,7 @@ export default function DetalhesCliente() {
       //setPropImovelIdAlt(proprietario.imovelId);
       //imovelLocAlt.setValue('dataInicio', new Date(moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD")));
       imovelLocAlt.setValue('dataInicio', moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD"));
-      imovelLocAlt.setValue('dataFim', new Date(moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD")));
+      imovelLocAlt.setValue('dataFim', moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD"));
       imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       imovelLocAlt.setValue('status', locacao.status);
       imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
@@ -1520,9 +1520,6 @@ export default function DetalhesCliente() {
                                 <Input type="date"
                                   {...imovelLocAlt.register('dataFim')}
                                   helperText={imovelLocAlt.formState?.errors?.dataFim?.message}
-                                  onChange={(e) => { imovelLocAlt.setValue('dataFim',                                     
-                                    new Date(moment(e.target.value).format("YYYY-MM-DD"))
-                                  ) }}
                                 />
                               </div>
                               <div className='mt-2'>

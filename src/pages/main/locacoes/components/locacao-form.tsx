@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import moment from "moment";
 /*import { ESTADO_CIVIL_OPTIONS } from '@/constants/estado-civil'
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
@@ -20,7 +19,6 @@ import { Search, X } from 'lucide-react'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
-import { Textarea } from '@/components/ui/textarea'
 import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
 import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -63,7 +61,6 @@ export const LocacaoFormContent = ({
   //Globals
   const glb_params = useGlobalParams();
 
-  const [selPessoa, setSelPessoa] = useState<boolean>(false);
   const [selLocatario, setSelLocatario] = useState<boolean>(false);
   const [selImovel, setSelImovel] = useState<boolean>(false);
   const [selGarantia, setSelGarantia] = useState<GarantiaLocacao>();
@@ -302,7 +299,7 @@ export const LocacaoFormContent = ({
 
   return (
     <>
-      <div style={{ display: ((!selPessoa && !selImovel && !selFiador) ? 'block' : 'none') }}>
+      <div style={{ display: ((!selLocatario && !selImovel && !selFiador) ? 'block' : 'none') }}>
         <FormProvider {...createLocacaoMethods}>
           <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
         </FormProvider>

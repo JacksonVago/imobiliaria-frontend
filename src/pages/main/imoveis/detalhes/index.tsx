@@ -639,7 +639,7 @@ export const DetalhesImovel = () => {
   const locacaoAtiva = imovel?.locacoes?.find((locacao) => locacao.status === 'ATIVA')
 
   const initialDefaultValues = {
-    dataFim: (locacaoAtiva?.dataFim ? new Date(locacaoAtiva?.dataFim) : new Date()),
+    dataFim: (locacaoAtiva?.dataFim ? moment(locacaoAtiva?.dataInicio).format("DD/MM/YYYY") : moment(new Date()).format("DD/MM/YYYY")),
     dataInicio: (locacaoAtiva?.dataInicio ? moment(locacaoAtiva?.dataInicio).format("DD/MM/YYYY") : moment(new Date()).format("DD/MM/YYYY")),
     valor_aluguel: locacaoAtiva?.valor_aluguel,
     dia_vencimento: locacaoAtiva?.dia_vencimento,
@@ -855,7 +855,7 @@ export const DetalhesImovel = () => {
       }
       locacaoMethodsAlt.setValue('locatarios', (locacao.locatarios ? locacao.locatarios.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
       locacaoMethodsAlt.setValue('dataInicio', moment(locacao.dataInicio).format("YYYY-MM-DD"));
-      locacaoMethodsAlt.setValue('dataFim', new Date(moment(locacao.dataFim).format("YYYY-MM-DD")));
+      locacaoMethodsAlt.setValue('dataFim', moment(locacao.dataFim).format("YYYY-MM-DD"));
       locacaoMethodsAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       locacaoMethodsAlt.setValue('dia_vencimento', locacao.dia_vencimento);
       locacaoMethodsAlt.setValue('status', locacao.status);
@@ -885,7 +885,7 @@ export const DetalhesImovel = () => {
 
     if (locEdit) {
       locacaoMethodsAlt.setValue('dataInicio', data.dataInicio);
-      locacaoMethodsAlt.setValue('dataFim', new Date(moment(data.dataFim).format("YYYY-MM-DD")));
+      locacaoMethodsAlt.setValue('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
       locacaoMethodsAlt.setValue('valor_aluguel', data.valor_aluguel);
       locacaoMethodsAlt.setValue('status', data.status);
       locacaoMethodsAlt.setValue('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
@@ -1454,7 +1454,6 @@ export const DetalhesImovel = () => {
                           <Input id="dataFim" type="date"
                             {...locacaoMethods.register('dataFim')}
                             helperText={locacaoMethods.formState?.errors?.dataFim?.message}
-                            onChange={(e) => { locacaoMethods.setValue('dataFim', new Date(moment(e.target.value).format("YYYY-MM-DD"))) }}
                           />
                         </div>
                         <div className='mt-2'>
@@ -1801,7 +1800,6 @@ export const DetalhesImovel = () => {
                               <Input type="date"
                                 {...locacaoMethodsAlt.register('dataFim')}
                                 helperText={locacaoMethodsAlt.formState?.errors?.dataFim?.message}
-                                onChange={(e) => { locacaoMethodsAlt.setValue('dataFim', new Date(moment(e.target.value).format("YYYY-MM-DD"))) }}
                               />
                             </div>
                             <div className='mt-2'>
