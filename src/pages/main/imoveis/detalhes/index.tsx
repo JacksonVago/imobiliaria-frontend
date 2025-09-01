@@ -93,6 +93,9 @@ export const getImovel = async (id: number): Promise<Imovel> => {
 
 //Altera imóvel
 const updateImovel = async (id: number, data: FormData): Promise<Imovel> => {
+  const dataObject = Object.fromEntries(data.entries());
+  const jsonData = JSON.stringify(dataObject);
+  console.log(jsonData);
   const response = await api.put<Imovel>(`imoveis/${id}`, data)
   return response.data
 }
@@ -525,7 +528,7 @@ export const DetalhesImovel = () => {
     // })
     const imagesToDeleteIds = data?.imagesToDeleteIds;
     const newImages = data?.images?.filter((image: any) => !image.id) || []
-    const docsToDeleteIds = data?.documentosToDeleteIds;
+    const documentosToDeleteIds = data?.documentosToDeleteIds;
     const newDocs = data?.documentos?.filter((doc: any) => !doc.id) || []
     //if images are the same, we can send an empty array
 
@@ -608,12 +611,11 @@ export const DetalhesImovel = () => {
     })
 
     if (imagesToDeleteIds) {
-      form.append('imagesToDeleteIds', JSON.stringify(imagesToDeleteIds))
-      // imagesToDeleteIds.forEach((id) => {
-      //   if (id) {
-      //     form.append('imagesToDeleteIds[]', id)
-      //   }
-      // })
+       imagesToDeleteIds.forEach((id) => {
+         if (id) {
+           form.append('imagesToDeleteIds[]', id.toString())
+         }
+       })
     }
 
     newDocs?.forEach((doc: any) => {
@@ -623,10 +625,10 @@ export const DetalhesImovel = () => {
     })
 
 
-    if (docsToDeleteIds?.length) {
-      console.log(JSON.stringify(docsToDeleteIds));
-      docsToDeleteIds.forEach((docId) => {
-        form.append('docsToDeleteIds[]', docId.toString())
+    if (documentosToDeleteIds) {
+      console.log(documentosToDeleteIds);
+      documentosToDeleteIds.forEach((docId) => {
+        form.append('documentosToDeleteIds[]', docId.toString())
       })
     }
 

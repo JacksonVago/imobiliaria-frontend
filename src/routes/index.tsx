@@ -102,7 +102,7 @@ export const RoutesComponent = () => {
             path={ROUTE.IMOVEIS}
             element={
               <ProtectedRoute permission="VIEW_IMOVELS">
-                <ListarImoveis limitView={3} exclude='' onSelectImovel={()=>{}} />
+                <ListarImoveis limitView={3} exclude='' onSelectImovel={undefined}/>
               </ProtectedRoute>
             }
           />
@@ -128,7 +128,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCACOES}
             element={
               <ProtectedRoute permission="VIEW_LOCACOES">
-                <ListarLocacoes exclude='' limitView={3} txtVinc='' onSelectLocacao={()=>{}} />
+                <ListarLocacoes exclude='' limitView={3} txtVinc='' onSelectLocacao={undefined} />
               </ProtectedRoute>
             }
           />
@@ -136,7 +136,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCACOES_CRIAR}
             element={
               <ProtectedRoute permission="CREATE_LOCACAO">
-                <CriarLocacao imovelId={0}/>
+                <CriarLocacao/>
               </ProtectedRoute>
             }
           />

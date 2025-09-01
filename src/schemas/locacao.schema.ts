@@ -135,10 +135,10 @@ const baseLocacaoSchema = z.object({
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
   imovelId: z.number().min(1, 'Id do imóvel e obrigatório')
-    .transform((val) => {
+    /*.transform((val) => {
       const num = Number(val)
       return isNaN(num) ? undefined : num
-    })
+    })*/
   ,
 })
 
@@ -188,51 +188,62 @@ export const locacaoSchema = z.object({
     .optional(),
 
   documentosToDeleteIds: z.array(z.number()).optional(),
+  //dataInicio: z.coerce.date({ message: 'Data inválida' }),  
   dataInicio: z.string().transform((val)=>{
     const data:string = val;
-    console.log(moment(data).format("YYYY-MM-DD"));
-    return moment(data).format("DD/MM/YYYY");
+    return moment(data.substring(0,10)).format("YYYY-MM-DD");
   }),
-  dataFim: z.coerce.date({ message: 'Data inválida' }),
-  valor_aluguel: z
-    .union(
-      [
-        z.number().min(1, 'Valor do aluguel é obrigatório'),
-        z
-          .string()
-          .min(1, 'Valor do aluguel é obrigatório')
-          .transform((val) => {
-            const num = Number(val)
-            return isNaN(num) ? undefined : num
-          })
-      ]
-    ).refine((val) => val !== undefined, 'Valor do aluguel é obrigatório'),
-  dia_vencimento: z
-    .union([
-      z.number().min(1, 'Dia de vencimento é obrigatório'),
-      z
-        .string()
-        .min(1, 'Dia de vencimento é obrigatório')
-        .transform((val) => {
-          const num = Number(val)
-          return isNaN(num) ? undefined : num
-        })
-    ])
-    .refine((val) => val !== undefined, 'Dia de vencimento é obrigatório'),
+  //dataFim: z.coerce.date({ message: 'Data inválida' }),
+   dataFim: z.string().transform((val)=>{
+     const data:string = val;
+     return moment(data.substring(0,10)).format("YYYY-MM-DD");
+   }),
+  valor_aluguel: z.string().or(z.number()),
+    // .union(
+    //   [
+    //     //z.number().min(1, 'Valor do aluguel é obrigatório'),
+    //     z.string().min(1, 'Valor do aluguel é obrigatório')
+    //       .transform((val) => {
+    //         try{
+    //         console.log(val);
+    //         const num = Number(val)
+    //         console.log(val);
+    //         return isNaN(num) ? 0 : num
+    //         }
+    //         catch (error){
+    //           console.log(error);
+    //           return error;
+    //         }
+    //       })
+    //   ]
+    // ).refine((val) => val !== undefined, 'Valor do aluguel é obrigatório'),
+  dia_vencimento: z.string().or(z.number()),
+    // .union([
+    //   z.number().min(1, 'Dia de vencimento é obrigatório'),
+    //   z
+    //     .string()
+    //     .min(1, 'Dia de vencimento é obrigatório')
+    //     .transform((val) => {
+    //       console.log(val);
+    //       const num = Number(val)
+    //       return isNaN(num) ? undefined : num
+    //     })
+    // ])
+    // .refine((val) => val !== undefined, 'Dia de vencimento é obrigatório'),
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
-  imovelId: z
-    .union([
-      z.number().min(1, 'Imóvel é obrigatório'),
-      z
-        .string()
-        .min(1, 'Imóvel é obrigatório')
-        .transform((val) => {
-          const num = Number(val)
-          return isNaN(num) ? 0 : num === undefined ? 0 : num
-        })
-    ])
-    .refine((val) => val !== undefined, 'Imóvel é obrigatório'),
+  imovelId: z.string().or(z.number()),
+    // .union([
+    //   z.number().min(1, 'Imóvel é obrigatório'),
+    //   z
+    //     .string()
+    //     .min(1, 'Imóvel é obrigatório')
+    //     .transform((val) => {
+    //       const num = Number(val)
+    //       return isNaN(num) ? 0 : num === undefined ? 0 : num
+    //     })
+    // ])
+    // .refine((val) => val !== undefined, 'Imóvel é obrigatório'),
   /*pessoaId: z.number().min(1, 'Id da Pessoa (locatário) e obrigatório')
     .transform((val) => {
       const num = Number(val)
@@ -253,7 +264,7 @@ export const locacaoSchema = z.object({
         id: z.number()
       }
     )
-  ),
+  ).optional(),
   imoveis: z.array(
     z.object(
       {
@@ -303,56 +314,82 @@ export const locacaoSchema = z.object({
         ).refine((val) => val !== undefined, 'Quantidade de meses é obrigatório'),*/
     }
   ).optional(),
-})/*.refine((schema) => {
+})
 
-  if (schema.garantiaLocacaoTipo === undefined || schema.garantiaLocacaoTipo === null || schema.garantiaLocacaoTipo.length === 0) {
-    return {
-      message: "Tipo de garantia é obrigatório",
-      path: ['garantiaLocacaoTipo']
-    }
+// export const locacaoSchema = z.object({
+//   documentos: z.array(
+//     z.object({
+//       file: z.instanceof(File),
+//       size: z
+//         .number()
+//         .max(MAX_DOCUMENT_FILE_SIZE, `Documento não pode ter mais que ${MAX_DOCUMENT_FILE_SIZE / 1024 / 1024}MB`)
+//         .optional(),
+//       type: z
+//         .string()
+//         .refine((val) => ACCEPTED_DOCUMENT_TYPES.includes(val), {
+//           message: 'Tipo de arquivo não suportado. Envie um formato válido.'
+//         })
+//         .optional(),
+//       id: z.number().optional(),
+//     })
+//   ).optional(),
 
-  }
+//   documentosToDeleteIds: z.array(z.number()).optional(),
 
-  switch (schema.garantiaLocacaoTipo) {
-    case GarantiaLocacao.DEPOSITO_CALCAO:
-      if (schema.depCalcao === undefined) {
-        return {
-          message: "Depósito calção obrigatório",
-          path: ['valorDeposito', 'quantidadeMeses']
-        }
-      }
-      else {
-        if (schema.depCalcao.quantidadeMeses === undefined || schema.depCalcao.quantidadeMeses === 0) {
-          return {
-            message: "Quantidade de meses obrigatório",
-            path: ['quantidadeMeses']
-          }
-        }
-        if (schema.depCalcao.valorDeposito === undefined || schema.depCalcao.valorDeposito === 0) {
-          return {
-            message: "Valor do Depósito é obrigatório",
-            path: ['valorDeposito']
-          }
-        }
-      }
-      break;
+//   dataInicio: z.coerce.date('Data de início inválida'),
 
-    case GarantiaLocacao.FIADOR:
-      if (schema.fiadores?.length === 0) {
-        return {
-          message: "Fiador é obrigatório",
-          path: ['fiadores']
-        }
-      }
-      break;
+//   dataFim: z.coerce.date('Data de término inválida'),
 
-    case GarantiaLocacao.SEGURO_FIANCA:
-      break;
+//   valor_aluguel: z.coerce.number()
+//     .refine((val) => val > 0, { message: 'Valor do aluguel obrigatório e maior que zero.' }),
 
-    case GarantiaLocacao.TITULO_CAPITALIZACAO:
-      break;
-  }
+//   dia_vencimento: z.coerce.number()
+//     .int({ message: 'Dia de vencimento deve ser inteiro.' })
+//     .min(1, { message: 'Dia de vencimento obrigatório' }),
 
-})*/
+//   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
+
+//   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
+
+//   imovelId: z.coerce.number()
+//     .int({ message: 'Imóvel obrigatório e inteiro.' })
+//     .min(1, { message: 'Imóvel obrigatório' }),
+
+//   locatarios: z.array(
+//     z.object({
+//       nome: z.string(),
+//       id: z.number(),
+//     })
+//   ).min(1, 'Locatário é obrigatório'),
+
+//   fiadores: z.array(
+//     z.object({
+//       nome: z.string(),
+//       id: z.number(),
+//     })
+//   ).optional(),
+
+//   imoveis: z.array(
+//     z.object({
+//       nome: z.string(),
+//       id: z.number(),
+//     })
+//   ).optional(),
+
+//   tituloCap: z.object({
+//     numeroTitulo: z.string(),
+//   }).optional(),
+
+//   seguroFianca: z.object({
+//     numeroSeguro: z.string(),
+//   }).optional(),
+
+//   depCalcao: z.object({
+//     valorDeposito: z.coerce.number()
+//       .refine((val) => val > 0, { message: 'Valor do depósito obrigatório e maior que zero.' }),
+//     quantidadeMeses: z.coerce.number()
+//       .refine((val) => val > 0, { message: 'Valor do depósito obrigatório e maior que zero.' }),
+//   }).optional(),
+// });
 
 export type LocacaoSchema = z.infer<typeof locacaoSchema>

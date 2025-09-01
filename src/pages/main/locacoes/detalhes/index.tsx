@@ -156,7 +156,7 @@ export const DetalhesLocacaoForm = ({
 
   const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
 
-  const createlocacao = useMutation({
+  /*const createlocacao = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.post<Locacao>(`/locacoes`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -167,9 +167,9 @@ export const DetalhesLocacaoForm = ({
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
-  })
+  })*/
 
-  /*const updatelocacao = useMutation({
+  const updatelocacao = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.put<Locacao>(`/locacoes/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -180,7 +180,7 @@ export const DetalhesLocacaoForm = ({
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
-  })*/
+  })
 
   /*const deletelocacaoMutation = useMutation({
     mutationFn: async () => {
@@ -202,6 +202,7 @@ export const DetalhesLocacaoForm = ({
 
   const onSubmitLocacaoData = async (data: LocacaoSchema) => {
     try {
+      console.log(new Date());
       const formData = new FormData()
 
       formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
@@ -218,15 +219,17 @@ export const DetalhesLocacaoForm = ({
       formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
       formData.append('pessoaId', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
 
-      console.log(formData.values());
+      console.log(new Date());
 
-      await createlocacao.mutateAsync(formData)
+      await updatelocacao.mutateAsync(formData)
+      console.log(new Date());
 
       toast({
         title: 'locacao atualizado com sucesso',
         description: `locacao atualizado com sucesso`
       })
     } catch (error) {
+      console.log(error);
       toast({
         title: 'Erro ao atualizar locacao',
         description: 'Ocorreu um erro ao tentar atualizar o locacao. Tente novamente.'
@@ -239,6 +242,8 @@ export const DetalhesLocacaoForm = ({
   const defaultValues = React.useMemo(
     () => ({
       ...transformNullToUndefined(locacao || {}),
+      dataInicio: moment(locacao?.dataInicio).format('YYYY-MM-DD'),
+      dataFim: moment(locacao?.dataFim).format('YYYY-MM-DD'),
       logradouro: enderecoData?.logradouro,
       numero: enderecoData?.numero ? parseInt(enderecoData.numero) : undefined,
       complemento: enderecoData?.complemento,
@@ -247,18 +252,24 @@ export const DetalhesLocacaoForm = ({
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
       documentos: documentFiles?.filter((doc) => doc !== null),
-      imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
-      fiadores: locacao?.fiadores?.map((fiador) => {
+      garantiaLocacaoTipo: locacao?.garantiaLocacaoTipo,
+      locatarios: locacao?.locatarios?.map((locatario) => {
+        return { nome: locatario.pessoa?.nome, id: locatario.pessoa?.id }
+      }),      
+      fiadores: locacao?.fiadores ? locacao?.fiadores?.map((fiador) => {
         return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
-      }),
-      locatarios: locacao?.locatarios,
+      }) : undefined,
+      imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
+      tituloCap : (locacao?.garantiaTituloCapitalizacao ? {numeroTitulo : locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
+      seguroFianca : locacao?.garantiaSeguroFianca?  {numeroSeguro : locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
+      depCalcao : locacao?.garantiaDepositoCalcao ? {valorDeposito : locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito } : undefined,
     }),
     [locacao, documentFiles]
   )
-
-  console.log(defaultValues);
+  
   React.useEffect(() => {
     if (locacao) locacaoMethods.reset(defaultValues)
+      console.log(defaultValues);
   }, [defaultValues])
 
   //react hook form
@@ -280,6 +291,8 @@ export const DetalhesLocacaoForm = ({
   }*/
 
   const hasLocatario = !!locacao?.locatarios?.length;
+
+  console.log(locacaoMethods.formState.errors);
 
   return (
     <Card>

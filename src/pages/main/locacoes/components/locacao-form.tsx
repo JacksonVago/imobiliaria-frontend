@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import moment from "moment";
 /*import { ESTADO_CIVIL_OPTIONS } from '@/constants/estado-civil'
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
@@ -17,7 +18,7 @@ import { DocumentUpload } from '../../imoveis/criarImovel/components/document-up
 import { LocacaoSchema } from '@/schemas/locacao.schema'
 import { Search, X } from 'lucide-react'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { Textarea } from '@/components/ui/textarea'
 import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
@@ -63,9 +64,17 @@ export const LocacaoFormContent = ({
   const glb_params = useGlobalParams();
 
   const [selPessoa, setSelPessoa] = useState<boolean>(false);
+  const [selLocatario, setSelLocatario] = useState<boolean>(false);
   const [selImovel, setSelImovel] = useState<boolean>(false);
   const [selGarantia, setSelGarantia] = useState<GarantiaLocacao>();
   const [selFiador, setSelFiador] = useState<boolean>(false);
+
+  useEffect(()=>{
+    if (createLocacaoMethods.getValues('garantiaLocacaoTipo')){
+      const sel: GarantiaLocacao = GarantiaLocacao[createLocacaoMethods.getValues('garantiaLocacaoTipo') as keyof typeof GarantiaLocacao];
+      setSelGarantia(sel);
+    }
+  },[]);
 
   //Lista de imóveis
   const locacaoImoveis = useFieldArray({
@@ -85,13 +94,8 @@ export const LocacaoFormContent = ({
     name: 'fiadores'
   });
 
-  console.log(createLocacaoMethods.formState.errors);
-  console.log(createLocacaoMethods.formState.isDirty);
-  console.log(createLocacaoMethods.formState.isValid);
-  console.log(createLocacaoMethods.getValues('fiadores'));
-
   //Pega imóvel quando informado
-    //Consulta imóvel
+  //Consulta imóvel
   /*const {
     data: imovel,
   } = useQuery({
@@ -117,16 +121,20 @@ export const LocacaoFormContent = ({
         if (locacaoFiadores.fields.length > 0) {
           locacaoFiadores.remove(0);
         }
+        setSelImovel(false);
         setSelFiador(true);
+        setSelLocatario(false);
         break;
 
       case 'locatarios':
+        setSelImovel(false);
+        setSelFiador(false);
+        setSelLocatario(true);
         if (locacaoLocatarios.fields.length > 0) {
           locacaoLocatarios.remove(0);
         }
         break;
     }
-    setSelPessoa(true);
 
   }
 
@@ -140,6 +148,8 @@ export const LocacaoFormContent = ({
           locacaoImoveis.remove(0);
         }
         setSelImovel(true);
+        setSelFiador(false);
+        setSelLocatario(false);
         break;
 
     }
@@ -220,7 +230,7 @@ export const LocacaoFormContent = ({
   const handleSelectedProp = (locatario: Pessoa | undefined) => {
 
     console.log(locatario);
-    
+
     if (locatario) {
       if (locacaoLocatarios.fields.length === 0) {
         locacaoLocatarios.append({
@@ -229,46 +239,56 @@ export const LocacaoFormContent = ({
         });
 
         createLocacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
-        /*createLocacaoMethods.setValue('imovelId', (id! ? id : 0));
-        createLocacaoMethods.setValue('valor_aluguel', (imovel?.valor_aluguel ? imovel?.valor_aluguel : 0))
-        createLocacaoMethods.setValue('pessoaId', proprietario.id);
-        createLocacaoMethods.setValue('imovelId', id!);*/
       }
-      /*
-      if (glb_params.origin_url === 'imoveis') {
-        setOpenLoc(true);
-      }*/
     }
 
 
-    setSelPessoa(false);
+    setSelLocatario(false);
   }
 
-//Retorno ao selecionar o imóvel
+  //Retorno ao selecionar o imóvel
   const handleSelectedImovel = (imovel: Imovel | undefined) => {
 
     console.log(imovel);
-    
+
     if (imovel) {
       if (locacaoImoveis.fields.length === 0) {
         locacaoImoveis.append({
           nome: (imovel.description ? imovel.description : ''),
           id: imovel.id
-        });        
+        });
       }
-      createLocacaoMethods.setValue('imovelId', imovel.id, 
+      createLocacaoMethods.setValue('imovelId', imovel.id,
         {
-          shouldDirty:true,
-          shouldValidate:true
+          shouldDirty: true,
+          shouldValidate: true
         }
       );
+      createLocacaoMethods.setValue('valor_aluguel', (imovel.valor_aluguel ? imovel.valor_aluguel: 0), {
+        shouldDirty: true,
+        shouldValidate: true
+      }
+      );
+    }
+    else {
+      createLocacaoMethods.setValue('imovelId', 0,
+        {
+          shouldDirty: false,
+          shouldValidate: false
+        }
+      );
+      createLocacaoMethods.setValue('valor_aluguel', 0, {
+        shouldDirty: false,
+        shouldValidate: false
+      }
+      )
     }
     console.log(createLocacaoMethods.getValues('imovelId'));
 
 
     setSelImovel(false);
   }
-  
+
   const handleSelectFiador = (fiador: Pessoa | undefined) => {
     //let fiador: Pessoa[] = fiadores?.filter((x: any) => x.id === fiadorId)
     if (fiador) {
@@ -290,7 +310,7 @@ export const LocacaoFormContent = ({
       <div className="space-y-4 font-[Poppins-Regular]">
         <div style={{ display: (!selFiador ? 'block' : 'none') }}>
           <div>
-            {(!selPessoa && !selImovel) && (
+            {(!selLocatario && !selImovel && !selFiador) && (
               <div>
                 <div className={(isPortrait ? "" : "grid grid-cols-1 gap-4 flex items-center")}>
                   <Button onClick={() => { handlerSelImovel('imoveis') }} disabled={disabled}>
@@ -307,7 +327,7 @@ export const LocacaoFormContent = ({
                           className='border bg-zinc-200 hover:bg-zinc-400'
                           type="button"
                           onClick={() => {
-                            createLocacaoMethods.setValue('imovelId', 0, { shouldDirty:false, shouldValidate:false});
+                            createLocacaoMethods.setValue('imovelId', 0, { shouldDirty: false, shouldValidate: false });
                             locacaoImoveis.remove(index);
                           }}
                         >
@@ -318,9 +338,9 @@ export const LocacaoFormContent = ({
                   </div>
                 )}
                 {!!createLocacaoMethods?.formState?.errors?.imovelId?.message && (
-                  createLocacaoMethods.formState?.errors?.imovelId?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.imovelId?.message}</p>
+                  createLocacaoMethods.formState?.errors?.imovelId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.imovelId?.message}</p>
                 )}
-                
+
                 <div className={(isPortrait ? "mt-2" : "grid grid-cols-1 gap-4 flex items-center mt-2")}>
                   <Button onClick={() => { handlerSelProp('locatarios') }} disabled={disabled}>
                     <Search className="mr-2 h-4 w-4" />
@@ -345,8 +365,8 @@ export const LocacaoFormContent = ({
                     ))}
                   </div>
                 )}
-                {!!createLocacaoMethods?.formState?.errors?.locatarios?.message && (                  
-                  createLocacaoMethods.formState?.errors?.locatarios?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.locatarios?.message}</p>
+                {!!createLocacaoMethods?.formState?.errors?.locatarios?.message && (
+                  createLocacaoMethods.formState?.errors?.locatarios?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.locatarios?.message}</p>
                 )}
               </div>
             )}
@@ -355,11 +375,11 @@ export const LocacaoFormContent = ({
             {selImovel && (
               <Card id='teste' className='h-full'>
                 <div className="flex  justify-end">
-                  <Button onClick={() => { handleSelectedProp(undefined) }}
+                  <Button onClick={() => { handleSelectedImovel(undefined) }}
                     className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                 </div>
                 <CardHeader>
-                  <h1 className='flex items-center justify-center font-bold'>Selecionar o Imóvel</h1>
+                  <h1 className='flex items-center justify-center font-bold'>Selecionar Imóvel</h1>
                 </CardHeader>
                 <CardContent className='mt-2 h-120'>
                   <ListarImoveis limitView={1} exclude='' onSelectImovel={handleSelectedImovel} />
@@ -368,14 +388,14 @@ export const LocacaoFormContent = ({
             )}
 
             {/*Seleção de locatários */}
-            {selPessoa && (
+            {selLocatario && (
               <Card id='teste' className='h-full'>
                 <div className="flex  justify-end">
                   <Button onClick={() => { handleSelectedProp(undefined) }}
                     className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                 </div>
                 <CardHeader>
-                  <h1 className='flex items-center justify-center font-bold'>Selecionar o Locatário</h1>
+                  <h1 className='flex items-center justify-center font-bold'>Selecionar Locatário</h1>
                 </CardHeader>
                 <CardContent className='mt-2 h-120'>
                   <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude='' onSelectCliente={handleSelectedProp} />
@@ -384,31 +404,32 @@ export const LocacaoFormContent = ({
             )}
           </div>
 
-          {(!selPessoa && !selImovel) && (
+          {(!selLocatario && !selImovel && !selFiador) && (
             <>
               <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
                 <Label className="text-base">
                   Valor do Aluguel
                   <Input
-                    type="text"
+                    type="number"
                     className="mt-1"
                     disabled={disabled}
                     placeholder="Valor do Aluguel"
-                    {...createLocacaoMethods.register('valor_aluguel')}                                        
+                    {...createLocacaoMethods.register('valor_aluguel')}
                   />
-                  {createLocacaoMethods.formState?.errors?.valor_aluguel?.message && <p style={{color:'#f26871', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.valor_aluguel?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.valor_aluguel?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.valor_aluguel?.message}</p>}
                 </Label>
               </div>
               <div className={(isPortrait ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4")}>
                 <Label className="text-base">
                   Data de Início
                   <Input
-                    className="mt-2"                  
+                    type='date'
+                    className="mt-2"
                     disabled={disabled}
                     placeholder="Data de Início"
-                    {...createLocacaoMethods.register('dataInicio')}                    
+                    {...createLocacaoMethods.register('dataInicio')}
                   />
-                  {createLocacaoMethods.formState?.errors?.dataInicio?.message && <p style={{color:'red', fontSize:'0.8rem'}}>*{createLocacaoMethods.formState?.errors?.dataInicio?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.dataInicio?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{createLocacaoMethods.formState?.errors?.dataInicio?.message}</p>}
                 </Label>
 
                 <Label className="text-base">
@@ -418,9 +439,9 @@ export const LocacaoFormContent = ({
                     type="date"
                     disabled={disabled}
                     placeholder="Data Fim"
-                    {...createLocacaoMethods.register('dataFim')}
+                    {...createLocacaoMethods.register('dataFim')}                    
                   />
-                  {createLocacaoMethods.formState?.errors?.dataFim?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.dataFim?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.dataFim?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.dataFim?.message}</p>}
                 </Label>
               </div>
 
@@ -429,19 +450,19 @@ export const LocacaoFormContent = ({
                   Dia de Vencimento
                   <Input
                     className="mt-2"
-                    type="text"
+                    type="number"
                     disabled={disabled}
                     placeholder="Dia de vencimento"
                     {...createLocacaoMethods.register('dia_vencimento')}
                   />
-                  {createLocacaoMethods.formState?.errors?.dia_vencimento?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.dia_vencimento?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.dia_vencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.dia_vencimento?.message}</p>}
                 </Label>
               </div>
 
-              <div className='mt-2'>
+              {/* <div className='mt-2'>
                 <Label className='text-base' htmlFor="observacoes">Observações</Label>
                 <Textarea id="observacoes" placeholder="Detalhes adicionais sobre a locação" />
-              </div>
+              </div> */}
 
               <div className='mt-2'>
                 <Label className='text-base' htmlFor="Garantia">Tipo de Garantia</Label>
@@ -469,7 +490,7 @@ export const LocacaoFormContent = ({
                       </Select>
                     )}
                   />
-                  {createLocacaoMethods.formState?.errors?.garantiaLocacaoTipo?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.garantiaLocacaoTipo?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.garantiaLocacaoTipo?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.garantiaLocacaoTipo?.message}</p>}
                 </div>
 
               </div>
@@ -477,18 +498,32 @@ export const LocacaoFormContent = ({
           )}
         </div>
 
-        {(!selPessoa && !selImovel) && (
+        {(!selLocatario && !selImovel) && (
           <div>
             {(selGarantia === GarantiaLocacao.FIADOR && selFiador) && (
               <div>
-                <Card>
+                <Card id='teste' className='h-full'>
+                  <div className="flex  justify-end">
+                    <Button onClick={() => { handleSelectFiador(undefined) }}
+                      className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                  </div>
+                  <CardHeader>
+                    <h1 className='flex items-center justify-center font-bold'>Selecionar Fiador</h1>
+                  </CardHeader>
+                  <CardContent className='mt-2 h-120'>
+                    <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude='' onSelectCliente={handleSelectFiador} />
+                  </CardContent>
+                </Card>
+
+
+                {/* <Card>
                   <CardHeader>
                     <h1 className='flex items-center justify-center font-bold'>Selecionar o Fiador</h1>
                   </CardHeader>
                   <CardContent className='mt-2 h-120 text-base'>
                     <ListarClientes limitView={1} txtVinc='Vincular Locação' onSelectCliente={handleSelectFiador} exclude='' />
                   </CardContent>
-                </Card>
+                </Card> */}
               </div>
             )}
 
@@ -521,22 +556,22 @@ export const LocacaoFormContent = ({
             {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
               <div className='mt-2 text-base'>
                 <Label htmlFor="titulocap">Número do Título</Label>
-                <Input id="titulocap" type="number"
-                  {...createLocacaoMethods.register('tituloCap.numeroTitulo')}                  
+                <Input id="titulocap" type="number" disabled={disabled}
+                  {...createLocacaoMethods.register('tituloCap.numeroTitulo')}
                   onChange={(e) => { createLocacaoMethods.setValue('tituloCap.numeroTitulo', e.target.value) }}
                 />
-                {createLocacaoMethods.formState?.errors?.tituloCap?.numeroTitulo?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.tituloCap?.numeroTitulo?.message}</p>}
+                {createLocacaoMethods.formState?.errors?.tituloCap?.numeroTitulo?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.tituloCap?.numeroTitulo?.message}</p>}
               </div>
             )}
 
             {selGarantia === GarantiaLocacao.SEGURO_FIANCA && (
               <div className='mt-2 text-base'>
                 <Label htmlFor="numseguro">Número do Seguro</Label>
-                <Input id="numseguro" type="number"
-                  {...createLocacaoMethods.register('seguroFianca.numeroSeguro')}                  
+                <Input type="text" disabled={disabled}
+                  {...createLocacaoMethods.register('seguroFianca.numeroSeguro')}
                   onChange={(e) => { createLocacaoMethods.setValue('seguroFianca.numeroSeguro', e.target.value) }}
                 />
-                {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message}</p>}
+                {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message}</p>}
               </div>
             )}
 
@@ -544,17 +579,17 @@ export const LocacaoFormContent = ({
               <div>
                 <div className='mt-2 text-base'>
                   <Label htmlFor="valdepCalcao">Valor do depósito</Label>
-                  <Input type="text" placeholder='0,00'
-                    {...createLocacaoMethods.register('depCalcao.valorDeposito')}                    
+                  <Input type="number" placeholder='0,00' disabled={disabled}
+                    {...createLocacaoMethods.register('depCalcao.valorDeposito')}
                   />
-                  {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message}</p>}
                 </div>
                 <div className='mt-2 text-base'>
                   <Label htmlFor="qtddepCalcao">Quantidade de meses</Label>
-                  <Input id="qtddepCalcao" type="text"
-                    {...createLocacaoMethods.register('depCalcao.quantidadeMeses')}                    
+                  <Input id="qtddepCalcao" type="number" disabled={disabled}
+                    {...createLocacaoMethods.register('depCalcao.quantidadeMeses')}
                   />
-                  {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message && <p style={{color:'#ed535d', fontSize:'0.8rem'}}>* {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message}</p>}
                 </div>
               </div>
             )}
@@ -608,7 +643,7 @@ export const LocacaoFormSubmitButton = ({
         type="submit"
         disabled={
           disabled ||
-          !createLocacaoMethods.formState.isDirty 
+          !createLocacaoMethods.formState.isDirty
           || !createLocacaoMethods.formState.isValid
         }
       >

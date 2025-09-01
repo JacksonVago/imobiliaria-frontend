@@ -48,11 +48,14 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
 
     //also for existant images, set the id to delete
     if (images[index]?.id) {
-      setValue('imagesToDeleteIds', [...(watch('imagesToDeleteIds') || []), images[index].id], {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true
-      })
+      setValue(
+        'imagesToDeleteIds',
+        [...(watch('imagesToDeleteIds') || []), images[index].id],
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
     }
   }
 
@@ -64,10 +67,12 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
     <div className="mb-6 w-full space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-2xlg font-semibold">Imagens do Imóvel</h3>
-        <Button onClick={handleAddImageClick} variant="outline" size="sm" type="button">
-          <ImagePlus className="mr-2 h-4 w-4" />
-          Adicionar imagem
-        </Button>
+        {!disabled && (
+          <Button onClick={handleAddImageClick} variant="outline" size="sm" type="button">
+            <ImagePlus className="mr-2 h-4 w-4" />
+            Adicionar imagem
+          </Button>
+        )}
       </div>
       <input
         type="file"
@@ -98,7 +103,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
                           onClick={() => removeImage(index)}
                           type="button"
                         >
-                          <X/>
+                          <X />
                         </Button>
                       )}
                     </CardContent>
@@ -107,8 +112,8 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious type="button" className={(images.length > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")}/>
-          <CarouselNext type="button" className={(images.length > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")}/>
+          <CarouselPrevious type="button" className={(images.length > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")} />
+          <CarouselNext type="button" className={(images.length > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")} />
         </Carousel>
       ) : (
         <div className="rounded-md bg-muted py-8 text-center">

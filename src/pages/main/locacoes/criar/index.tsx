@@ -23,9 +23,9 @@ const createLocacao = async (data: FormData): Promise<Locacao | any> => {
   })
 }
 
-export default function CriarLocacao(
-  { imovelId }:
-    { imovelId: number | undefined }) {
+export default function CriarLocacao (){
+  //{ imovelId }:
+    //{ imovelId: number | undefined }) {
   
   /*const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
@@ -43,9 +43,9 @@ export default function CriarLocacao(
     mode: 'all'
   })
 
-  useEffect(() => {
+  /*useEffect(() => {
     locacaoMethods.setValue('imovelId', 0);
-  }, [glb_params, pessoa]);
+  }, [glb_params, pessoa]);*/
 
   /*
   const createLocacaoMutation = useMutation({
@@ -80,7 +80,7 @@ export default function CriarLocacao(
     }
   });  
 
-  locacaoMethods.setValue('imovelId', imovelId ? imovelId : 0);
+  //locacaoMethods.setValue('imovelId', imovelId ? imovelId : 0);
 
   console.log('locacaoMethods errors', locacaoMethods.formState.errors)
   console.log('locacaoMethods dirtyFields', locacaoMethods.formState.isDirty)

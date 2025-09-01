@@ -73,7 +73,7 @@ export default function ListarLocacoes({
   txtVinc: string
   limitView: number
   exclude: string
-  onSelectLocacao: (locacao: Locacao | undefined) => void
+  onSelectLocacao: ((locacao: Locacao) => void) | undefined
 }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })

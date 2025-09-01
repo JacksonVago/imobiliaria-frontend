@@ -291,6 +291,7 @@ export const DetalhesClienteForm = ({
       toast({
         title: 'Cliente atualizado com sucesso',
         description: `Cliente atualizado com sucesso`
+
       })
     } catch (error) {
       toast({
@@ -675,7 +676,8 @@ export default function DetalhesCliente() {
       //setCotaImovelAlt(proprietario.cota_imovel);
       //setSelImovelAlt(proprietario.imovelId.toString());
       //setPropImovelIdAlt(proprietario.imovelId);
-      imovelLocAlt.setValue('dataInicio', locacao.dataInicio);
+      //imovelLocAlt.setValue('dataInicio', new Date(moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD")));
+      imovelLocAlt.setValue('dataInicio', moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD"));
       imovelLocAlt.setValue('dataFim', new Date(moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD")));
       imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
       imovelLocAlt.setValue('status', locacao.status);
@@ -1509,7 +1511,8 @@ export default function DetalhesCliente() {
                                 <Input type="date"
                                   {...imovelLocAlt.register('dataInicio')}
                                   helperText={imovelLocAlt.formState?.errors?.dataInicio?.message}
-                                  onChange={(e) => { imovelLocAlt.setValue('dataInicio', e.target.value) }}
+                                  //onChange={(e) => { imovelLocAlt.setValue('dataInicio', new Date(moment((e.target.value ? e.target.value : '')).format("YYYY-MM-DD"))) }}
+                                  onChange={(e) => { imovelLocAlt.setValue('dataInicio', moment((e.target.value ? e.target.value : '')).format("YYYY-MM-DD")) }}
                                 />
                               </div>
                               <div className='mt-2'>

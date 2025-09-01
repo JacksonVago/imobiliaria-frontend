@@ -21,7 +21,8 @@ import {
 import { ImovelTipo } from '@/enums/imovel/enums-imovel'
 import { ROUTE } from '@/enums/routes.enum'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
+import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
+import { Endereco } from '@/interfaces/endereco'
 import { Imovel } from '@/interfaces/imovel'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
@@ -110,7 +111,8 @@ export default function ListarImoveis({
 }: {
   limitView: number
   exclude: string
-  onSelectImovel: (imovel: Imovel | undefined) => void
+  //onSelectImovel: (imovel: Imovel | undefined) => void
+  onSelectImovel: ((imovel: Imovel ) => void) | undefined
 }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
@@ -139,6 +141,8 @@ export default function ListarImoveis({
 
   const imoveis = data?.data?.data || []
   const totalPages = data?.data?.totalPages
+  //const googleMaps = "https://www.google.com/maps/place/R.+Jo%C3%A3o+Kopke,+236+-+Bom+Retiro,+S%C3%A3o+Paulo+-+SP,+01124-030";
+  const googleMaps = "https://www.google.com/maps/place/";
 
   //const hasTotalPages = !!totalPages
   //const canGoToNextPage = hasTotalPages && page < totalPages
@@ -224,16 +228,22 @@ export default function ListarImoveis({
     navigate(`${ROUTE.IMOVEIS}/${id}`)
   }
 
+  const handlerClickMaps = (endereco: Endereco) =>{
+    const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
+    console.log(urlGoogleMaps);
+    window.open(urlGoogleMaps);
+  }
+
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
-      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-bold">Imoveis</h1>
         <Button onClick={handleClickCreateImovel}>
           <Plus className="mr-2 h-4 w-4" /> Criar imovel
         </Button>
       </div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -260,7 +270,7 @@ export default function ListarImoveis({
       </div>
 
       {/* Imoveis Grid */}
-      <div className= {(isBigScreen ? "grid gap-6 grid-cols-3" : isPortrait ? "grid gap-6 grid-cols-3" : isTablet ? "grid gap-6 grid-cols-2" : isMobile ? "grid gap-6 grid-cols-1" : "grid gap-6 grid-cols-1")}>
+      <div className= {(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">Nenhum imóvel</p>
@@ -314,7 +324,10 @@ export default function ListarImoveis({
             </CardHeader>
             <CardContent>
               <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                <MapPin className="inline-block h-4 w-4" />
+                <MapPin className="inline-block h-4 w-4 cursor-pointer" 
+                onClick={()=>{handlerClickMaps(imovel?.endereco)}} 
+                color='green'
+                />
                 {getEnderecoFormatado(imovel?.endereco)}
               </p>
               <span className="text-lg font-bold">
