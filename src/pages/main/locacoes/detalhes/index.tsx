@@ -15,20 +15,23 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTE } from '@/enums/routes.enum'
 import { toast } from '@/hooks/use-toast'
+import axios from 'axios';
 import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Edit, Link2Off, Mail, Phone,  Trash2 } from 'lucide-react'
+import { Edit, Link2Off, Mail, Phone, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 //import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 //import { Pessoa } from '@/interfaces/pessoa'
-import { PropImovelSchema, propImoveSchema, 
+import {
+  PropImovelSchema, propImoveSchema,
   //ProprietarioSchema, 
-  proprietarioSchema } from '@/schemas/proprietario.schema'
+  proprietarioSchema
+} from '@/schemas/proprietario.schema'
 /*import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Imovel } from '@/interfaces/imovel'
 import { Proprietario } from '@/interfaces/proprietario'
@@ -38,6 +41,7 @@ import { Locacao } from '@/interfaces/locacao'
 import { LocacaoFormContent, LocacaoFormRoot } from '../components/locacao-form';
 import { useMediaQuery } from 'react-responsive';
 import moment from 'moment';
+import { AxiosError } from 'axios'
 //import { Locatario } from '@/interfaces/locatario';
 
 // Mock data for demonstration
@@ -124,7 +128,9 @@ export const DetalhesLocacaoForm = ({
   disabled?: boolean
   desvincularlocacaoImovel?: () => void
 }) => {
-    
+
+  const navigate = useNavigate()
+
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   /*const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -171,6 +177,9 @@ export const DetalhesLocacaoForm = ({
 
   const updatelocacao = useMutation({
     mutationFn: async (data: FormData) => {
+      const dataObject = Object.fromEntries(data.entries());
+      const jsonData = JSON.stringify(dataObject);
+      console.log(jsonData);
       return await api.put<Locacao>(`/locacoes/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -179,6 +188,20 @@ export const DetalhesLocacaoForm = ({
       ;['locacao', 'documentFiles', id].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
+    },
+    onError: (error) => {
+      // Access the Axios error object here
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
     }
   })
 
@@ -203,6 +226,7 @@ export const DetalhesLocacaoForm = ({
   const onSubmitLocacaoData = async (data: LocacaoSchema) => {
     try {
       console.log(new Date());
+      console.log(data);
       const formData = new FormData()
 
       formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
@@ -225,15 +249,31 @@ export const DetalhesLocacaoForm = ({
       console.log(new Date());
 
       toast({
-        title: 'locacao atualizado com sucesso',
-        description: `locacao atualizado com sucesso`
-      })
+        title: 'locacao atualizado com sucesso'
+      });
     } catch (error) {
-      console.log(error);
-      toast({
-        title: 'Erro ao atualizar locacao',
-        description: 'Ocorreu um erro ao tentar atualizar o locacao. Tente novamente.'
-      })
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          const data = error.response.data as { message: string };
+          if (data.message.toLowerCase().includes("unauthorized")) {
+            navigate(ROUTE.LOGIN);
+          }
+
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar locacao',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
+
     }
   }
 
@@ -255,21 +295,21 @@ export const DetalhesLocacaoForm = ({
       garantiaLocacaoTipo: locacao?.garantiaLocacaoTipo,
       locatarios: locacao?.locatarios?.map((locatario) => {
         return { nome: locatario.pessoa?.nome, id: locatario.pessoa?.id }
-      }),      
+      }),
       fiadores: locacao?.fiadores ? locacao?.fiadores?.map((fiador) => {
         return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
       }) : undefined,
       imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
-      tituloCap : (locacao?.garantiaTituloCapitalizacao ? {numeroTitulo : locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
-      seguroFianca : locacao?.garantiaSeguroFianca?  {numeroSeguro : locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
-      depCalcao : locacao?.garantiaDepositoCalcao ? {valorDeposito : locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito } : undefined,
+      tituloCap: (locacao?.garantiaTituloCapitalizacao ? { numeroTitulo: locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
+      seguroFianca: locacao?.garantiaSeguroFianca ? { numeroSeguro: locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
+      depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito } : undefined,
     }),
     [locacao, documentFiles]
   )
-  
+
   React.useEffect(() => {
     if (locacao) locacaoMethods.reset(defaultValues)
-      console.log(defaultValues);
+    console.log(defaultValues);
   }, [defaultValues])
 
   //react hook form
@@ -885,15 +925,15 @@ export default function DetalhesLocacao() {
                   </div>
 
                 </div>
-                <div className="grid grid-cols-4 gap-4 flex items-end">
+                <div className="grid grid-cols-2 gap-3 flex items-end mt-2">
                   <Button
-                    className='col-start-4'
+                    className='col-start-3'
                     variant="secondary"
                     size="sm"
                     onClick={() => { handlerDetailLocatario(locatario.pessoa?.id ? locatario.pessoa?.id : 0) }}
                     style={
                       {
-                        fontSize: '0.7rem',
+                        fontSize: '0.8rem',
                       }}
                   >
                     Ver detalhes
@@ -934,15 +974,15 @@ export default function DetalhesLocacao() {
                   </div>
 
                 </div>
-                <div className="grid grid-cols-4 gap-4 flex items-end">
+                <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
                   <Button
-                    className='col-start-4'
+                    className='col-start-3'
                     variant="secondary"
                     size="sm"
                     onClick={() => { handlerDetailLocatario(fiador.pessoaId ? fiador.pessoaId : 0) }}
                     style={
                       {
-                        fontSize: '0.7rem',
+                        fontSize: '0.8rem',
                       }}
                   >
                     Ver detalhes

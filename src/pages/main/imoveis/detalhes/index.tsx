@@ -150,8 +150,8 @@ const createLocacao = async (data: FormData): Promise<void> => {
 const deleteLocacao = async (locacaoId: number): Promise<void> => {
   console.log(locacaoId);
 
-  //await api.delete(`locacoes/${locacaoId}`)
-  await api.delete(`locacoes/locacao/${locacaoId}`)
+  await api.delete(`locacoes/${locacaoId}`)
+  //await api.delete(`locacoes/locacao/${locacaoId}`)
 }
 
 //Alterar locação do imóvel
@@ -874,6 +874,7 @@ export const DetalhesImovel = () => {
   }
 
   const handleDeleteLocacao = (locacao: Locacao) => {
+    console.log(locacao);
     deleteLocacaoMutation.mutate(locacao.id);
   }
 
@@ -1245,14 +1246,14 @@ export const DetalhesImovel = () => {
                   </div>
 
                 </div>
-                <div className="grid grid-cols-4 gap-4 flex items-end">
+                <div className="grid grid-cols-3 gap-4 flex items-end">
                   <Button
                     variant="secondary"
-                    size="sm"
+                    size="lg"
                     onClick={() => { handlerDetailProp(proprietario.pessoaId) }}
                     style={
                       {
-                        fontSize: '0.7rem',
+                        fontSize: '0.8rem',
                       }}
                   >
                     Ver detalhes
@@ -1608,7 +1609,7 @@ export const DetalhesImovel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{locacao.id}</span>
-                  <Badge variant="default">{locacao.status}</Badge>
+                  <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive": "default"} >{locacao.status}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1620,8 +1621,8 @@ export const DetalhesImovel = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">
                   <Label>Período</Label>
-                  <p className="flex items-center text-[0.70rem]">
-                    <Calendar className="mr-2 h-4 w-4" />
+                  <p className="flex items-center text-[0.7rem] font-semibold">
+                    
                     {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
                     {locacao.dataFim
                       ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
@@ -1631,14 +1632,14 @@ export const DetalhesImovel = () => {
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">
                   <Label>Locatários</Label>
                   {locacao.locatarios?.map((locatario) => (
-                    <div className='flex justify-end'>
+                    <div className='flex justify-start'>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
                         style={
                           {
-                            fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.6rem' : '1.5rem'),
+                            fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
                             fontWeight: 'Bold'
                           }}
                       >
@@ -1653,14 +1654,14 @@ export const DetalhesImovel = () => {
                     <>
                       <Label>Fiadores</Label>
                       {locacao.fiadores?.map((fiador) => (
-                        <div className='flex justify-end'>
+                        <div className='flex justify-start'>
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => { handlerDetailPessoa(parseFloat(fiador.pessoaId.toString())) }}
                             style={
                               {
-                                fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.6rem' : '1.5rem'),
+                                fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
                                 fontWeight: 'Bold'
                               }}
                           >
@@ -1674,7 +1675,7 @@ export const DetalhesImovel = () => {
                   {locacao.garantiaLocacaoTipo === GarantiaLocacao.SEGURO_FIANCA && (
                     <>
                       <Label>Seguro Fiança</Label>
-                      <div className='flex justify-end'>
+                      <div className='flex justify-start font-semibold'>
                         <p>{locacao.garantiaSeguroFianca?.numeroSeguro}</p>
                       </div>
                     </>
@@ -1690,7 +1691,7 @@ export const DetalhesImovel = () => {
                   {locacao.garantiaLocacaoTipo === GarantiaLocacao.TITULO_CAPITALIZACAO && (
                     <>
                       <Label>Título de Capitalização</Label>
-                      <div className='flex justify-end'>
+                      <div className='flex justify-start font-semibold'>
                         <p>{locacao.garantiaTituloCapitalizacao?.numeroTitulo}</p>
                       </div>
                     </>
@@ -1698,14 +1699,14 @@ export const DetalhesImovel = () => {
                 </div>
 
 
-                <div className="grid grid-cols-2 gap-4 flex items-end">
+                <div className="grid grid-cols-2 gap-4 flex items-end mt-2">
                   <Button className='col-start-2' variant="secondary" onClick={() => { handlerSelProp('locacoes') }}>
                     <CircleDollarSign className="mr-2 h-4 w-4" />
                     Pagamentos
                   </Button>
                 </div>
 
-                <hr className="border-t border-gray-300 mt-5" />
+                <hr className="border-t border-gray-300 mt-3" />
               </CardContent>
               <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">
                 <Dialog>
@@ -1977,12 +1978,14 @@ export const DetalhesImovel = () => {
                     </form>
                   </DialogContent>
                 </Dialog>
+                {!locacao.status || locacao.status !== LocacaoStatus.ENCERRADA && (
                 <Button variant="destructive" size="sm"
                   onClick={() => { handleDeleteLocacao(locacao) }}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir
                 </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

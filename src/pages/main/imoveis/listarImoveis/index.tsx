@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select'
 import { ImovelTipo } from '@/enums/imovel/enums-imovel'
 import { ROUTE } from '@/enums/routes.enum'
-import { useGlobalParams } from '@/globals/GlobalParams'
+import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
 import { Endereco } from '@/interfaces/endereco'
 import { Imovel } from '@/interfaces/imovel'
@@ -122,6 +122,7 @@ export default function ListarImoveis({
   const navigate = useNavigate()
   //Globals
   const glb_params = useGlobalParams();
+  const { resetStatePessoa } = usePessoa();
 
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1
@@ -170,6 +171,12 @@ export default function ListarImoveis({
   //always that we go to out of the total pages, we will go to the first page
   useEffect(() => {
     glb_params.updTitle_form('Imóveis');
+
+    if (onSelectImovel === undefined) {
+      glb_params.updPastaOrig('personal-info');
+      resetStatePessoa();
+    }
+
 
     if (totalPages && page > totalPages) {
       navigate({

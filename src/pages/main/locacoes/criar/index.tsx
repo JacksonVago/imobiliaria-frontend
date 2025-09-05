@@ -3,6 +3,7 @@ import { ROUTE } from '@/enums/routes.enum'
 import { toast } from '@/hooks/use-toast'
 import { Pessoa } from '@/interfaces/pessoa'
 //import { clienteSchema, ClienteSchema } from '@/schemas/cliente.schema'
+import axios from 'axios';
 import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
@@ -74,8 +75,23 @@ export default function CriarLocacao (){
       }
 
     },
-    onError: () => {
-      toast({ title: 'Erro ao criar locação', variant: 'destructive' })
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar locacao',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
     }
   });  
 

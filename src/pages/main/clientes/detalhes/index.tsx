@@ -961,10 +961,10 @@ export default function DetalhesCliente() {
       </div>
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="personal-info" className='text-[0.8rem]'>Dados Pessoais</TabsTrigger>
-          <TabsTrigger value="propriedades" className='text-[0.8rem]'>Propriedades</TabsTrigger>
-          <TabsTrigger value="locacoes" className='text-[0.8rem]'>Locações</TabsTrigger>
-          <TabsTrigger value="finance" className='text-[0.8rem]'>Fianças</TabsTrigger>
+          <TabsTrigger value="personal-info" className='text-[0.7rem]'>Dados Pessoais</TabsTrigger>
+          <TabsTrigger value="propriedades" className='text-[0.7rem]'>Propriedades</TabsTrigger>
+          <TabsTrigger value="locacoes" className='text-[0.7rem]'>Locações</TabsTrigger>
+          <TabsTrigger value="finance" className='text-[0.7rem]'>Fianças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4">
@@ -974,11 +974,11 @@ export default function DetalhesCliente() {
         {/*Propriedades */}
         <TabsContent value="propriedades" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Propriedades</h2>
+            <h2 className="text-2xl font-bold text-[1.3rem]">Propriedades</h2>
             <Button
               onClick={handlerNewProp}>
               <Plus className="mr-2 h-4 w-4" />
-              Nova Propriedade
+              Propriedade
             </Button>
             <Dialog open={openImovel} onOpenChange={setOpenImovel}>
               <DialogContent>
@@ -1080,20 +1080,21 @@ export default function DetalhesCliente() {
                       proprietario.imovel?.endereco.cidade.toString()}
 
                   </p>
-                  <div className="grid grid-cols-4 gap-4 flex items-end">
+                  <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
                     <Button
+                      className='col-start-3'
                       variant="secondary"
                       size="sm"
                       onClick={() => { handlerDetailImovel(proprietario.imovelId) }}
                       style={
                         {
-                          fontSize: '0.7rem',
+                          fontSize: '0.8rem',
                         }}
                     >
                       Ver detalhes
                     </Button>
                   </div>
-                  <hr className="border-t border-gray-300 mt-5" />
+                  <hr className="border-t border-gray-300 mt-3" />
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Dialog>
@@ -1417,29 +1418,29 @@ export default function DetalhesCliente() {
                       </div>
                       <div className="grid grid-cols-2 gap-4 items-center mt-4">
                         <Label>Período</Label>
-                        <p className="flex items-center text-[0.70rem]">
-                          <Calendar className="mr-2 h-4 w-4" />
+                        <p className="flex items-center text-[0.75rem] font-semibold">
+                          {/* <Calendar className="mr-2 h-4 w-4" /> */}
                           {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
                           {locacao.dataFim
                             ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
                             : 'Atual'}
                         </p>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 items-center mt-4">
+                      <div className="grid grid-cols-2 gap-3 items-center mt-4">
                         <Label>Imóvel</Label>
                         <p className="flex flex-col items-center text-[0.70rem]">
                           {locacao.imovel?.tipo.toString() + ", " + locacao.imovel?.endereco.logradouro.toString() + " " + locacao.imovel?.endereco.bairro + " " + locacao.imovel?.endereco.cidade}
                         </p>
                       </div>
-                      <div className='flex justify-end'>
+                      <div className='grid grid-cols-3 gap-4 flex items-end mt-2'>
                         <Button
+                          className='col-start-3'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
                           style={
                             {
-                              fontSize: '0.6rem',
-                              fontWeight: 'Bold'
+                              fontSize: '0.8rem',
                             }}
                         >
                           Ver detalhes
@@ -1713,8 +1714,8 @@ export default function DetalhesCliente() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">
                   <Label>Período</Label>
-                  <p className="flex items-center text-[0.70rem]">
-                    <Calendar className="mr-2 h-4 w-4" />
+                  <p className="flex items-center text-[0.75rem] font-semibold">
+                    {/* <Calendar className="mr-2 h-4 w-4" /> */}
                     {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
                     {locacao.dataFim
                       ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
@@ -1727,21 +1728,21 @@ export default function DetalhesCliente() {
                     {locacao.imovel?.tipo.toString() + ", " + locacao.imovel?.endereco.logradouro.toString() + " " + locacao.imovel?.endereco.bairro + " " + locacao.imovel?.endereco.cidade}
                   </p>
                 </div>
-                <div className='flex justify-end'>
+                <div className='grid grid-cols-2 gap-3 flex items-end mt-2'>
                   <Button
+                    className='col-start-3'
                     variant="secondary"
                     size="sm"
                     onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
                     style={
                       {
-                        fontSize: '0.6rem',
-                        fontWeight: 'Bold'
+                        fontSize: '0.8rem',
                       }}
                   >
                     Ver detalhes
                   </Button>
                 </div>
-                <hr className="border-t border-gray-300 mt-5" />
+                <hr className="border-t border-gray-300 mt-2" />
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">
                 <Dialog>
