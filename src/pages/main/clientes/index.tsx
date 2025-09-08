@@ -77,7 +77,7 @@ export default function ListarClientes({
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
 
   const navigate = useNavigate()
@@ -87,7 +87,8 @@ export default function ListarClientes({
 
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 2 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
 
   const { data, isLoading } = useQuery(
@@ -258,7 +259,7 @@ export default function ListarClientes({
           <PaginationItem>
             <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
           </PaginationItem>
-          {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 2 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
+          {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 1 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
           <PaginationItem>
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}

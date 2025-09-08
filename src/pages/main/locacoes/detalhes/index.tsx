@@ -41,7 +41,6 @@ import { Locacao } from '@/interfaces/locacao'
 import { LocacaoFormContent, LocacaoFormRoot } from '../components/locacao-form';
 import { useMediaQuery } from 'react-responsive';
 import moment from 'moment';
-import { AxiosError } from 'axios'
 //import { Locatario } from '@/interfaces/locatario';
 
 // Mock data for demonstration
