@@ -39,7 +39,7 @@ export const LocacaoFormRoot = ({
   createLocacaoMethods: UseFormReturn<LocacaoSchema>
   children: React.ReactNode
   onSubmitLocacaoData: (data: LocacaoSchema) => void
-}) => {
+}) => {  
   return (
     <form onSubmit={createLocacaoMethods.handleSubmit(onSubmitLocacaoData)}>{children}</form>
   )
@@ -209,16 +209,16 @@ export const LocacaoFormContent = ({
     }
 
     if (bol_limpa.calcao) {
-      createLocacaoMethods.setValue('depCalcao.valorDeposito', 0);
-      createLocacaoMethods.setValue('depCalcao.quantidadeMeses', 0);
+      createLocacaoMethods.setValue('depCalcao.valorDeposito', undefined);
+      createLocacaoMethods.setValue('depCalcao.quantidadeMeses', undefined);
     }
 
     if (bol_limpa.seguro) {
-      createLocacaoMethods.setValue('seguroFianca.numeroSeguro', '0');
+      createLocacaoMethods.setValue('seguroFianca.numeroSeguro', undefined);
     }
 
     if (bol_limpa.titulo) {
-      createLocacaoMethods.setValue('tituloCap.numeroTitulo', '0');
+      createLocacaoMethods.setValue('tituloCap.numeroTitulo', undefined);
     }
 
   }
@@ -242,6 +242,11 @@ export const LocacaoFormContent = ({
 
     setSelLocatario(false);
   }
+
+  console.log('createLocacaoMethods errors', createLocacaoMethods.formState.errors)
+  console.log('createLocacaoMethods dirtyFields', createLocacaoMethods.formState.isDirty)
+  console.log('createLocacaoMethods isvalid', createLocacaoMethods.formState.isValid)
+  console.log('createLocacaoMethods errors', createLocacaoMethods.getValues())
 
   //Retorno ao selecionar o imóvel
   const handleSelectedImovel = (imovel: Imovel | undefined) => {
@@ -362,8 +367,8 @@ export const LocacaoFormContent = ({
                     ))}
                   </div>
                 )}
-                {!!createLocacaoMethods?.formState?.errors?.locatarios?.message && (
-                  createLocacaoMethods.formState?.errors?.locatarios?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.locatarios?.message}</p>
+                {!!createLocacaoMethods?.formState?.errors?.locatarios && (
+                  <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.locatarios.message}</p>
                 )}
               </div>
             )}
@@ -462,7 +467,7 @@ export const LocacaoFormContent = ({
               </div> */}
 
               <div className='mt-2'>
-                <Label className='text-base' htmlFor="Garantia">Tipo de Garantia</Label>
+                <Label className='text-base'>Tipo de Garantia</Label>
                 <div className='mt-2'>
                   <Controller
                     name="garantiaLocacaoTipo"
@@ -552,7 +557,7 @@ export const LocacaoFormContent = ({
 
             {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
               <div className='mt-2 text-base'>
-                <Label htmlFor="titulocap">Número do Título</Label>
+                <Label>Número do Título</Label>
                 <Input id="titulocap" type="number" disabled={disabled}
                   {...createLocacaoMethods.register('tituloCap.numeroTitulo')}
                   onChange={(e) => { createLocacaoMethods.setValue('tituloCap.numeroTitulo', e.target.value) }}
@@ -563,10 +568,9 @@ export const LocacaoFormContent = ({
 
             {selGarantia === GarantiaLocacao.SEGURO_FIANCA && (
               <div className='mt-2 text-base'>
-                <Label htmlFor="numseguro">Número do Seguro</Label>
+                <Label>Número do Seguro</Label>
                 <Input type="text" disabled={disabled}
                   {...createLocacaoMethods.register('seguroFianca.numeroSeguro')}
-                  onChange={(e) => { createLocacaoMethods.setValue('seguroFianca.numeroSeguro', e.target.value) }}
                 />
                 {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message}</p>}
               </div>
@@ -575,15 +579,15 @@ export const LocacaoFormContent = ({
             {selGarantia === GarantiaLocacao.DEPOSITO_CALCAO && (
               <div>
                 <div className='mt-2 text-base'>
-                  <Label htmlFor="valdepCalcao">Valor do depósito</Label>
+                  <Label>Valor do depósito</Label>
                   <Input type="number" placeholder='0,00' disabled={disabled}
                     {...createLocacaoMethods.register('depCalcao.valorDeposito')}
                   />
                   {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message}</p>}
                 </div>
                 <div className='mt-2 text-base'>
-                  <Label htmlFor="qtddepCalcao">Quantidade de meses</Label>
-                  <Input id="qtddepCalcao" type="number" disabled={disabled}
+                  <Label>Quantidade de meses</Label>
+                  <Input type="number" disabled={disabled}
                     {...createLocacaoMethods.register('depCalcao.quantidadeMeses')}
                   />
                   {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message}</p>}
@@ -592,7 +596,7 @@ export const LocacaoFormContent = ({
             )}
 
             <div className='mt-2 text-base'>
-              <Label className='text-base' htmlFor="status">Situação da Locação</Label>
+              <Label className='text-base'>Situação da Locação</Label>
               <div className='mt-2'>
                 <Controller
                   name="status"
@@ -639,9 +643,10 @@ export const LocacaoFormSubmitButton = ({
       <Button
         type="submit"
         disabled={
-          disabled ||
-          !createLocacaoMethods.formState.isDirty
-          || !createLocacaoMethods.formState.isValid
+          disabled 
+          //||
+          //!createLocacaoMethods.formState.isDirty
+          //|| !createLocacaoMethods.formState.isValid
         }
       >
         Finalizar Cadastro

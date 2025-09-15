@@ -439,7 +439,7 @@ export const DetalhesImovel = () => {
   const defaultValues = {
     ...parsedData,
     logradouro: enderecoData?.logradouro,
-    numero: enderecoData?.numero ? parseInt(enderecoData.numero) : undefined,
+    numero: enderecoData?.numero ? enderecoData.numero : undefined,
     complemento: enderecoData?.complemento,
     bairro: enderecoData?.bairro,
     cidade: enderecoData?.cidade,

@@ -37,22 +37,19 @@ export const ImovelFormContent = ({
   createImovelMethods: UseFormReturn<ImovelSchema>
   disabled?: boolean
 }) => {
-  console.log(createImovelMethods.formState.errors);
-  console.log(createImovelMethods.formState.isDirty);
-  console.log(createImovelMethods.formState.isValid);
-  console.log(createImovelMethods.formState.dirtyFields);
-
   return (
-    <>
-      <FormProvider {...createImovelMethods}>
-        <DocumentUpload disabled={disabled} downloadDocuments={true} />
-        <PropertyImageUpload disabled={disabled} />
-      </FormProvider>
+    <div className="space-y-4">
+      <div>
+        <FormProvider {...createImovelMethods}>
+          <DocumentUpload disabled={disabled} downloadDocuments={true} />
+          <PropertyImageUpload disabled={disabled} />
+        </FormProvider>
+      </div>
       <div className="space-y-4 font-[Poppins-Regular]">
         <div className='mt-2'>
           <Label htmlFor="description">Descrição</Label>
-          <Textarea placeholder="Descrição principal do imóvel " 
-          {...createImovelMethods.register('description')}
+          <Textarea placeholder="Descrição principal do imóvel "
+            {...createImovelMethods.register('description')}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -67,7 +64,7 @@ export const ImovelFormContent = ({
                 onChange: async (e) => {
                   let cep = e.target.value?.replace(/\D/g, '') // Remove caracteres não numéricos
                   const cleanedCep = cep
-                  // Formata o CEP para o formato '#####-###'
+                  7                  // Formata o CEP para o formato '#####-###'
                   console.log('first cep', cep)
                   if (cep.length > 5) {
                     cep = `${cep.slice(0, 5)}-${cep.slice(5, 8)}`
@@ -101,8 +98,11 @@ export const ImovelFormContent = ({
                   }
                 }
               })}
-              helperText={createImovelMethods.formState?.errors?.cep?.message}
             />
+            {createImovelMethods.formState.errors.cep?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.cep.message}
+              </p>)}
           </Label>
         </div>
 
@@ -115,20 +115,26 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Logradouro"
               {...createImovelMethods.register('logradouro')}
-              helperText={createImovelMethods.formState?.errors?.logradouro?.message}
             />
+            {createImovelMethods.formState.errors.logradouro?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.logradouro.message}
+              </p>)}
           </Label>
 
           <Label className='text-base font-[Poppins-Regular]'>
             Número
             <Input
               className="mt-2"
-              type="number"
+              type="text"
               disabled={disabled}
               placeholder="Número"
               {...createImovelMethods.register('numero')}
-              helperText={createImovelMethods.formState?.errors?.numero?.message}
             />
+            {createImovelMethods.formState.errors.numero?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.numero.message}
+              </p>)}
           </Label>
         </div>
 
@@ -141,8 +147,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Bairro"
               {...createImovelMethods.register('bairro')}
-              helperText={createImovelMethods.formState?.errors?.bairro?.message}
             />
+            {createImovelMethods.formState.errors.bairro?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.bairro.message}
+              </p>)}
           </Label>
           <Label className='text-base font-[Poppins-Regular]'>
             Cidade
@@ -152,8 +161,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Cidade"
               {...createImovelMethods.register('cidade')}
-              helperText={createImovelMethods.formState?.errors?.cidade?.message}
             />
+            {createImovelMethods.formState.errors.cidade?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.cidade.message}
+              </p>)}
           </Label>
 
           <Label className='text-base font-[Poppins-Regular]'>
@@ -164,8 +176,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Complemento"
               {...createImovelMethods.register('complemento')}
-              helperText={createImovelMethods.formState?.errors?.complemento?.message}
             />
+            {createImovelMethods.formState.errors.complemento?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.complemento.message}
+              </p>)}
           </Label>
         </div>
 
@@ -197,7 +212,10 @@ export const ImovelFormContent = ({
                   </Select>
                 )}
               />
-              <span>{createImovelMethods?.formState?.errors?.estado?.message}</span>
+              {createImovelMethods.formState.errors.estado?.message &&
+                (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                  {createImovelMethods.formState.errors.estado.message}
+                </p>)}
             </div>
           </Label>
         </div>
@@ -229,8 +247,10 @@ export const ImovelFormContent = ({
                   </Select>
                 )}
               />
-              {createImovelMethods?.formState?.errors?.status?.message}
-              <span>{createImovelMethods?.formState?.errors?.status?.message}</span>
+              {createImovelMethods.formState.errors.status?.message &&
+                (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                  {createImovelMethods.formState.errors.status.message}
+                </p>)}
             </div>
           </Label>
         </div>
@@ -262,8 +282,10 @@ export const ImovelFormContent = ({
                   </Select>
                 )}
               />
-              {createImovelMethods?.formState?.errors?.tipo?.message}
-              <span>{createImovelMethods?.formState?.errors?.tipo?.message}</span>
+              {createImovelMethods.formState.errors.tipo?.message &&
+                (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                  {createImovelMethods.formState.errors.tipo.message}
+                </p>)}
             </div>
           </Label>
         </div>
@@ -295,8 +317,10 @@ export const ImovelFormContent = ({
                   </Select>
                 )}
               />
-              {createImovelMethods?.formState?.errors?.finalidade?.message}
-              <span>{createImovelMethods?.formState?.errors?.finalidade?.message}</span>
+              {createImovelMethods.formState.errors.finalidade?.message &&
+                (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                  {createImovelMethods.formState.errors.finalidade.message}
+                </p>)}
             </div>
           </Label>
         </div>
@@ -305,8 +329,8 @@ export const ImovelFormContent = ({
         <div className="flex justify-center font-[Poppins-ExtraLight]">
           <Label className='font-bold text-lg'>VALORES DO IMÓVEL</Label>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Label className='text-base font-[Poppins-Regular]'>
+        <div className="grid grid-cols-3 gap-4">
+          <Label className='col-span-2'>
             Taxa Administrativa
             <Input
               className="mt-2"
@@ -314,10 +338,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Taxa Administrativa"
               {...createImovelMethods.register('porcentagem_lucro_imobiliaria')}
-              helperText={
-                createImovelMethods.formState?.errors?.porcentagem_lucro_imobiliaria?.message
-              }
             />
+            {createImovelMethods.formState.errors.porcentagem_lucro_imobiliaria?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.porcentagem_lucro_imobiliaria.message}
+              </p>)}
           </Label>
 
         </div>
@@ -333,8 +358,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor do aluguel"
               {...createImovelMethods.register('valor_aluguel')}
-              helperText={createImovelMethods.formState?.errors?.valor_aluguel?.message}
             />
+            {createImovelMethods.formState.errors.valor_aluguel?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_aluguel.message}
+              </p>)}
           </Label>
           <Label className='text-base font-[Poppins-Regular]'>
             Venda
@@ -345,8 +373,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor de venda"
               {...createImovelMethods.register('valor_venda')}
-              helperText={createImovelMethods.formState?.errors?.valor_venda?.message}
             />
+            {createImovelMethods.formState.errors.valor_venda?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_venda.message}
+              </p>)}
           </Label>
         </div>
 
@@ -360,8 +391,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor da água"
               {...createImovelMethods.register('valor_agua')}
-              helperText={createImovelMethods.formState?.errors?.valor_agua?.message}
             />
+            {createImovelMethods.formState.errors.valor_agua?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_agua.message}
+              </p>)}
           </Label>
           <Label className='text-base font-[Poppins-Regular]'>
             Taxa de lixo
@@ -372,8 +406,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor da taxa de lixo"
               {...createImovelMethods.register('valor_taxa_lixo')}
-              helperText={createImovelMethods.formState?.errors?.valor_taxa_lixo?.message}
             />
+            {createImovelMethods.formState.errors.valor_taxa_lixo?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_taxa_lixo.message}
+              </p>)}
           </Label>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -386,8 +423,11 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor do condomínio"
               {...createImovelMethods.register('valor_condominio')}
-              helperText={createImovelMethods.formState?.errors?.valor_condominio?.message}
             />
+            {createImovelMethods.formState.errors.valor_condominio?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_condominio.message}
+              </p>)}
           </Label>
           <Label className='text-base font-[Poppins-Regular]'>
             IPTU
@@ -398,12 +438,15 @@ export const ImovelFormContent = ({
               disabled={disabled}
               placeholder="Valor do IPTU"
               {...createImovelMethods.register('valor_iptu')}
-              helperText={createImovelMethods.formState?.errors?.valor_iptu?.message}
             />
+            {createImovelMethods.formState.errors.valor_iptu?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.valor_iptu.message}
+              </p>)}
           </Label>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -420,7 +463,8 @@ export const ImovelFormSubmitButton = ({
         type="submit"
         className="mt-4"
         disabled={
-          disabled ||
+          disabled
+          ||
           !createImovelMethods.formState.isDirty ||
           !createImovelMethods.formState.isValid
         }

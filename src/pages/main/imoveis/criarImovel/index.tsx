@@ -138,7 +138,6 @@ export const CriarImovel = () => {
     resolver: zodResolver(imovelSchema),
     defaultValues: {
       status: ImovelStatus.DISPONIVEL,
-      //images: imovelData?.imovelPhotos?.map((photo) => ({}))
       images: (imovelData?.imovelPhotos ? imovelData?.imovelPhotos : [])
     },
     mode: 'all'
@@ -149,19 +148,19 @@ export const CriarImovel = () => {
       console.log(data);
       const form = new FormData()
 
-      if (data.description) {
+      /*if (data.description) {
         form.append('description', data.description)
-      }
-      
+      }*/
+
       if (data.tipo) {
         form.append('tipo', data.tipo)
       }
       if (data.status) {
         form.append('status', data.status)
       }
-      if (data.finalidade) {
+      /*if (data.finalidade) {
         form.append('finalidade', data.finalidade)
-      }
+      }*/
       if (hasValues(data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria : "")) {
         form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria.toString() : "")
       }
@@ -237,7 +236,9 @@ export const CriarImovel = () => {
 
       toast({ title: 'Imóvel criado com sucesso' })
       navigate(`${ROUTE.IMOVEIS}/${response.data.id}`)
+
     } catch (error) {
+      console.log(error);
       toast({
         title: 'Erro ao criar imóvel',
         description: 'Não foi possível criar o imóvel, tente novamente'

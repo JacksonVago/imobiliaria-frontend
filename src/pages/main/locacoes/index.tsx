@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Pagination,
   PaginationContent,
@@ -9,6 +10,13 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -21,22 +29,26 @@ import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { Locacao } from '@/interfaces/locacao'
+import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
+import { LocacaoStatus } from '@/enums/locacao/enums-locacao'
 
 // Types
 interface GetLocacoesParams {
   search?: string
   page?: number
   limit?: number,
+  status?: string | undefined,
   exclude?: string,
 }
 
 // API & Query Logic
-export const getLocacoes = async ({ page, limit, search, exclude }: GetLocacoesParams) => {
+export const getLocacoes = async ({ page, limit, search, status, exclude }: GetLocacoesParams) => {
   return await api.get<BasePaginationData<Locacao>>('locacoes', {
     params: {
       page,
       limit,
       search,
+      status,
       exclude
     }
   })
@@ -46,6 +58,7 @@ export const useGetLocacoesQueryOptions = ({
   search,
   page,
   limit,
+  status,
   exclude,
   ...queryKeys
 }: {
@@ -55,11 +68,12 @@ export const useGetLocacoesQueryOptions = ({
   price?: string
   page?: number
   limit?: number
+  status?: string | undefined
   exclude?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['locacoes', { search, page, limit, exclude }, queryKeys],
-    queryFn: () => getLocacoes({ search, page, limit, exclude })
+    queryKey: ['locacoes', { search, page, limit, status, exclude }, queryKeys],
+    queryFn: () => getLocacoes({ search, page, limit, status, exclude })
   })
 }
 
@@ -90,12 +104,14 @@ export default function ListarLocacoes({
   const page = Number(searchParams.get('page')) || 1;
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 2 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
+  const status = searchParams.get('status') || undefined
 
   const { data, isLoading } = useQuery(
     useGetLocacoesQueryOptions({
       page,
       limit,
       search,
+      status,
       exclude,
     })
   )
@@ -103,6 +119,7 @@ export default function ListarLocacoes({
   const locacoes = data?.data?.data || []
   const totalPages = data?.data?.totalPages
 
+  console.log(totalPages)
   // const hasTotalPages = !!totalPages
   // const canGoToNextPage = hasTotalPages && page < totalPages
   // const canGoToPreviousPage = hasTotalPages && page > totalPages
@@ -111,7 +128,7 @@ export default function ListarLocacoes({
     glb_params.updTitle_form('Locações');
     if (totalPages && page > totalPages) {
       navigate({
-        search: `?page=1&limit=${limit}&search=${search}`
+        search: `?page=1&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
       })
     }
   }, [totalPages, page, navigate, limit, search])
@@ -130,7 +147,7 @@ export default function ListarLocacoes({
 
     if (!canChangePage) return
     navigate({
-      search: `?page=${newpage}&limit=${limit}&search=${search}`
+      search: `?page=${newpage}&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
     })
   }
   const handleClickCreateLocacao = () => {
@@ -145,13 +162,34 @@ export default function ListarLocacoes({
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && locacoes?.length === 0)
 
+  const handlerChangeStatus = (tipo: string) => {
+    let tipo_aux: LocacaoStatus | null;
+
+    switch (tipo.toUpperCase()) {
+      case "ATIVA":
+        tipo_aux = LocacaoStatus.ATIVA;
+        break;
+      case "AGUARDANDO DOCUMENTOS":
+        tipo_aux = LocacaoStatus.AGUARDANDO_DOCUMENTOS;
+        break;
+      case "ENCERRADA":
+        tipo_aux = LocacaoStatus.ENCERRADA;
+        break;
+
+      default:
+        tipo_aux = LocacaoStatus.ATIVA;
+    }
+    navigate({
+      search: `?page=1&limit=${limit}&search=${search}&status=${(tipo_aux !== null ? tipo_aux : '')}`
+    })
+  }
+
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
-      <div className={(isPortrait ? 'grid grid-cols-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isTablet ? 'grid grid-cols-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isMobile ? 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center')}>
-        {glb_params.origin_url.indexOf('lista') > -1 && (
-          <h1 className="text-2xl font-bold">Locações</h1>
-        )}
+      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+        {/* <div className={(isPortrait ? 'grid grid-cols-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isTablet ? 'grid grid-cols-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isMobile ? 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center')}> */}
+        <h1 className="text-2xl font-bold">Locações</h1>
         <Button onClick={handleClickCreateLocacao}>
           <Plus className="h-4 w-4" />Criar Locação
         </Button>
@@ -178,12 +216,32 @@ export default function ListarLocacoes({
           </p>
         )}
 
+        <div className='mt-2'>
+          <Label className='text-base font-[Poppins-Regular]'>
+            Situação da Locação
+            <div className='mt-2'>
+              <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Situação" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_LOCACAO_OPTIONS.map((value) => (
+                    <SelectItem key={value.label} value={value.label}>
+                      {value.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </Label>
+        </div>
+
         {/* locações Cards */}
         {locacoes?.map((locacao) => (
           <Card key={locacao.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                  <span className="truncate"
+                <span className="truncate"
                   style={
                     {
                       fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
@@ -206,7 +264,7 @@ export default function ListarLocacoes({
                 <dd className="truncate">{locacao?.dia_vencimento || 'N/A'}</dd>
                 <dt className="font-semibold">Situacao:</dt>
                 <dd style={{
-                  fontSize: ( isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                  fontSize: (isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
                 }}>{locacao?.status || 'N/A'}</dd>
               </dl>
             </CardContent>

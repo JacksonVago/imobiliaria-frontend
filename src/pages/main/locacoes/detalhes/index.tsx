@@ -142,12 +142,10 @@ export const DetalhesLocacaoForm = ({
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   //const params = useParams();
 
-  console.log(id);
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
       const { data } = await api.get<Locacao>(`/locacoes/${id}`)
-      console.log(data);
       return data
     },
     enabled: !!id
@@ -223,8 +221,9 @@ export const DetalhesLocacaoForm = ({
   });*/
 
   const onSubmitLocacaoData = async (data: LocacaoSchema) => {
-    try {
-      console.log(new Date());
+    console.log(new Date());
+
+    try {      
       console.log(data);
       const formData = new FormData()
 
@@ -233,7 +232,7 @@ export const DetalhesLocacaoForm = ({
       formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : '0'));
       formData.append('status', data.status);
       formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-      formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : ""));
+      formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : "0"));
       formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
       formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
       formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -244,7 +243,7 @@ export const DetalhesLocacaoForm = ({
 
       console.log(new Date());
 
-      await updatelocacao.mutateAsync(formData)
+      //await updatelocacao.mutateAsync(formData)
       console.log(new Date());
 
       toast({
@@ -277,24 +276,21 @@ export const DetalhesLocacaoForm = ({
   }
 
   //default values
-  const enderecoData = transformNullToUndefined(locacao?.imovel?.endereco || {})
+  //const enderecoData = transformNullToUndefined(locacao?.imovel?.endereco || {})
   const defaultValues = React.useMemo(
     () => ({
-      ...transformNullToUndefined(locacao || {}),
+      //...transformNullToUndefined(locacao || {}),
       dataInicio: moment(locacao?.dataInicio).format('YYYY-MM-DD'),
       dataFim: moment(locacao?.dataFim).format('YYYY-MM-DD'),
-      logradouro: enderecoData?.logradouro,
-      numero: enderecoData?.numero ? parseInt(enderecoData.numero) : undefined,
-      complemento: enderecoData?.complemento,
-      bairro: enderecoData?.bairro,
-      cidade: enderecoData?.cidade,
-      cep: enderecoData?.cep,
-      estado: enderecoData?.estado,
+      valor_aluguel: locacao?.valor_aluguel,
+      dia_vencimento: locacao?.dia_vencimento,
+      status: locacao?.status || 'ATIVA',
       documentos: documentFiles?.filter((doc) => doc !== null),
       garantiaLocacaoTipo: locacao?.garantiaLocacaoTipo,
-      locatarios: locacao?.locatarios?.map((locatario) => {
+      imovelId: locacao?.imovelId,
+      locatarios: locacao?.locatarios ? locacao?.locatarios?.map((locatario) => {
         return { nome: locatario.pessoa?.nome, id: locatario.pessoa?.id }
-      }),
+      }) : undefined,
       fiadores: locacao?.fiadores ? locacao?.fiadores?.map((fiador) => {
         return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
       }) : undefined,
@@ -305,11 +301,6 @@ export const DetalhesLocacaoForm = ({
     }),
     [locacao, documentFiles]
   )
-
-  React.useEffect(() => {
-    if (locacao) locacaoMethods.reset(defaultValues)
-    console.log(defaultValues);
-  }, [defaultValues])
 
   //react hook form
 
@@ -323,15 +314,19 @@ export const DetalhesLocacaoForm = ({
     if (locacao) {
       locacaoMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
     }
+    console.log(defaultValues);
   }, [id, locacao, documentFiles])
 
   /*const handleDeleteProprietario = () => {
     deletelocacaoMutation.mutate()
   }*/
 
+    const result = locacaoSchema.safeParse(defaultValues)
+    console.log(result)
   const hasLocatario = !!locacao?.locatarios?.length;
 
-  console.log(locacaoMethods.formState.errors);
+  console.log(locacaoMethods.getValues());
+  console.log(locacaoMethods.formState.errors.dia_vencimento);
 
   return (
     <Card>

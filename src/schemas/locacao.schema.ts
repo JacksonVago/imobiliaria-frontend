@@ -188,67 +188,22 @@ export const locacaoSchema = z.object({
     .optional(),
 
   documentosToDeleteIds: z.array(z.number()).optional(),
-  //dataInicio: z.coerce.date({ message: 'Data inválida' }),  
   dataInicio: z.string().transform((val)=>{
     const data:string = val;
     return moment(data.substring(0,10)).format("YYYY-MM-DD");
   }),
-  //dataFim: z.coerce.date({ message: 'Data inválida' }),
-   dataFim: z.string().transform((val)=>{
+  dataFim: z.string().transform((val)=>{
      const data:string = val;
      return moment(data.substring(0,10)).format("YYYY-MM-DD");
    }),
-  valor_aluguel: z.string().or(z.number()),
-    // .union(
-    //   [
-    //     //z.number().min(1, 'Valor do aluguel é obrigatório'),
-    //     z.string().min(1, 'Valor do aluguel é obrigatório')
-    //       .transform((val) => {
-    //         try{
-    //         console.log(val);
-    //         const num = Number(val)
-    //         console.log(val);
-    //         return isNaN(num) ? 0 : num
-    //         }
-    //         catch (error){
-    //           console.log(error);
-    //           return error;
-    //         }
-    //       })
-    //   ]
-    // ).refine((val) => val !== undefined, 'Valor do aluguel é obrigatório'),
-  dia_vencimento: z.string().or(z.number()),
-    // .union([
-    //   z.number().min(1, 'Dia de vencimento é obrigatório'),
-    //   z
-    //     .string()
-    //     .min(1, 'Dia de vencimento é obrigatório')
-    //     .transform((val) => {
-    //       console.log(val);
-    //       const num = Number(val)
-    //       return isNaN(num) ? undefined : num
-    //     })
-    // ])
-    // .refine((val) => val !== undefined, 'Dia de vencimento é obrigatório'),
+  valor_aluguel: z.coerce.number().min(1, 'Valor do aluguel é obrigatório'),
+  dia_vencimento: z.string().transform((val)=>{
+     const data:string = val;
+     return isNaN(Number(data)) ? undefined : data
+   }),
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
-  imovelId: z.string().or(z.number()),
-    // .union([
-    //   z.number().min(1, 'Imóvel é obrigatório'),
-    //   z
-    //     .string()
-    //     .min(1, 'Imóvel é obrigatório')
-    //     .transform((val) => {
-    //       const num = Number(val)
-    //       return isNaN(num) ? 0 : num === undefined ? 0 : num
-    //     })
-    // ])
-    // .refine((val) => val !== undefined, 'Imóvel é obrigatório'),
-  /*pessoaId: z.number().min(1, 'Id da Pessoa (locatário) e obrigatório')
-    .transform((val) => {
-      const num = Number(val)
-      return isNaN(num) ? undefined : num
-    }),*/
+  imovelId: z.coerce.number().min(1, 'Id do imóvel e obrigatório'),
   locatarios: z.array(    z.object(
       {
         nome: z.string(),
@@ -256,7 +211,7 @@ export const locacaoSchema = z.object({
       }
     )
 
-  ).min(1, 'Locatário é obrigatório'),
+  ).min(1, {message: 'Locatário é obrigatório'}),
   fiadores: z.array(
     z.object(
       {
@@ -275,46 +230,21 @@ export const locacaoSchema = z.object({
   ).optional(),
   tituloCap: z.object(
     {
-      numeroTitulo: z.string(),
+      numeroTitulo: z.string().min(1, 'Número do seguro é obrigatório').optional(),
     }
   ).optional(),
   seguroFianca: z.object(
     {
-      numeroSeguro: z.string(),
+      numeroSeguro: z.string().min(1, 'Número do seguro é obrigatório').optional(),
     }
   ).optional(),
   depCalcao: z.object(
     {
-      valorDeposito: z.number(),
-      /*z.union(
-          [
-            z.number().min(1, 'Valor do depósito é obrigatório'),
-            z
-              .string()
-              .min(1, 'Valor do depósito é obrigatório')
-              .transform((val) => {
-                const num = Number(val)
-                return isNaN(num) ? undefined : num
-              })
-          ]
-        ).refine((val) => val !== undefined, 'Valor do depósito é obrigatório'),*/
-
-      quantidadeMeses: z.number(),
-      /*z.union(
-          [
-            z.number().min(1, 'Quantidade de meses é obrigatório'),
-            z
-              .string()
-              .min(1, 'Quantidade de meses é obrigatório')
-              .transform((val) => {
-                const num = Number(val)
-                return isNaN(num) ? undefined : num
-              })
-          ]
-        ).refine((val) => val !== undefined, 'Quantidade de meses é obrigatório'),*/
+      valorDeposito: z.number().min(1, 'Valor do depósito é obrigatório').optional(),
+      quantidadeMeses: z.number().min(1, 'Quantidade de meses é obrigatório').optional(),
     }
   ).optional(),
-})
+});
 
 // export const locacaoSchema = z.object({
 //   documentos: z.array(
