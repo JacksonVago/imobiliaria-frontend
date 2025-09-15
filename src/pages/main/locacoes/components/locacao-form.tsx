@@ -644,9 +644,9 @@ export const LocacaoFormSubmitButton = ({
         type="submit"
         disabled={
           disabled 
-          //||
-          //!createLocacaoMethods.formState.isDirty
-          //|| !createLocacaoMethods.formState.isValid
+          ||
+          !createLocacaoMethods.formState.isDirty
+          || !createLocacaoMethods.formState.isValid
         }
       >
         Finalizar Cadastro

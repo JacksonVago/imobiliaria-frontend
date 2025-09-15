@@ -627,7 +627,7 @@ export const DetalhesImovel = () => {
 
     if (documentosToDeleteIds) {
       console.log(documentosToDeleteIds);
-      documentosToDeleteIds.forEach((docId) => {
+      documentosToDeleteIds.forEach((docId:any) => {
         form.append('documentosToDeleteIds[]', docId.toString())
       })
     }

@@ -172,7 +172,7 @@ export const DetalhesLocacaoForm = ({
     }
   })*/
 
-  const updatelocacao = useMutation({
+  /*const updatelocacao = useMutation({
     mutationFn: async (data: FormData) => {
       const dataObject = Object.fromEntries(data.entries());
       const jsonData = JSON.stringify(dataObject);
@@ -202,7 +202,7 @@ export const DetalhesLocacaoForm = ({
     }
   })
 
-  /*const deletelocacaoMutation = useMutation({
+  const deletelocacaoMutation = useMutation({
     mutationFn: async () => {
       return await api.delete(`/locacoes/${id}`)
     },

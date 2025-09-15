@@ -197,10 +197,18 @@ export const locacaoSchema = z.object({
      return moment(data.substring(0,10)).format("YYYY-MM-DD");
    }),
   valor_aluguel: z.coerce.number().min(1, 'Valor do aluguel é obrigatório'),
-  dia_vencimento: z.string().transform((val)=>{
-     const data:string = val;
-     return isNaN(Number(data)) ? undefined : data
-   }),
+  dia_vencimento: z
+    .union([
+      z.number().min(1, 'Dia de vencimento é obrigatório'),
+      z
+        .string()
+        .min(1, 'Dia de vencimento é obrigatório')
+        .transform((val) => {
+          const num = Number(val)
+          return isNaN(num) ? undefined : num
+        })
+    ])
+    .refine((val) => val !== undefined, 'Dia de vencimento é obrigatório'),
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
   imovelId: z.coerce.number().min(1, 'Id do imóvel e obrigatório'),
