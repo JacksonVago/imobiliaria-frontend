@@ -112,15 +112,16 @@ enum QueryKeys {
 }
 
 import { PageLoader } from '@/pages/assistant/page-loader'
-//import { z } from 'zod'
+import { z } from 'zod'
+import axios from 'axios'
 
-/*const createUserSchema = z.object({
+const createUserSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório.'),
   email: z.string().email('Insira um e-mail válido.'),
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.')
-})*/
+})
 
-/*const updateUserSchema = z.object({
+const updateUserSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'O nome é obrigatório.'),
   email: z.string().email('Insira um e-mail válido.'),
@@ -145,7 +146,7 @@ import { PageLoader } from '@/pages/assistant/page-loader'
       'VIEW_LOCACOES'
     ])
   )
-})*/
+})
 
 export const ListarColaboradores = () => {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null)
@@ -174,12 +175,29 @@ export const ListarColaboradores = () => {
       setIsCreateDialogOpen(false)
       setNewUser({ name: '', email: '', password: '' })
     },
-    onError: () => {
-      toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao criar o usuário. Tente novamente.',
-        variant: 'destructive'
-      })
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao criar colaborador',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+        toast({
+          title: 'Erro',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao criar o usuário. Tente novamente.',
+          variant: 'destructive'
+        })
+      }
+
     }
   })
 

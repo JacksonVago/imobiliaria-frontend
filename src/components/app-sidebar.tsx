@@ -40,16 +40,15 @@ const data = {
       icon: Users
     },*/
     {
-      title: 'Permissões',
-      url: ROUTE.COLABORADORES,
-      icon: Lock
-    }
-,
-    {
       title: 'Clientes',
       url: ROUTE.CLIENTES,
       icon: Users
-    }    
+    },
+    {
+      title: 'Permissões/Colaboradores',
+      url: ROUTE.COLABORADORES,
+      icon: Lock
+    },
   ]
 }
 
