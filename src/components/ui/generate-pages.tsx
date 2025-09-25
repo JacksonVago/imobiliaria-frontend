@@ -10,7 +10,7 @@ export const generatePaginationLinks = (
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
   const pages: JSX.Element[] = [];
   if (totalPages <= showPages) {

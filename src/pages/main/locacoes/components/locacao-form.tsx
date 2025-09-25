@@ -72,7 +72,7 @@ export const LocacaoFormContent = ({
       setSelGarantia(sel);
     }
   },[]);
-
+7
   //Lista de imóveis
   const locacaoImoveis = useFieldArray({
     control: createLocacaoMethods.control,
