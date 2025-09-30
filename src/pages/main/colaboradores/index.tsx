@@ -1,5 +1,3 @@
-'use client'
-
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
 import * as React from 'react'
 
@@ -33,6 +31,7 @@ import { Permission, User } from '@/interfaces/user'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { z } from 'zod'
 
 export const permissions: { value: Permission; label: string }[] = [
   { value: 'ALL', label: 'Todas as permissões' },
@@ -75,22 +74,34 @@ const locatariosPermissions: { value: Permission; label: string }[] = [
   { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' }
 ]
 
+const loginSchema = z.object({
+  login: z
+    .string()
+    .min(1, { message: 'Login é obrigatório' }),
+  password: z.string().min(8, { message: 'A senha deve possuir no mínimo 8 caracteres incluindo , letras maiúculas, minúsculas, números e caracteres especiais (@#$%)' })
+})
+
+type LoginSchema = z.infer<typeof loginSchema>
+
 export const getUsers = () => {
   return api.get<User[]>('/users/collaborators')
 }
 
 export const createUser = ({
-  email,
+  login,
   name,
+  email,
   password,
   permissions = []
 }: {
+  login: string
   name: string
   email: string
   password: string
   permissions: Permission[]
 }) => {
   return api.post('/users', {
+    login: login,
     name: name,
     email: email,
     password: password,
@@ -100,6 +111,7 @@ export const createUser = ({
 
 export const putUpdateUser = (userData: {
   id: string
+  login: string
   name: string
   email: string
   permissions: Permission[]
@@ -112,7 +124,6 @@ enum QueryKeys {
 }
 
 import { PageLoader } from '@/pages/assistant/page-loader'
-//import { z } from 'zod'
 import axios from 'axios'
 
 /*const createUserSchema = z.object({
@@ -153,7 +164,7 @@ export const ListarColaboradores = () => {
   const [userPermissions, setUserPermissions] = React.useState<Permission[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [newUser, setNewUser] = React.useState({ name: '', email: '', password: '' })
+  const [newUser, setNewUser] = React.useState({ login: '', name: '', email: '', password: '' })
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -173,7 +184,7 @@ export const ListarColaboradores = () => {
         description: 'O novo usuário foi criado com sucesso.'
       })
       setIsCreateDialogOpen(false)
-      setNewUser({ name: '', email: '', password: '' })
+      setNewUser({ login: '', name: '', email: '', password: '' })
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
@@ -328,6 +339,7 @@ export const ListarColaboradores = () => {
     if (selectedUser) {
       updateUserMutation.mutate({
         id: selectedUser.id,
+        login: selectedUser.login,
         name: selectedUser.name,
         email: selectedUser.email,
         permissions: userPermissions
@@ -336,18 +348,32 @@ export const ListarColaboradores = () => {
   }
 
   const handleCreateUser = () => {
-    createUserMutation.mutate({
-      name: newUser.name,
-      email: newUser.email,
-      password: newUser.password,
-      permissions: []
-    })
+    console.log('Creating user', newUser);
+    const parsedData = loginSchema.safeParse({ login: newUser.login, password: newUser.password });
+    if (parsedData.success) {
+      createUserMutation.mutate({
+        login: newUser.login,
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password,
+        permissions: []
+      });
+    }
+    else {
+      toast({
+        title: 'Erro ao criar colaborador',
+        description: parsedData.error.issues[0].message,
+        variant: 'destructive'
+      });
+    }
+
   }
 
   const handleUpdateUser = () => {
     if (selectedUser) {
       updateUserMutation.mutate({
         id: selectedUser.id,
+        login: selectedUser.login,
         name: selectedUser.name,
         email: selectedUser.email,
         permissions: userPermissions
@@ -366,14 +392,14 @@ export const ListarColaboradores = () => {
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4">
+    <div className="container mx-auto space-y-6 p-4 ">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-bold">Gerenciar usuários e permissões</h1>
         <Dialog
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-            setNewUser({ name: '', email: '', password: '' })
+            setNewUser({ login: '', name: '', email: '', password: '' })
           }}
         >
           <DialogTrigger asChild>
@@ -387,6 +413,17 @@ export const ListarColaboradores = () => {
               <DialogDescription>Preencha os dados do novo colaborador abaixo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Login
+                </Label>
+                <Input
+                  id="login"
+                  value={newUser.login}
+                  onChange={(e) => setNewUser({ ...newUser, login: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
                   Nome
@@ -587,6 +624,17 @@ export const ListarColaboradores = () => {
             <DialogDescription>Edite os dados do colaborador abaixo.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-name" className="text-right">
+                Login
+              </Label>
+              <Input
+                id="edit-login"
+                value={selectedUser?.login || ''}
+                onChange={(e) => setSelectedUser((prev) => ({ ...prev!, login: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
                 Nome

@@ -286,7 +286,7 @@ export default function ListarImoveis({
         {/* Imoveis Cards */}
         {imoveis?.map((imovel) => (
           <Card key={imovel.id} className="">
-            {(imovel?.imovelPhotos?.length ? imovel?.imovelPhotos?.length : 0) > 0 ? (
+            {/*(imovel?.imovelPhotos?.length ? imovel?.imovelPhotos?.length : 0) > 0 ? (
               <Carousel  autoplay={true}>
                 <CarouselContent>
                   {imovel?.imovelPhotos && (
@@ -314,7 +314,7 @@ export default function ListarImoveis({
               <div className="rounded-md bg-muted py-8 text-center">
                 <p className="text-muted-foreground">Nenhuma imagem adicionada</p>
               </div>
-            )}
+            )*/}
 
             <CardHeader className="flex flex-row justify-between">
               <CardTitle className="line-clamp-1" style={{fontSize:'1rem'}}>{imovel?.description}</CardTitle>

@@ -5,8 +5,9 @@ import { isAxiosError } from 'axios'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import { createContext, useEffect, useState } from 'react'
 
-interface UserInfo {
+interface UserInfo {  
   id: string
+  login: string
   name: string
   email: string
   role: UserRole
@@ -20,7 +21,7 @@ export const STORAGE_REFRESH_TOKEN_KEY = '@my_application_refresh_token'
 
 //interface for login mutation
 interface LoginData {
-  email: string
+  login: string
   password: string
 }
 
@@ -29,6 +30,7 @@ interface loginResponse {
 }
 
 interface RegisterData {
+  login: string
   email: string
   password: string
   name: string
@@ -110,7 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   async function login(data: LoginData) {
     try {
       const response = await postLogin({
-        email: data.email,
+        login: data.login,
         password: data.password
       })
       const { access_token } = response

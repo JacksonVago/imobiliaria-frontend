@@ -11,11 +11,18 @@ import { z } from 'zod'
 export const description =
   "A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account."
 
-const loginSchema = z.object({
+const loginSchema_old = z.object({
   email: z
     .string()
     .min(1, { message: 'Email is required' })
     .email({ message: 'Invalid email address' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' })
+})
+
+const loginSchema = z.object({
+  login: z
+    .string()
+    .min(1, { message: 'Login is required' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' })
 })
 
@@ -45,14 +52,14 @@ export function Login() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="login">Usuário</Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              {...register('email')}
+              id="login"
+              type="text"
+              placeholder="Usuario"
+              {...register('login')}
               required
-              helperText={errors.email?.message}
+              helperText={errors.login?.message}
             />
           </div>
           <div className="grid gap-2">
