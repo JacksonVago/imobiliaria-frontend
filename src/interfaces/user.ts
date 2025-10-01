@@ -12,6 +12,8 @@ export interface User {
 
 export type Permission =
   | 'ALL'
+  | 'VIEW_EMPRESA'
+  | 'UPDATE_EMPRESA'
   | 'CREATE_IMOVEL'
   | 'UPDATE_IMOVEL'
   | 'DELETE_IMOVEL'
@@ -32,6 +34,10 @@ export type Permission =
   | 'UPDATE_CLIENTE'
   | 'DELETE_CLIENTE'
   | 'VIEW_CLIENTES'
+  | 'CREATE_TIPOIMOVEL'
+  | 'UPDATE_TIPOIMOVEL'
+  | 'DELETE_TIPOIMOVEL'
+  | 'VIEW_TIPOIMOVEL'
 
 export const userPermissions: {
   [key in Permission]: string
@@ -57,6 +63,10 @@ export const userPermissions: {
   UPDATE_CLIENTE: 'Atualizar clientes',
   DELETE_CLIENTE: 'Deletar clientes',
   VIEW_CLIENTES: 'Visualizar clientes',
+  CREATE_TIPOIMOVEL: 'Criar tipos de imóvel',
+  UPDATE_TIPOIMOVEL: 'Atualizar tipos de imóvel',
+  DELETE_TIPOIMOVEL: 'Deletar tipos de imóvel',
+  VIEW_TIPOIMOVEL: 'Visualizar tipos de imóvel'
 
 }
 

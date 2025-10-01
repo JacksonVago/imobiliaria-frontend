@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff, EyeOffIcon, Icon } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
@@ -29,6 +31,7 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>
 
 export function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth()
 
   const {
@@ -71,11 +74,14 @@ export function Login() {
             </div>
             <Input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               required
               {...register('password')}
               helperText={errors.password?.message}
             />
+            <Button className='bg-white' onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <Eye color='black'></Eye> : <EyeOffIcon color='black'></EyeOffIcon>}
+            </Button>
           </div>
           <Button type="submit" className="w-full">
             Acessar

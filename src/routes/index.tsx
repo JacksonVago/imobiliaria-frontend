@@ -27,6 +27,8 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import ListarLocacoes from '@/pages/main/locacoes'
 import DetalhesLocacao from '@/pages/main/locacoes/detalhes'
 import  CriarLocacao  from '@/pages/main/locacoes/criar'
+import ListarTipos from '@/pages/main/tipoImovel'
+import DetalhesEmpresa from '@/pages/main/empresas/detalhes'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -96,6 +98,41 @@ export const RoutesComponent = () => {
           />
 
           <Route path={ROUTE.HOME} element={<div>Home</div>} />
+
+          <Route
+            path={ROUTE.EMPRESA}
+            element={
+              <ProtectedRoute permission="VIEW_EMPRESA">
+                <DetalhesEmpresa />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Tipo de Imóveis */}
+          <Route
+            path={ROUTE.TIPOIMOVEL}
+            element={
+              <ProtectedRoute permission="VIEW_TIPOIMOVEL">
+                <ListarTipos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.IMOVEIS_CRIAR}
+            element={
+              <ProtectedRoute permission="CREATE_IMOVEL">
+                <CriarImovel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.IMOVEIS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_IMOVELS">
+                <DetalhesImovel />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Imóveis */}
           <Route

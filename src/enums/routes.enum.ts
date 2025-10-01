@@ -7,6 +7,9 @@ export enum ROUTE {
   HOME = '/',
   SOBRE = '/sobre',
 
+  // Configurações
+  EMPRESA = '/empresas',
+
   // Imoveis routes
   IMOVEIS = '/imoveis',
   IMOVEIS_CRIAR = '/imoveis/criar',
@@ -36,6 +39,11 @@ export enum ROUTE {
   COLABORADORES = '/colaboradores',
   COLABORADORES_CRIAR = '/colaboradores/criar',
   COLABORADORES_DETALHES = '/colaboradores/:id',
+
+  //TipoImovel routes
+  TIPOIMOVEL = '/tipoimovel',
+  TIPOIMOVEL_CRIAR = '/tipoimovel/criar',
+  TIPOIMOVEL_DETALHES = '/tipoimovel/:id',
 
   // Error routes
   NOT_FOUND = '*',

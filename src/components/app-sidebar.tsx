@@ -1,6 +1,6 @@
 'use client'
 
-import { House, Lock, LogOut, Users } from 'lucide-react'
+import { Cog, HotelIcon, House, HouseIcon, HousePlus, Lock, LogOut, LucideHouse, Users } from 'lucide-react'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -20,6 +20,16 @@ import { Link } from 'react-router-dom'
 const data = {
   navMain: [
     {
+      title: 'Configurações',
+      url: ROUTE.EMPRESA,
+      icon: Cog
+    },
+    {
+      title: 'Tipo de Imóvel',
+      url: ROUTE.TIPOIMOVEL,
+      icon: HotelIcon
+    },
+    {
       title: 'Imoveis',
       url: ROUTE.IMOVEIS,
       icon: House
@@ -27,7 +37,7 @@ const data = {
     {
       title: 'Locações',
       url: ROUTE.LOCACOES,
-      icon: House
+      icon: HousePlus
     },
     /*{
       title: 'Proprietários',
@@ -78,6 +88,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return true
       }
       if (item.url === ROUTE.CLIENTES && user?.permissions.includes('VIEW_CLIENTES')) {
+        return true
+      }
+      if (item.url === ROUTE.TIPOIMOVEL && user?.permissions.includes('VIEW_TIPOIMOVEL')) {
         return true
       }
       return false
