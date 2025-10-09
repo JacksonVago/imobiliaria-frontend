@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { ESTADO_CIVIL_OPTIONS } from '@/constants/estado-civil'
 import { ESTADOS } from '@/constants/estados'
-import { ImovelStatus } from '@/enums/imovel/enums-imovel'
+import { ImovelFinalidade, ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { ROUTE } from '@/enums/routes.enum'
 import { useToast } from '@/hooks/use-toast'
 import { ApiCep } from '@/interfaces/cep'
@@ -137,6 +137,7 @@ export const CriarImovel = () => {
   const createImovelMethods = useForm<ImovelSchema>({
     resolver: zodResolver(imovelSchema),
     defaultValues: {
+      finalidade: ImovelFinalidade.ALUGUEL,
       status: ImovelStatus.DISPONIVEL,
       images: (imovelData?.imovelPhotos ? imovelData?.imovelPhotos : [])
     },
@@ -152,8 +153,8 @@ export const CriarImovel = () => {
         form.append('description', data.description)
       }*/
 
-      if (data.tipo) {
-        form.append('tipo', data.tipo)
+      if (data.tipoId) {
+        form.append('tipoId', data.tipoId.toString());
       }
       if (data.status) {
         form.append('status', data.status)
@@ -223,6 +224,10 @@ export const CriarImovel = () => {
       /*await api.post('imoveis', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })*/
+
+      const dataObject = Object.fromEntries(form.entries());
+      const jsonData = JSON.stringify(dataObject);
+      console.log(jsonData);
 
       const response = await api.post('imoveis', form, {
         headers: { 'Content-Type': 'multipart/form-data' }

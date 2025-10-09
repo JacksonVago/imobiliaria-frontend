@@ -43,18 +43,29 @@ export const empresaSchema = z.object({
   cidade: z.string().min(1, 'Cidade é obrigatória'),
   cep: z.string().regex(/^\d{5}-\d{3}$/, 'CEP inválido'),
   estado: z.string().min(1, 'Estado é obrigatório'),
-  avisosReajusteLocacao: z.number().optional(),
-  avisosRenovacaoContrato: z.number().optional(),
-  avisosSeguroFianca: z.number().optional(),
-  avisosSeguroIncendio: z.number().optional(),
-  avisosTituloCapitalizacao: z.number().optional(),
-  avisosDepositoCalcao: z.number().optional(),
-  porcentagemComissao: z.number().optional(),
+  avisosReajusteLocacao: z.coerce.number().optional(),
+  avisosRenovacaoContrato: z.coerce.number().optional(),
+  avisosSeguroFianca: z.coerce.number().optional(),
+  avisosSeguroIncendio: z.coerce.number().optional(),
+  avisosTituloCapitalizacao: z.coerce.number().optional(),
+  avisosDepositoCalcao: z.coerce.number().optional(),
+  porcentagemComissao: z.coerce.number(),
   emiteBoleto: z.string().optional(),
-  valorTaxaBoleto: z.number().optional(),
-  emissaoBoletoAntecedencia: z.number().optional(),
-  porcentagemMultaAtraso: z.number().optional(),
-  porcentagemJurosAtraso: z.number().optional(),
+  valorTaxaBoleto: z.coerce.number().optional(),
+  emissaoBoletoAntecedencia: z.coerce.number().optional(),
+  porcentagemMultaAtraso: z.coerce.number().optional(),
+  porcentagemJurosAtraso: z
+    .union([
+      z.number().min(0, 'Número é obrigatório').optional(),
+      z
+        .string()
+        .min(0, 'Número é obrigatório')
+        .transform((val) => {
+          const num = Number(val)
+          return isNaN(num) ? undefined : num
+        })
+    ])
+    .optional(),
 
 })
 

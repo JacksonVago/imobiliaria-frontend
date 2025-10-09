@@ -47,6 +47,14 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_PROPRIETARIO', label: 'Atualizar Proprietário' },
   { value: 'DELETE_PROPRIETARIO', label: 'Excluir Proprietário' },
   { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' },
+  { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
+  { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
+  { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
+  { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' },
+  { value: 'CREATE_TIPO', label: 'Criar Tipo de imóvel' },
+  { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
+  { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
+  { value: 'VIEW_TIPOS', label: 'Ver Tipos de Imóvel' },
   { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
   { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
   { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
@@ -60,19 +68,33 @@ const imoveisPermissions: { value: Permission; label: string }[] = [
   { value: 'VIEW_IMOVELS', label: 'Visualizar Imóveis' }
 ]
 
-const proprietariosPermissions: { value: Permission; label: string }[] = [
+/*const proprietariosPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_PROPRIETARIO', label: 'Criar Proprietário' },
   { value: 'UPDATE_PROPRIETARIO', label: 'Atualizar Proprietário' },
   { value: 'DELETE_PROPRIETARIO', label: 'Excluir Proprietário' },
   { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' }
+]*/
+
+const pessoasPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
+  { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
+  { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
+  { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' }
 ]
 
-const locatariosPermissions: { value: Permission; label: string }[] = [
+const locacoesPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
+  { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
+  { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
+  { value: 'VIEW_LOCACOES', label: 'Ver Locações' }
+]
+
+/*const locatariosPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_LOCATARIO', label: 'Criar Locatário' },
   { value: 'UPDATE_LOCATARIO', label: 'Atualizar locatário' },
   { value: 'DELETE_LOCATARIO', label: 'Excluir Locatário' },
   { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' }
-]
+]*/
 
 const loginSchema = z.object({
   login: z
@@ -114,8 +136,10 @@ export const putUpdateUser = (userData: {
   login: string
   name: string
   email: string
+  password: string
   permissions: Permission[]
 }) => {
+
   return api.put(`/users/${userData.id}`, userData)
 }
 
@@ -224,12 +248,28 @@ export const ListarColaboradores = () => {
       })
       setIsEditDialogOpen(false)
     },
-    onError: () => {
-      toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao atualizar o usuário. Tente novamente.',
-        variant: 'destructive'
-      })
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar colaborador',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+        toast({
+          title: 'Erro',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao atualizar o usuário. Tente novamente.',
+          variant: 'destructive'
+        })
+      }      
     }
   })
 
@@ -341,7 +381,8 @@ export const ListarColaboradores = () => {
         id: selectedUser.id,
         login: selectedUser.login,
         name: selectedUser.name,
-        email: selectedUser.email,
+        email: selectedUser.email,        
+        password: selectedUser.password,        
         permissions: userPermissions
       })
     }
@@ -371,11 +412,13 @@ export const ListarColaboradores = () => {
 
   const handleUpdateUser = () => {
     if (selectedUser) {
+      console.log(selectedUser);
       updateUserMutation.mutate({
         id: selectedUser.id,
         login: selectedUser.login,
         name: selectedUser.name,
         email: selectedUser.email,
+        password: selectedUser.password,
         permissions: userPermissions
       })
     }
@@ -547,6 +590,7 @@ export const ListarColaboradores = () => {
                           onCheckedChange={(checked) =>
                             handlePermissionChange(checked as boolean, permission.value)
                           }
+                          style={{'border':'1px solid black'}}
                         />
                         <label
                           htmlFor={permission.value}
@@ -558,8 +602,8 @@ export const ListarColaboradores = () => {
                     ))}
                   </>
                   <>
-                    <h3 className="text-lg font-semibold">Proprietários</h3>
-                    {proprietariosPermissions.map((permission) => (
+                    <h3 className="text-lg font-semibold">Locações</h3>
+                    {locacoesPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
                           id={permission.value}
@@ -567,6 +611,7 @@ export const ListarColaboradores = () => {
                           onCheckedChange={(checked) =>
                             handlePermissionChange(checked as boolean, permission.value)
                           }
+                          style={{'border':'1px solid black'}}
                         />
                         <label
                           htmlFor={permission.value}
@@ -578,8 +623,8 @@ export const ListarColaboradores = () => {
                     ))}
                   </>
                   <>
-                    <h3 className="text-lg font-semibold">Locatários</h3>
-                    {locatariosPermissions.map((permission) => (
+                    <h3 className="text-lg font-semibold">Pessoas</h3>
+                    {pessoasPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
                           id={permission.value}
@@ -587,6 +632,7 @@ export const ListarColaboradores = () => {
                           onCheckedChange={(checked) =>
                             handlePermissionChange(checked as boolean, permission.value)
                           }
+                          style={{'border':'1px solid black'}}
                         />
                         <label
                           htmlFor={permission.value}

@@ -52,7 +52,7 @@ export const activeTipo = async (tipoData: {
   id: number
   status: PessoaStatus
 }) => {
-  const result = await api.patch(tipoData.status === PessoaStatus.CANCELADA ? `/tipoimovel/statusAtiva/${tipoData.id}` : `/tipoimovel/statusDesativa/${tipoData.id}` )
+  const result = await api.patch(tipoData.status === PessoaStatus.CANCELADA ? `/tipoimovel/statusAtiva/${tipoData.id}` : `/tipoimovel/statusDesativa/${tipoData.id}`)
   return result.data;
 }
 
@@ -94,6 +94,9 @@ export default function ListarTipos() {
   const createTipoMutation = useMutation({
     mutationFn: createTipo,
     onSuccess: () => {
+      ;['tipoimovel'].forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+      });
       toast({
         title: 'Tipo de imóvel criado',
         description: 'O novo tipo de imóvel foi criado com sucesso.'

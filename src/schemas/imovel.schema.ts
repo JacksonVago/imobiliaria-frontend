@@ -169,7 +169,15 @@ export const imovelSchema1 = z.object({
 
 export const imovelSchema = z.object({
   description: z.string().optional(),
-  tipo: z.enum(Object.values(ImovelTipo) as [string, ...string[]],{required_error:'Tipo é obrigatório'}),
+  //tipo: z.coerce.number().min(1, 'Tipo é obrigatório').or(z.string().transform(Number)),
+  /*tipo: z.object(
+      {
+        name: z.string(),
+        id: z.number()
+      }
+    ).optional(),*/
+  tipoId: z.coerce.number().min(1, 'Tipo é obrigatório').or(z.string().transform(Number)),
+  //tipo: z.enum(Object.values(ImovelTipo) as [string, ...string[]],{required_error:'Tipo é obrigatório'}),
   status: z.enum(Object.values(ImovelStatus) as [string, ...string[]],{required_error:'Situação é obrigatório'}),
   finalidade: z.enum(Object.values(ImovelFinalidade) as [string, ...string[]],{required_error:'Finalidade é obrigatório'}),
   porcentagem_lucro_imobiliaria: z

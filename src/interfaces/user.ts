@@ -12,7 +12,7 @@ export interface User {
 
 export type Permission =
   | 'ALL'
-  | 'VIEW_EMPRESA'
+  | 'VIEW_EMPRESAS'
   | 'UPDATE_EMPRESA'
   | 'CREATE_IMOVEL'
   | 'UPDATE_IMOVEL'
@@ -26,6 +26,10 @@ export type Permission =
   | 'UPDATE_PROPRIETARIO'
   | 'DELETE_PROPRIETARIO'
   | 'VIEW_PROPRIETARIOS'
+  | 'CREATE_PESSOA'
+  | 'UPDATE_PESSOA'
+  | 'DELETE_PESSOA'
+  | 'VIEW_PESSOAS'
   | 'CREATE_LOCACAO'
   | 'UPDATE_LOCACAO'
   | 'DELETE_LOCACAO'
@@ -34,10 +38,10 @@ export type Permission =
   | 'UPDATE_CLIENTE'
   | 'DELETE_CLIENTE'
   | 'VIEW_CLIENTES'
-  | 'CREATE_TIPOIMOVEL'
-  | 'UPDATE_TIPOIMOVEL'
-  | 'DELETE_TIPOIMOVEL'
-  | 'VIEW_TIPOIMOVEL'
+  | 'CREATE_TIPO'
+  | 'UPDATE_TIPO'
+  | 'DELETE_TIPO'
+  | 'VIEW_TIPOS'
 
 export const userPermissions: {
   [key in Permission]: string
@@ -63,10 +67,16 @@ export const userPermissions: {
   UPDATE_CLIENTE: 'Atualizar clientes',
   DELETE_CLIENTE: 'Deletar clientes',
   VIEW_CLIENTES: 'Visualizar clientes',
-  CREATE_TIPOIMOVEL: 'Criar tipos de imóvel',
-  UPDATE_TIPOIMOVEL: 'Atualizar tipos de imóvel',
-  DELETE_TIPOIMOVEL: 'Deletar tipos de imóvel',
-  VIEW_TIPOIMOVEL: 'Visualizar tipos de imóvel'
+  CREATE_TIPO: 'Criar tipos de imóvel',
+  UPDATE_TIPO: 'Atualizar tipos de imóvel',
+  DELETE_TIPO: 'Deletar tipos de imóvel',
+  VIEW_TIPOS: 'Visualizar tipos de imóvel',
+  CREATE_PESSOA: 'Criar Pessoa',
+  UPDATE_PESSOA: 'Atualizar Pessoa',
+  DELETE_PESSOA: 'Deletar Pessoa',
+  VIEW_PESSOAS: 'Visualizar Pessoas',
+  UPDATE_EMPRESA: 'Atualizar Empresa',
+  VIEW_EMPRESAS: 'Visualizar Empresas',
 
 }
 

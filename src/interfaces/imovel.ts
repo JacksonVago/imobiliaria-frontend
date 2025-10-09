@@ -9,7 +9,8 @@ export interface Imovel {
   title: string
   status: ImovelStatus
   description?: string
-  tipo: ImovelTipo
+  tipo: {id:number, name: string}
+  tipoId: number
 
   porcentagem_lucro_imobiliaria: number
   valor_iptu?: number

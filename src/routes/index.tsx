@@ -43,7 +43,7 @@ export const MainLayout = () => {
 
   useEffect(()=>{},[glb_params]);
   return (
-    <SidebarProvider>
+    <SidebarProvider className='font-[Poppins-Regular]'>
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 bg-gray-100">
@@ -100,9 +100,9 @@ export const RoutesComponent = () => {
           <Route path={ROUTE.HOME} element={<div>Home</div>} />
 
           <Route
-            path={ROUTE.EMPRESA}
+            path={ROUTE.EMPRESA_DETALHES}
             element={
-              <ProtectedRoute permission="VIEW_EMPRESA">
+              <ProtectedRoute permission="VIEW_EMPRESAS">
                 <DetalhesEmpresa />
               </ProtectedRoute>
             }
@@ -112,7 +112,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.TIPOIMOVEL}
             element={
-              <ProtectedRoute permission="VIEW_TIPOIMOVEL">
+              <ProtectedRoute permission="VIEW_TIPOS">
                 <ListarTipos />
               </ProtectedRoute>
             }

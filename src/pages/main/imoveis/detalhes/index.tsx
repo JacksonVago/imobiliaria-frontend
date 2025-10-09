@@ -58,6 +58,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
+import { useAuth } from '@/hooks/auth/use-auth'
 
 //REFACTOR: move to another directory
 //const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
@@ -93,9 +94,6 @@ export const getImovel = async (id: number): Promise<Imovel> => {
 
 //Altera imóvel
 const updateImovel = async (id: number, data: FormData): Promise<Imovel> => {
-  const dataObject = Object.fromEntries(data.entries());
-  const jsonData = JSON.stringify(dataObject);
-  console.log(jsonData);
   const response = await api.put<Imovel>(`imoveis/${id}`, data)
   return response.data
 }
@@ -189,6 +187,8 @@ export const getFormattedDefaultValues = (imovel: Imovel | undefined) => {
 
 
 export const DetalhesImovel = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
@@ -438,6 +438,7 @@ export const DetalhesImovel = () => {
 
   const defaultValues = {
     ...parsedData,
+    //tipoId: imovel?.tipo.name,
     logradouro: enderecoData?.logradouro,
     numero: enderecoData?.numero ? enderecoData.numero : undefined,
     complemento: enderecoData?.complemento,
@@ -532,16 +533,14 @@ export const DetalhesImovel = () => {
     const newDocs = data?.documentos?.filter((doc: any) => !doc.id) || []
     //if images are the same, we can send an empty array
 
-    console.log(data);
-
     //form data
     const form = new FormData()
 
     if (data.description) {
       form.append('description', data.description)
     }
-    if (data.tipo) {
-      form.append('tipo', data.tipo)
+    if (data.tipoId) {
+      form.append('tipoId', data.tipoId.toString())
     }
     if (data.status) {
       form.append('status', data.status)
@@ -611,11 +610,11 @@ export const DetalhesImovel = () => {
     })
 
     if (imagesToDeleteIds) {
-       imagesToDeleteIds.forEach((id) => {
-         if (id) {
-           form.append('imagesToDeleteIds[]', id.toString())
-         }
-       })
+      imagesToDeleteIds.forEach((id) => {
+        if (id) {
+          form.append('imagesToDeleteIds[]', id.toString())
+        }
+      })
     }
 
     newDocs?.forEach((doc: any) => {
@@ -627,7 +626,7 @@ export const DetalhesImovel = () => {
 
     if (documentosToDeleteIds) {
       console.log(documentosToDeleteIds);
-      documentosToDeleteIds.forEach((docId:any) => {
+      documentosToDeleteIds.forEach((docId: any) => {
         form.append('documentosToDeleteIds[]', docId.toString())
       })
     }
@@ -647,21 +646,21 @@ export const DetalhesImovel = () => {
     garantiaLocacaoTipo: locacaoAtiva?.garantiaLocacaoTipo
       ? mappGarantyType(locacaoAtiva.garantiaLocacaoTipo)
       : 'fiador',
-    imovelId : locacaoAtiva?.imovelId,
-    locatarios : locacaoAtiva?.locatarios?.map((locatario)=>{
-      return { nome: locatario.pessoa?.nome, id : locatario.pessoaId}
+    imovelId: locacaoAtiva?.imovelId,
+    locatarios: locacaoAtiva?.locatarios?.map((locatario) => {
+      return { nome: locatario.pessoa?.nome, id: locatario.pessoaId }
     }),
-    fiadores : locacaoAtiva?.fiadores?.map((fiador)=>{
-      return { nome: fiador.pessoa?.nome, id : fiador.pessoaId}
+    fiadores: locacaoAtiva?.fiadores?.map((fiador) => {
+      return { nome: fiador.pessoa?.nome, id: fiador.pessoaId }
     }),
-    imoveis : [{ nome : locacaoAtiva?.imovel?.description , id : locacaoAtiva?.imovel?.id }],    
-    tituloCap: {numeroTitulo: locacaoAtiva?.garantiaTituloCapitalizacao?.numeroTitulo },
-    seguroFianca:{ numeroSeguro: locacaoAtiva?.garantiaSeguroFianca?.numeroSeguro },
-    depCalcao : { 
-      valorDeposito : locacaoAtiva?.garantiaDepositoCalcao?.valorDeposito,
+    imoveis: [{ nome: locacaoAtiva?.imovel?.description, id: locacaoAtiva?.imovel?.id }],
+    tituloCap: { numeroTitulo: locacaoAtiva?.garantiaTituloCapitalizacao?.numeroTitulo },
+    seguroFianca: { numeroSeguro: locacaoAtiva?.garantiaSeguroFianca?.numeroSeguro },
+    depCalcao: {
+      valorDeposito: locacaoAtiva?.garantiaDepositoCalcao?.valorDeposito,
       quantidadeMeses: locacaoAtiva?.garantiaDepositoCalcao?.quantidadeMeses
     },
-    documentos: locacaoAtiva?.documentos    
+    documentos: locacaoAtiva?.documentos
   }
 
 
@@ -913,10 +912,10 @@ export const DetalhesImovel = () => {
 
     formData.append('dataInicio', data.dataInicio);
     formData.append('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
-    formData.append('valor_aluguel', (data.valor_aluguel  ? data.valor_aluguel.toString(): "0"));
+    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', (data.dia_vencimento? data.dia_vencimento.toString() :"0"));
+    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : "0"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -1048,14 +1047,18 @@ export const DetalhesImovel = () => {
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Detalhes do Imóvel</h1>
+        <h1 className="text-2xl font-bold">Detalhes</h1>
         {activeTab === 'personal-info' && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Excluir Imóvel
-              </Button>
+              {(isAdmin ||
+                user?.permissions.includes("ALL") ||
+                user?.permissions.includes("DELETE_IMOVEL")
+              ) && (
+                  <Button variant="destructive">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir Imóvel
+                  </Button>)}
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -1609,7 +1612,7 @@ export const DetalhesImovel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{locacao.id}</span>
-                  <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive": "default"} >{locacao.status}</Badge>
+                  <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive" : "default"} >{locacao.status}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1622,7 +1625,7 @@ export const DetalhesImovel = () => {
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">
                   <Label>Período</Label>
                   <p className="flex items-center text-[0.7rem] font-semibold">
-                    
+
                     {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
                     {locacao.dataFim
                       ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
@@ -1771,8 +1774,8 @@ export const DetalhesImovel = () => {
                                   <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
                                 </CardHeader>
                                 <CardContent className='mt-2 h-120'>
-                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ? 
-                                    imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString() 
+                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ?
+                                    imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString()
                                     : ''} onSelectCliente={handleSelectProp} />
                                 </CardContent>
                               </Card>
@@ -1979,12 +1982,12 @@ export const DetalhesImovel = () => {
                   </DialogContent>
                 </Dialog>
                 {!locacao.status || locacao.status !== LocacaoStatus.ENCERRADA && (
-                <Button variant="destructive" size="sm"
-                  onClick={() => { handleDeleteLocacao(locacao) }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </Button>
+                  <Button variant="destructive" size="sm"
+                    onClick={() => { handleDeleteLocacao(locacao) }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                  </Button>
                 )}
               </CardFooter>
             </Card>

@@ -47,7 +47,7 @@ export function Login() {
   }
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="mx-auto max-w-sm font-[Poppins-Regular]">
       <CardHeader>
         <CardTitle className="text-2xl">Acesso</CardTitle>
         <CardDescription>Digite seu e-mail abaixo para acessar sua conta</CardDescription>

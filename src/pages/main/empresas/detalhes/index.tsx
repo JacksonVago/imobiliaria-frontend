@@ -1,58 +1,22 @@
-//import { createClient } from '@supabase/supabase-js';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import moment from "moment";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
-import { ROUTE } from '@/enums/routes.enum'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {  Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
+import {  Edit } from 'lucide-react'
 import * as React from 'react'
-import { useForm, Controller, useFieldArray } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
-import { Imovel } from '@/interfaces/imovel'
-import { DialogClose } from '@radix-ui/react-dialog'
 import { useGlobalParams } from '@/globals/GlobalParams';
 import { useMediaQuery } from 'react-responsive';
 import { Empresa } from '@/interfaces/empresa'
 import { empresaSchema, EmpresaSchema } from '@/schemas/empresa.schema'
 import { EmpresaFormContent, EmpresaFormRoot } from '../components/empresa-form'
+import axios from 'axios'
 
 export const DetalhesEmpresaForm = () => {
 
@@ -78,6 +42,20 @@ export const DetalhesEmpresaForm = () => {
     enabled: !!id
   })
 
+  const createEmpresa = useMutation({
+    mutationFn: async (data: FormData) => {
+
+        return await api.post<Empresa>(`/empresas`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    },
+    onSuccess: () => {
+      ;['empresa'].forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: [key] })
+      })
+    }
+  })
+
   const updateEmpresa = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.put<Empresa>(`/empresas/${id}`, data, {
@@ -85,13 +63,14 @@ export const DetalhesEmpresaForm = () => {
       })
     },
     onSuccess: () => {
-      ;['cliente', 'documentFiles', id].forEach((key) => {
+      ;['empresa', id].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
   })
 
   const onSubmitEmpresaData = async (data: EmpresaSchema) => {
+
     try {
       const form = new FormData()
 
@@ -146,8 +125,66 @@ export const DetalhesEmpresaForm = () => {
         form.append('status', PessoaStatus.ATIVA)
       }
 
+      console.log(data?.avisosReajusteLocacao);
+      if (data?.avisosReajusteLocacao) {        
+        form.append('avisosReajusteLocacao', data.avisosReajusteLocacao.toString())
+      }
 
+      if (data?.avisosRenovacaoContrato) {
+        form.append('avisosRenovacaoContrato', data.avisosRenovacaoContrato.toString())
+      }
+
+      if (data?.avisosSeguroFianca) {
+        form.append('avisosSeguroFianca', data.avisosSeguroFianca.toString())
+      }
+
+      if (data?.avisosSeguroIncendio) {
+        form.append('avisosSeguroIncendio', data.avisosSeguroIncendio.toString())
+      }
+
+      if (data?.avisosTituloCapitalizacao) {
+        form.append('avisosTituloCapitalizacao', data.avisosTituloCapitalizacao.toString())
+      }
+
+      if (data?.avisosDepositoCalcao) {
+        form.append('avisosDepositoCalcao', data.avisosDepositoCalcao.toString())
+      }
+
+      if (data?.porcentagemComissao) {
+        form.append('porcentagemComissao', data.porcentagemComissao.toString())
+      }
+            
+      if (data?.emiteBoleto) {
+        form.append('emiteBoleto', data.emiteBoleto.toString())
+      }
+      
+      if (data?.valorTaxaBoleto) {
+        form.append('valorTaxaBoleto', data.valorTaxaBoleto.toString())
+      }      
+      
+      if (data?.emissaoBoletoAntecedencia) {
+        form.append('emissaoBoletoAntecedencia', data.emissaoBoletoAntecedencia.toString())
+      }      
+      
+      if (data?.porcentagemMultaAtraso) {
+        form.append('porcentagemMultaAtraso', data.porcentagemMultaAtraso.toString())
+      }
+
+      if (data?.porcentagemJurosAtraso) {
+        form.append('porcentagemJurosAtraso', data.porcentagemJurosAtraso.toString())
+      }
+
+      if (id !== undefined && id > 0){
       await updateEmpresa.mutateAsync(form)
+      }
+      else{
+        
+  const dataObject = Object.fromEntries(form.entries());
+  const jsonData = JSON.stringify(dataObject);
+  console.log(jsonData);
+
+        await createEmpresa.mutateAsync(form)
+      }
 
       toast({
         title: 'Empresa atualizado com sucesso',
@@ -155,10 +192,27 @@ export const DetalhesEmpresaForm = () => {
 
       })
     } catch (error) {
-      toast({
-        title: 'Erro ao atualizar empresa',
-        description: 'Ocorreu um erro ao tentar atualizar a empresa. Tente novamente.'
-      })
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao criar tipo de imóvel',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+        toast({
+          title: 'Erro',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao criar o tipo de imóvel. Tente novamente.',
+          variant: 'destructive'
+        })
+      }
     }
   }
 
@@ -179,8 +233,11 @@ export const DetalhesEmpresaForm = () => {
   )
 
   React.useEffect(() => {
-    glb_params.updTitle_form('Clientes');
+    glb_params.updTitle_form('Configurações');
     if (empresa) empresaMethods.reset(defaultValues)
+    if (id === undefined){
+      setIsEditingPersonalInfo(true);
+    }
   }, [defaultValues])
 
   //react hook form
@@ -251,7 +308,7 @@ export default function DetalhesEmpresa() {
   //const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
 
   const { data: empresa } = useQuery({
-    queryKey: ['cliente', id],
+    queryKey: ['empresa', id],
     queryFn: async () => {
       const { data } = await api.get<Empresa>(`/empresas/${id}`)
       return data

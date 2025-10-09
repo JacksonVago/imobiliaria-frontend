@@ -16,6 +16,7 @@ import { Controller, UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
+import { useState } from 'react'
 
 export const EmpresaFormRoot = ({
   children,
@@ -38,6 +39,7 @@ export const EmpresaFormContent = ({
   createEmpresaMethods: UseFormReturn<EmpresaSchema>
   disabled?: boolean
 }) => {
+  const [showBoleto, setShowBoleto] = useState(false);
   return (
     <>
       <div className="space-y-4 font-[Poppins-Regular]">
@@ -50,9 +52,13 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Nome completo"
               {...createEmpresaMethods.register('nome')}
-              helperText={createEmpresaMethods.formState?.errors?.nome?.message}
             />
+            {createEmpresaMethods.formState.errors.nome?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.nome.message}
+              </p>)}
           </Label>
+
           <Label className="text-base">
             CPF/CNPJ
             <Input
@@ -60,15 +66,19 @@ export const EmpresaFormContent = ({
               type="text"
               disabled={disabled}
               placeholder="Cpf/Cnpj"
-              {...createEmpresaMethods.register('nome', {
+              {...createEmpresaMethods.register('cnpj', {
                 onChange: async (e) => {
                   const { value } = e.target;
                   e.target.value = formatCpfCnpj(value);
                 }
               })}
-              helperText={createEmpresaMethods.formState?.errors?.nome?.message}
             />
+            {createEmpresaMethods.formState.errors.cnpj?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.cnpj.message}
+              </p>)}
           </Label>
+
           <Label className="text-base">
             Email
             <Input
@@ -77,8 +87,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Email"
               {...createEmpresaMethods.register('email')}
-              helperText={createEmpresaMethods.formState?.errors?.email?.message}
             />
+            {createEmpresaMethods.formState.errors.email?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.email.message}
+              </p>)}
           </Label>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -90,8 +103,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Telefone"
               {...createEmpresaMethods.register('telefone')}
-              helperText={createEmpresaMethods.formState?.errors?.telefone?.message}
             />
+            {createEmpresaMethods.formState.errors.telefone?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.telefone.message}
+              </p>)}
           </Label>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -138,8 +154,11 @@ export const EmpresaFormContent = ({
                   }
                 }
               })}
-              helperText={createEmpresaMethods.formState?.errors?.cep?.message}
             />
+            {createEmpresaMethods.formState.errors.cep?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.cep.message}
+              </p>)}
           </Label>
         </div>
 
@@ -152,8 +171,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Logradouro"
               {...createEmpresaMethods.register('logradouro')}
-              helperText={createEmpresaMethods.formState?.errors?.logradouro?.message}
             />
+            {createEmpresaMethods.formState.errors.logradouro?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.logradouro.message}
+              </p>)}
           </Label>
 
         </div>
@@ -167,8 +189,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Número"
               {...createEmpresaMethods.register('numero')}
-              helperText={createEmpresaMethods.formState?.errors?.numero?.message}
             />
+            {createEmpresaMethods.formState.errors.numero?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.numero.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Complemento
@@ -178,8 +203,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Complemento"
               {...createEmpresaMethods.register('complemento')}
-              helperText={createEmpresaMethods.formState?.errors?.complemento?.message}
             />
+            {createEmpresaMethods.formState.errors.complemento?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.complemento.message}
+              </p>)}
           </Label>
         </div>
 
@@ -192,8 +220,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Bairro"
               {...createEmpresaMethods.register('bairro')}
-              helperText={createEmpresaMethods.formState?.errors?.bairro?.message}
             />
+            {createEmpresaMethods.formState.errors.bairro?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.bairro.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Cidade
@@ -203,8 +234,11 @@ export const EmpresaFormContent = ({
               disabled={disabled}
               placeholder="Cidade"
               {...createEmpresaMethods.register('cidade')}
-              helperText={createEmpresaMethods.formState?.errors?.cidade?.message}
             />
+            {createEmpresaMethods.formState.errors.cidade?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.cidade.message}
+              </p>)}
           </Label>
         </div>
 
@@ -234,10 +268,11 @@ export const EmpresaFormContent = ({
                   </Select>
                 )}
               />
-              {createEmpresaMethods.formState?.errors?.estado?.message && (
-                <span>{createEmpresaMethods.formState?.errors?.estado?.message}</span>
-              )}
             </div>
+            {createEmpresaMethods.formState.errors.estado?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.estado.message}
+              </p>)}
           </Label>
         </div>
 
@@ -249,67 +284,85 @@ export const EmpresaFormContent = ({
             Reajuste de Locação
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosReajusteLocacao')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosReajusteLocacao?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosReajusteLocacao?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosReajusteLocacao.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Renovação de Contrato
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosRenovacaoContrato')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosRenovacaoContrato?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosRenovacaoContrato?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosRenovacaoContrato.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Seguro Fiança
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosSeguroFianca')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosSeguroFianca?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosSeguroFianca?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosSeguroFianca.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Seguro Incêndio
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosSeguroIncendio')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosSeguroIncendio?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosSeguroIncendio?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosSeguroIncendio.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Titulo de Capitalização
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosTituloCapitalizacao')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosTituloCapitalizacao?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao.message}
+              </p>)}
           </Label>
           <Label className="text-base">
             Depósito Calcão
             <Input
               className="mt-2"
-              type="text"
+              type="number"
               disabled={disabled}
               placeholder="Dias"
               {...createEmpresaMethods.register('avisosDepositoCalcao')}
-              helperText={createEmpresaMethods.formState?.errors?.avisosDepositoCalcao?.message}
             />
+            {createEmpresaMethods.formState.errors.avisosDepositoCalcao?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createEmpresaMethods.formState.errors.avisosDepositoCalcao.message}
+              </p>)}
           </Label>
         </div>
 
@@ -321,7 +374,7 @@ export const EmpresaFormContent = ({
               type="number"
               disabled={disabled}
               placeholder="Porcentagem comissão"
-              {...createEmpresaMethods.register('porcentagemComissao')}
+              {...createEmpresaMethods.register('porcentagemComissao', {valueAsNumber:true})}
             />
             {createEmpresaMethods.formState.errors.porcentagemComissao?.message &&
               (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
@@ -340,39 +393,73 @@ export const EmpresaFormContent = ({
             Boletos
           </label>
           <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
-            onCheckedChange={(checked) => { createEmpresaMethods.setValue("emiteBoleto", (checked ? "S" : "N")) }}>
+            onCheckedChange={(checked) => { createEmpresaMethods.setValue("emiteBoleto", (checked ? "S" : "N")); setShowBoleto(!showBoleto); }}>
             <Thumb className="SwitchThumb" />
           </Switch>
         </div>
 
-        <div className="mt-2">
-          <div style={{ 'display': createEmpresaMethods.getValues("emiteBoleto") === "S" ? "block" : "none" }}>
-            <div className="grid grid-cols-2 gap-4">
+        {showBoleto && (
+          <div className="mt-2 border p-2 rounded-md">
+            <div className="grid grid-cols-1 gap-4">
               <Label className="text-base">
-                Número
+                Taxa de Boleto
                 <Input
                   className="mt-2"
-                  type="text"
+                  type="number"
                   disabled={disabled}
-                  placeholder="Número"
-                  {...createEmpresaMethods.register('numero')}
-                  helperText={createEmpresaMethods.formState?.errors?.numero?.message}
+                  placeholder="Taxa"
+                  {...createEmpresaMethods.register('valorTaxaBoleto')}
                 />
+                {createEmpresaMethods.formState.errors.valorTaxaBoleto?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.valorTaxaBoleto.message}
+                  </p>)}
               </Label>
               <Label className="text-base">
-                Complemento
+                Dias de antecedência para emissão de boletos
                 <Input
                   className="mt-2"
-                  type="text"
+                  type="number"
                   disabled={disabled}
-                  placeholder="Complemento"
-                  {...createEmpresaMethods.register('complemento')}
-                  helperText={createEmpresaMethods.formState?.errors?.complemento?.message}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('emissaoBoletoAntecedencia')}
                 />
+                {createEmpresaMethods.formState.errors.emissaoBoletoAntecedencia?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.emissaoBoletoAntecedencia.message}
+                  </p>)}
+              </Label>
+              <Label className="text-base">
+                Porcentagem de Multa por atraso
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Porcentagem de multa"
+                  {...createEmpresaMethods.register('porcentagemMultaAtraso')}
+                />
+                {createEmpresaMethods.formState.errors.porcentagemMultaAtraso?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.porcentagemMultaAtraso.message}
+                  </p>)}
+              </Label>
+              <Label className="text-base">
+                Porcentagem de Juros por atraso
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Porcentagem de juros"
+                  {...createEmpresaMethods.register('porcentagemJurosAtraso', {valueAsNumber:true})}
+                />
+                {createEmpresaMethods.formState.errors.porcentagemJurosAtraso?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.porcentagemJurosAtraso.message}
+                  </p>)}
               </Label>
             </div>
           </div>
-        </div>
+        )}
 
       </div>
     </>

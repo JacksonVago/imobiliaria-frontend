@@ -22,6 +22,7 @@ import { ImovelTipo } from '@/enums/imovel/enums-imovel'
 import { ROUTE } from '@/enums/routes.enum'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
+import { useAuth } from '@/hooks/auth/use-auth'
 import { Endereco } from '@/interfaces/endereco'
 import { Imovel } from '@/interfaces/imovel'
 import { cn } from '@/lib/utils'
@@ -112,8 +113,10 @@ export default function ListarImoveis({
   limitView: number
   exclude: string
   //onSelectImovel: (imovel: Imovel | undefined) => void
-  onSelectImovel: ((imovel: Imovel ) => void) | undefined
+  onSelectImovel: ((imovel: Imovel) => void) | undefined
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -140,6 +143,7 @@ export default function ListarImoveis({
     })
   )
 
+  console.log(data?.data?.data);
   const imoveis = data?.data?.data || []
   const totalPages = data?.data?.totalPages
   //const googleMaps = "https://www.google.com/maps/place/R.+Jo%C3%A3o+Kopke,+236+-+Bom+Retiro,+S%C3%A3o+Paulo+-+SP,+01124-030";
@@ -203,7 +207,6 @@ export default function ListarImoveis({
     })
   }
 
-  console.log(limit);
   const handlerChangeTipo = (tipo: string) => {
     let tipo_aux: ImovelTipo | null;
 
@@ -235,7 +238,7 @@ export default function ListarImoveis({
     navigate(`${ROUTE.IMOVEIS}/${id}`)
   }
 
-  const handlerClickMaps = (endereco: Endereco) =>{
+  const handlerClickMaps = (endereco: Endereco) => {
     const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
     console.log(urlGoogleMaps);
     window.open(urlGoogleMaps);
@@ -246,9 +249,15 @@ export default function ListarImoveis({
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-bold">Imoveis</h1>
-        <Button onClick={handleClickCreateImovel}>
-          <Plus className="mr-2 h-4 w-4" /> Criar imovel
-        </Button>
+        {(isAdmin || 
+          user?.permissions.includes("ALL") ||
+         user?.permissions.includes("CREATE_IMOVEL")
+        ) && (
+          <Button onClick={handleClickCreateImovel}>
+            <Plus className="mr-2 h-4 w-4" /> Criar imovel
+          </Button>
+        )
+        }
       </div>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
@@ -277,7 +286,7 @@ export default function ListarImoveis({
       </div>
 
       {/* Imoveis Grid */}
-      <div className= {(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+      <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">Nenhum imóvel</p>
@@ -317,23 +326,23 @@ export default function ListarImoveis({
             )*/}
 
             <CardHeader className="flex flex-row justify-between">
-              <CardTitle className="line-clamp-1" style={{fontSize:'1rem'}}>{imovel?.description}</CardTitle>
+              <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
               <Badge
                 variant="secondary"
                 className={cn('mt-2', {
-                  'bg-blue-50 text-blue-800': imovel?.tipo === ImovelTipo.APARTAMENTO,
-                  'bg-yellow-50 text-yellow-800': imovel?.tipo === ImovelTipo.TERRENO,
-                  'bg-green-50 text-green-800': imovel?.tipo === ImovelTipo.CASA
+                  'bg-blue-50 text-blue-800': imovel?.tipo.name === ImovelTipo.APARTAMENTO,
+                  'bg-yellow-50 text-yellow-800': imovel?.tipo.name === ImovelTipo.TERRENO,
+                  'bg-green-50 text-green-800': imovel?.tipo.name === ImovelTipo.CASA
                 })}
               >
-                {imovel?.tipo}
+                {imovel?.tipo.name}
               </Badge>
             </CardHeader>
             <CardContent>
               <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                <MapPin className="inline-block h-4 w-4 cursor-pointer" 
-                onClick={()=>{handlerClickMaps(imovel?.endereco)}} 
-                color='green'
+                <MapPin className="inline-block h-4 w-4 cursor-pointer"
+                  onClick={() => { handlerClickMaps(imovel?.endereco) }}
+                  color='green'
                 />
                 {getEnderecoFormatado(imovel?.endereco)}
               </p>

@@ -8,6 +8,7 @@ export enum ROUTE {
   SOBRE = '/sobre',
 
   // Configurações
+  EMPRESA_DETALHES = '/empresas/:id',
   EMPRESA = '/empresas',
 
   // Imoveis routes

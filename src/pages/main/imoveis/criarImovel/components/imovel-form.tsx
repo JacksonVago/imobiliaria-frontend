@@ -17,6 +17,13 @@ import { IMOVEL_FINALIDADE, IMOVEL_STATUS, IMOVEL_TIPO } from '../../constants/i
 import { PropertyImageUpload } from './multi-images-upload'
 import { DocumentUpload } from './document-upload'
 import { Textarea } from '@/components/ui/textarea'
+import { useQuery } from '@tanstack/react-query'
+import { TipoImovel } from '@/interfaces/tipoimovel'
+import { useState } from 'react'
+
+export const getTipos = async () => {
+  return await api.get<TipoImovel[]>('tipoimovel')
+}
 
 export const ImovelFormRoot = ({
   children,
@@ -37,6 +44,30 @@ export const ImovelFormContent = ({
   createImovelMethods: UseFormReturn<ImovelSchema>
   disabled?: boolean
 }) => {
+
+  //Consulta Tipo imóvel
+  const {
+    data: imovelTipo
+  } = useQuery({
+    queryKey: ['imovelTipo'],
+    queryFn: () => getTipos()
+  });
+
+  const handleChange = (event: string) => {
+    console.log(event);
+    if (imovelTipo?.data.find(x => x.id === Number(event))?.id) {
+      const tipo_aux: TipoImovel | undefined = imovelTipo?.data.find(x => x.id === Number(event));
+      if (tipo_aux) {
+        //createImovelMethods.setValue("tipo", { name: tipo_aux.name, id: tipo_aux.id });
+        createImovelMethods.setValue("tipoId", tipo_aux.id);
+      }
+    }
+    
+  };
+
+  console.log(createImovelMethods.formState.errors);
+  console.log(createImovelMethods.getValues("tipoId"));
+
   return (
     <div className="space-y-4">
       <div>
@@ -185,7 +216,7 @@ export const ImovelFormContent = ({
         </div>
 
 
-        <div className='mt-2'>
+        <div className='mt-2 mr-5'>
           <Label className='text-base font-[Poppins-Regular]'>
             Estado
             <div className='mt-2'>
@@ -220,7 +251,7 @@ export const ImovelFormContent = ({
           </Label>
         </div>
 
-        <div className='mt-2'>
+        <div className='mt-2 mr-5'>
           <Label className='text-base font-[Poppins-Regular]'>
             Status do imóvel
             <div className='mt-2'>
@@ -255,42 +286,51 @@ export const ImovelFormContent = ({
           </Label>
         </div>
 
-        <div className='mt-2'>
+        <div className='mt-2 mr-5'>
           <Label className='text-base font-[Poppins-Regular]'>
             Tipo do imóvel
             <div className='mt-2'>
               <Controller
-                name="tipo"
+                name="tipoId"
                 control={createImovelMethods.control}
                 render={({ field }) => (
                   <Select
                     disabled={disabled}
                     aria-label={field.value}
-                    onValueChange={(value) => field.onChange(value)}
-                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      //handleChange(value);
+                    }}
+                    value={String(field.value)}
                   >
-                    <SelectTrigger value={field.value}>
+                    <SelectTrigger >
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {IMOVEL_TIPO.map((value) => (
+                      {imovelTipo?.data.map((value) => (
+                        <SelectItem key={value.id} value={value.id.toString()}>
+                          {value.name}
+                        </SelectItem>
+
+                      ))}
+                      {/*IMOVEL_TIPO.map((value) => (
                         <SelectItem key={value} value={value}>
                           {value}
                         </SelectItem>
-                      ))}
+                      ))*/}
                     </SelectContent>
                   </Select>
                 )}
               />
-              {createImovelMethods.formState.errors.tipo?.message &&
+              {createImovelMethods.formState.errors.tipoId?.message &&
                 (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                  {createImovelMethods.formState.errors.tipo.message}
+                  {createImovelMethods.formState.errors.tipoId.message}
                 </p>)}
             </div>
           </Label>
         </div>
 
-        <div className='mt-2'>
+        <div className='mt-2 mr-5'>
           <Label className='text-base font-[Poppins-Regular]'>
             Finalidade
             <div className='mt-2'>

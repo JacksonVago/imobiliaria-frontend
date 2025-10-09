@@ -41,23 +41,6 @@ export default function CriarTipoImovel (){
     mode: 'all'
   })
 
-  /*useEffect(() => {
-    locacaoMethods.setValue('imovelId', 0);
-  }, [glb_params, pessoa]);*/
-
-  /*
-  const createLocacaoMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      data.forEach((item) => {
-        console.log(item.toString());
-      })
-
-      return await api.post<Pessoa>('/pessoas', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-    }
-  });*/
-
   const createLocacaoMutation = useMutation({
     mutationFn: ({ data }: { data: FormData }) => createLocacao(data),
     onSuccess: ({ data: clienteData }) => {
@@ -92,12 +75,6 @@ export default function CriarTipoImovel (){
       }
     }
   });  
-
-  //locacaoMethods.setValue('imovelId', imovelId ? imovelId : 0);
-
-  console.log('locacaoMethods errors', locacaoMethods.formState.errors)
-  console.log('locacaoMethods dirtyFields', locacaoMethods.formState.isDirty)
-  console.log('isvalid', locacaoMethods.formState.isValid)
 
   const onSubmitLocacaoData = async (data: LocacaoSchema) => {
     //try {

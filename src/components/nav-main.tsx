@@ -34,10 +34,10 @@ export function NavMain({
 }) {
   //Globals
   const glb_params = useGlobalParams();
-  
+
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel className="my-5">Navegação</SidebarGroupLabel>
+    <SidebarGroup className='font-[Poppins-Regular]'>
+      <SidebarGroupLabel className="my-2 flex justify-center" style={{ "fontSize": "1.5rem" }}>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
@@ -45,7 +45,7 @@ export function NavMain({
               <SidebarMenuButton className="py-5" asChild tooltip={item.title}>
                 <Link to={item.url}>
                   <item.icon />
-                  <span>{item.title}</span>
+                  <span style={{ "fontSize": "1rem" }}>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (
@@ -61,9 +61,10 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link to={subItem.url} onClick={()=> {    glb_params.updOrigin_url('');
-    glb_params.updPastaOrig('');
-}}>
+                            <Link to={subItem.url} onClick={() => {
+                              glb_params.updOrigin_url('');
+                              glb_params.updPastaOrig('');
+                            }}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
