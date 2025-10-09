@@ -103,7 +103,7 @@ const loginSchema = z.object({
   password: z.string().min(8, { message: 'A senha deve possuir no mínimo 8 caracteres incluindo , letras maiúculas, minúsculas, números e caracteres especiais (@#$%)' })
 })
 
-type LoginSchema = z.infer<typeof loginSchema>
+//type LoginSchema = z.infer<typeof loginSchema>
 
 export const getUsers = () => {
   return api.get<User[]>('/users/collaborators')

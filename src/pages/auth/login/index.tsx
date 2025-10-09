@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff, EyeOffIcon, Icon } from 'lucide-react'
+import { Eye, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -13,13 +13,13 @@ import { z } from 'zod'
 export const description =
   "A login form with email and password. There's an option to login with Google and a link to sign up if you don't have an account."
 
-const loginSchema_old = z.object({
+/*const loginSchema_old = z.object({
   email: z
     .string()
     .min(1, { message: 'Email is required' })
     .email({ message: 'Invalid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' })
-})
+})*/
 
 const loginSchema = z.object({
   login: z

@@ -13,13 +13,12 @@ import { ApiCep } from '@/interfaces/cep'
 import { ImovelSchema } from '@/schemas/imovel.schema'
 import api from '@/services/axios/api'
 import { Controller, FormProvider, UseFormReturn } from 'react-hook-form'
-import { IMOVEL_FINALIDADE, IMOVEL_STATUS, IMOVEL_TIPO } from '../../constants/imovel'
+import { IMOVEL_FINALIDADE, IMOVEL_STATUS } from '../../constants/imovel'
 import { PropertyImageUpload } from './multi-images-upload'
 import { DocumentUpload } from './document-upload'
 import { Textarea } from '@/components/ui/textarea'
 import { useQuery } from '@tanstack/react-query'
 import { TipoImovel } from '@/interfaces/tipoimovel'
-import { useState } from 'react'
 
 export const getTipos = async () => {
   return await api.get<TipoImovel[]>('tipoimovel')
@@ -52,21 +51,6 @@ export const ImovelFormContent = ({
     queryKey: ['imovelTipo'],
     queryFn: () => getTipos()
   });
-
-  const handleChange = (event: string) => {
-    console.log(event);
-    if (imovelTipo?.data.find(x => x.id === Number(event))?.id) {
-      const tipo_aux: TipoImovel | undefined = imovelTipo?.data.find(x => x.id === Number(event));
-      if (tipo_aux) {
-        //createImovelMethods.setValue("tipo", { name: tipo_aux.name, id: tipo_aux.id });
-        createImovelMethods.setValue("tipoId", tipo_aux.id);
-      }
-    }
-    
-  };
-
-  console.log(createImovelMethods.formState.errors);
-  console.log(createImovelMethods.getValues("tipoId"));
 
   return (
     <div className="space-y-4">

@@ -9,10 +9,9 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import {  Edit } from 'lucide-react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams } from '@/globals/GlobalParams';
-import { useMediaQuery } from 'react-responsive';
 import { Empresa } from '@/interfaces/empresa'
 import { empresaSchema, EmpresaSchema } from '@/schemas/empresa.schema'
 import { EmpresaFormContent, EmpresaFormRoot } from '../components/empresa-form'
@@ -294,17 +293,17 @@ export const DetalhesEmpresaForm = () => {
 }
 
 export default function DetalhesEmpresa() {
-  //const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  /*const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
 
-  const navigate = useNavigate()
+  const navigate = useNavigate()*/
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
 
   //Globals
-  const glb_params = useGlobalParams();
+  //const glb_params = useGlobalParams();
   //const { pessoa, addPessoa, removePessoa, updatePessoa, resetStatePessoa } = usePessoa();
 
   const { data: empresa } = useQuery({

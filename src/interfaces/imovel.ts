@@ -1,4 +1,4 @@
-import { ImovelStatus, ImovelTipo } from '@/enums/imovel/enums-imovel'
+import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Endereco } from './endereco'
 import { Locacao } from './locacao'
 //import { Locatario } from './locatario'

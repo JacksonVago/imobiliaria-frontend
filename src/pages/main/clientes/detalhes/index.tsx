@@ -1059,7 +1059,7 @@ export default function DetalhesCliente() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{proprietario.id}</span>
-                    <Badge variant="default">{proprietario.imovel?.tipo}</Badge>
+                    <Badge variant="default">{proprietario.imovel?.tipo.name}</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1694,7 +1694,7 @@ export default function DetalhesCliente() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{locacao.id}</span>
-                  <Badge variant="default">{locacao.imovel?.tipo}</Badge>
+                  <Badge variant="default">{locacao.imovel?.tipo.name}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>

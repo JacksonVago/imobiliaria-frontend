@@ -1,6 +1,6 @@
 'use client'
 
-import { Cog, HotelIcon, House, HouseIcon, HousePlus, Lock, LogOut, LucideHouse, Shapes, Users } from 'lucide-react'
+import { Cog, House,  HousePlus, Lock, LogOut, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 import logo  from '../assets/logo-molina.png';
 

@@ -1,7 +1,4 @@
-import { EstadoCivil } from '@/enums/estado-civil'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
-import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
-import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
 import { z } from 'zod'
 
 export const empresaSchema = z.object({

@@ -1,13 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { Pencil, Plus, Recycle, SquareX, Trash2 } from 'lucide-react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { BasePaginationData } from '../imoveis/listarImoveis'
-import { useMediaQuery } from 'react-responsive'
+import { Pencil, Plus, Recycle, Trash2 } from 'lucide-react'
 import { TipoImovel } from '@/interfaces/tipoimovel'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import React from 'react'
@@ -18,13 +14,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 
 // Types
-interface GetTipoParams {
+/*interface GetTipoParams {
   search?: string
   page?: number
   limit?: number,
   status?: string | undefined,
   exclude?: string,
-}
+}*/
 
 // API & Query Logic
 export const getTipos = async () => {
@@ -68,22 +64,22 @@ export const putUpdateTipo = (tipoData: {
 export default function ListarTipos() {
 
 
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  /*const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
-  //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+  const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })*/
 
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
   const [selectedTipo, setSelectedTipo] = React.useState<TipoImovel | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [newTipo, setNewTipo] = React.useState({ name: '' })
 
-  const [searchParams, setSearchTerm] = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
-  const limit = 3;
+  //const [searchParams, setSearchTerm] = useSearchParams();
+  //const page = Number(searchParams.get('page')) || 1;
+  //const limit = 3;
 
   const { data, isLoading } = useQuery(
     useGetTiposQueryOptions()
