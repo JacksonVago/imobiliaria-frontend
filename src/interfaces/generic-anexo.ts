@@ -3,7 +3,7 @@ export interface GenericAnexo {
   name?: string
   url: string
   type?: string
-  tipo_arquivo: string
+  tipoArquivo: string
   createdAt: string
   updatedAt: string
 }

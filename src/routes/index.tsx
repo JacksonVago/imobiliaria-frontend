@@ -29,6 +29,12 @@ import DetalhesLocacao from '@/pages/main/locacoes/detalhes'
 import  CriarLocacao  from '@/pages/main/locacoes/criar'
 import ListarTipos from '@/pages/main/tipoImovel'
 import DetalhesEmpresa from '@/pages/main/empresas/detalhes'
+import ListarLancamentos from '@/pages/main/lancamentos'
+import ListarTiposLancamento from '@/pages/main/tipolancamento'
+import { DetalhesLancamento } from '@/pages/main/lancamentos/detalhes'
+import ListarPagamentos from '@/pages/main/boletos'
+import { DetalhesBoleto } from '@/pages/main/boletos/detalhes'
+import ListarBoletos from '@/pages/main/boletos'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -104,6 +110,16 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_EMPRESAS">
                 <DetalhesEmpresa />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Tipo de Lançamentos */}
+          <Route
+            path={ROUTE.TIPOLANCAMENTO}
+            element={
+              <ProtectedRoute permission="VIEW_TIPOLANCAMENTOS">
+                <ListarTiposLancamento />
               </ProtectedRoute>
             }
           />
@@ -186,6 +202,50 @@ export const RoutesComponent = () => {
             }
           />
 
+          {/* Lançamentos */}
+          <Route
+            path={ROUTE.LANCAMENTOS}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS">
+                <ListarLancamentos exclude='' limitView={3} onSelectLancamento={undefined} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.LANCAMENTOS_CRIAR}
+            element={
+              <ProtectedRoute permission="CREATE_LANCAMENTO">
+                <CriarLocacao/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.LANCAMENTOS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS">
+                <DetalhesLancamento />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Pagamentos */}
+          <Route
+            path={ROUTE.PAGAMENTOS}
+            element={
+              <ProtectedRoute permission="VIEW_PAGAMENTOS">
+                <ListarBoletos exclude='' limitView={3} onSelectBoleto={undefined}/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.PAGAMENTOS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_PAGAMENTOS">
+                <DetalhesBoleto />
+              </ProtectedRoute>
+            }
+          />
+
           {/* propriterios */}
           <Route
             path={ROUTE.PROPRIETARIOS}
@@ -246,7 +306,7 @@ export const RoutesComponent = () => {
             path={ROUTE.CLIENTES}
             element={
               <ProtectedRoute permission="VIEW_CLIENTES">
-                <ListarClientes exclude='' limitView={3} txtVinc='' onSelectCliente={()=>{}} />
+                <ListarClientes exclude='' limitView={3} txtVinc='' onSelectCliente={undefined} />
               </ProtectedRoute>
             }
           />

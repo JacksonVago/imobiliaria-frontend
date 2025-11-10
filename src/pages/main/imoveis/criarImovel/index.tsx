@@ -60,7 +60,7 @@ import { ProprietarioSearch } from './components/owner-search'
 
 export interface CriarLocatarioData extends LocatarioSchema {
   imovelId?: string
-  valor_aluguel?: number
+  valorAluguel?: number
 }
 
 export const postCriarLocatario = async (data: CriarLocatarioData) => {
@@ -149,9 +149,9 @@ export const CriarImovel = () => {
       console.log(data);
       const form = new FormData()
 
-      /*if (data.description) {
+      if (data.description) {
         form.append('description', data.description)
-      }*/
+      }
 
       if (data.tipoId) {
         form.append('tipoId', data.tipoId.toString());
@@ -162,32 +162,12 @@ export const CriarImovel = () => {
       /*if (data.finalidade) {
         form.append('finalidade', data.finalidade)
       }*/
-      if (hasValues(data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria : "")) {
-        form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria.toString() : "")
+      if (hasValues(data.porcentagemLucroImobiliaria ? data.porcentagemLucroImobiliaria : "")) {
+        form.append('porcentagemLucroImobiliaria', data.porcentagemLucroImobiliaria ? data.porcentagemLucroImobiliaria.toString() : "")
       }
-      if (data.valor_aluguel) {
-        form.append('valor_aluguel', data.valor_aluguel.toString())
+      if (data.valorAluguel) {
+        form.append('valorAluguel', data.valorAluguel.toString())
       }
-      if (data.valor_venda) {
-        form.append('valor_venda', data.valor_venda.toString())
-      }
-
-      if (data.valor_agua) {
-        form.append('valor_agua', data.valor_agua.toString())
-      }
-
-      if (data.valor_condominio) {
-        form.append('valor_condominio', data.valor_condominio.toString())
-      }
-
-      if (data.valor_iptu) {
-        form.append('valor_iptu', data.valor_iptu.toString())
-      }
-
-      if (data.valor_taxa_lixo) {
-        form.append('valor_taxa_lixo', data.valor_taxa_lixo.toString())
-      }
-
       if (data.logradouro) {
         form.append('logradouro', data.logradouro)
       }
@@ -240,7 +220,8 @@ export const CriarImovel = () => {
       //
 
       toast({ title: 'Imóvel criado com sucesso' })
-      navigate(`${ROUTE.IMOVEIS}/${response.data.id}`)
+      //navigate(`${ROUTE.IMOVEIS}/${response.data.id}`)
+      navigate(`${ROUTE.IMOVEIS}`)
 
     } catch (error) {
       console.log(error);
@@ -430,123 +411,14 @@ export const CriarImovel = () => {
     }
   })
 
-  // // ======CREATE LOCATARIO METHODS======
-
-  // const createLocatarioMethods = useForm<LocatarioSchema>({
-  //   resolver: zodResolver(locatarioSchema),
-  //   defaultValues: {},
-  //   mode: 'all'
-  // })
-
-  // const [garantiaLocacaoTipo, setGarantiaLocacaoTipo] = React.useState<
-  //   'fiador' | 'titulo-capitalizacao' | 'seguro-fianca' | 'deposito-calcao'
-  // >('fiador')
-
-  // const onSubmitLocatarioData = async (data: LocatarioSchema) => {
-  //   try {
-  //     alert('submit')
-  //   } catch (error) {
-  //     toast({
-  //       title: 'Erro ao criar locatário',
-  //       description: 'Não foi possível criar o locatário, tente novamente'
-  //     })
-  //   }
-  // }
-
-  // const methods = useForm<
-  //   // Dynamically determine the type based on currentStep
-  //   typeof currentStep extends 'imovel'
-  //     ? ImovelSchema
-  //     : typeof currentStep extends 'proprietario'
-  //       ? ProprietarioSchema
-  //       : LocatarioSchema
-  // >({
-  //   resolver: zodResolver(
-  //     currentStep === 'imovel'
-  //       ? imovelSchema
-  //       : currentStep === 'proprietario'
-  //         ? proprietarioSchema
-  //         : locatarioSchema
-  //   ),
-  //   defaultValues: {},
-  //   mode: 'onBlur'
-  // })
-
-  // const documentProprietario =
-  //   currentStep == 'proprietario' ? methods.watch('documento') : undefined
-  // //when the document is changed we should check if the document already exists
-
-  // const handleSubmit = async (data: any) => {
-  //   if (currentStep === 'locatario') {
-  //     try {
-  //       await postCriarLocatario({
-  //         documento: data.documento,
-  //         email: data.email,
-  //         nome: data.nome,
-  //         telefone: data.telefone,
-  //         dataInicio: data.dataInicio,
-  //         valor_aluguel: imovelData?.valor_aluguel,
-  //         imovelId: imovelData?.id,
-  //         endereco: {
-  //           bairro: data.endereco.bairro,
-  //           cep: data.endereco.cep,
-  //           cidade: data.endereco.cidade,
-  //           estado: data.endereco.estado,
-  //           logradouro: data.endereco.logradouro,
-  //           numero: data.endereco.numero
-  //         }
-  //       })
-  //       setCompletedSteps(new Set([currentStep]))
-  //       //When register we should redirect to the created imovel page
-  //       navigate(ROUTE.IMOVEIS)
-  //     } catch (error) {
-  //       toast({
-  //         title: 'Erro ao criar locatário',
-  //         description: 'Não foi possível criar o locatário, tente novamente'
-  //       })
-  //     }
-  //   }
-  // }
+  console.log('imovel dados', createImovelMethods.formState.errors);
 
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mb-8 flex w-full items-center justify-between">
-        {/* {steps.map((step, index) => (
-          <React.Fragment key={step.id}>
-            <div className="flex flex-col items-center gap-2">
-              <div
-                className={cn(
-                  'flex h-10 w-10 items-center justify-center rounded-full border-2',
-                  currentStep === step.id && 'border-primary bg-primary text-primary-foreground',
-                  completedSteps.has(step.id) &&
-                    'border-primary bg-primary text-primary-foreground',
-                  !completedSteps.has(step.id) && currentStep !== step.id && 'border-muted'
-                )}
-              >
-                {completedSteps.has(step.id) ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  <step.icon className="h-5 w-5" />
-                )}
-              </div>
-              <span className="text-sm font-medium">{step.title}</span>
-            </div>
-            {index < steps.length - 1 && <ArrowRight className="h-5 w-5 text-muted-foreground" />}
-          </React.Fragment>
-        ))} */}
       </div>
       <div className="mx-auto w-full rounded-md">
         <Card>
-          {/* <div className="flex  justify-end">
-          <Button className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
-          </div>
-          <div className="flex  justify-end">
-            <Button className="btn btn-change rounded-full bg-transparent">
-              <div className="flex  justify-center">
-                <span className="w-5 h-5 bg-red-500 rounded-full">X</span>
-              </div>
-            </Button>
-          </div> */}
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo imovel</h2>
 
@@ -931,17 +803,3 @@ export const CriarImovel = () => {
     </div>
   )
 }
-
-// const IconButton = () => {
-//   return (
-//     <button className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-black drop-shadow-sm transition-colors duration-150 hover:bg-gray-200">
-//       <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-//         <path
-//           d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-//           clip-rule="evenodd"
-//           fill-rule="evenodd"
-//         ></path>
-//       </svg>
-//     </button>
-//   );
-// };

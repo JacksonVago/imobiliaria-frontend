@@ -25,9 +25,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 //import { DialogTitle } from '@radix-ui/react-dialog'
 import ListarClientes from '../../clientes'
 import { Pessoa } from '@/interfaces/pessoa'
-import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
+import { LOCAL_DEPOSITO_OPTIONS, STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { Imovel } from '@/interfaces/imovel'
 import ListarImoveis from '../../imoveis/listarImoveis'
+import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
+import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
+import { LocalDeposito } from '@/interfaces/locacao'
 //import { useQuery } from '@tanstack/react-query'
 //import { getImovel } from '../../imoveis/detalhes'
 
@@ -39,7 +42,7 @@ export const LocacaoFormRoot = ({
   createLocacaoMethods: UseFormReturn<LocacaoSchema>
   children: React.ReactNode
   onSubmitLocacaoData: (data: LocacaoSchema) => void
-}) => {  
+}) => {
   return (
     <form onSubmit={createLocacaoMethods.handleSubmit(onSubmitLocacaoData)}>{children}</form>
   )
@@ -66,13 +69,13 @@ export const LocacaoFormContent = ({
   const [selGarantia, setSelGarantia] = useState<GarantiaLocacao>();
   const [selFiador, setSelFiador] = useState<boolean>(false);
 
-  useEffect(()=>{
-    if (createLocacaoMethods.getValues('garantiaLocacaoTipo')){
+  useEffect(() => {
+    if (createLocacaoMethods.getValues('garantiaLocacaoTipo')) {
       const sel: GarantiaLocacao = GarantiaLocacao[createLocacaoMethods.getValues('garantiaLocacaoTipo') as keyof typeof GarantiaLocacao];
       setSelGarantia(sel);
     }
-  },[]);
-7
+  }, []);
+  7
   //Lista de imóveis
   const locacaoImoveis = useFieldArray({
     control: createLocacaoMethods.control,
@@ -256,7 +259,7 @@ export const LocacaoFormContent = ({
     if (imovel) {
       if (locacaoImoveis.fields.length === 0) {
         locacaoImoveis.append({
-          nome: (imovel.description ? imovel.description : ''),
+          nome: getEnderecoFormatado(imovel.endereco),
           id: imovel.id
         });
       }
@@ -266,7 +269,7 @@ export const LocacaoFormContent = ({
           shouldValidate: true
         }
       );
-      createLocacaoMethods.setValue('valor_aluguel', (imovel.valor_aluguel ? imovel.valor_aluguel: 0), {
+      createLocacaoMethods.setValue('valorAluguel', (imovel.valorAluguel ? imovel.valorAluguel : 0), {
         shouldDirty: true,
         shouldValidate: true
       }
@@ -279,7 +282,7 @@ export const LocacaoFormContent = ({
           shouldValidate: false
         }
       );
-      createLocacaoMethods.setValue('valor_aluguel', 0, {
+      createLocacaoMethods.setValue('valorAluguel', 0, {
         shouldDirty: false,
         shouldValidate: false
       }
@@ -314,13 +317,8 @@ export const LocacaoFormContent = ({
           <div>
             {(!selLocatario && !selImovel && !selFiador) && (
               <div>
-                <div className={(isPortrait ? "" : "grid grid-cols-1 gap-4 flex items-center")}>
-                  <Button onClick={() => { handlerSelImovel('imoveis') }} disabled={disabled}>
-                    <Search className="mr-2 h-4 w-4" />
-                    Imóveis
-                  </Button>
-                </div>
-                {(locacaoImoveis.fields.length > 0) && (
+                <Label className='text-base' >Imóvel</Label>
+                {(locacaoImoveis.fields.length > 0) ? (
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
                     {locacaoImoveis.fields.map((field, index) => (
                       <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
@@ -338,35 +336,60 @@ export const LocacaoFormContent = ({
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                    <div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                      <button disabled={disabled}
+                        className='border bg-zinc-200 hover:bg-zinc-400'
+                        type="button"
+                        onClick={() => {
+                          handlerSelImovel('imoveis')
+                        }}
+                      >
+                        <Search className='px-1'></Search>
+                      </button>
+                    </div>
+                  </div>
                 )}
                 {!!createLocacaoMethods?.formState?.errors?.imovelId?.message && (
                   createLocacaoMethods.formState?.errors?.imovelId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.imovelId?.message}</p>
                 )}
 
-                <div className={(isPortrait ? "mt-2" : "grid grid-cols-1 gap-4 flex items-center mt-2")}>
-                  <Button onClick={() => { handlerSelProp('locatarios') }} disabled={disabled}>
-                    <Search className="mr-2 h-4 w-4" />
-                    Locatários
-                  </Button>
-                </div>
-                {(locacaoLocatarios.fields.length > 0) && (
-                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                    {locacaoLocatarios.fields.map((field, index) => (
-                      <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                        <Label >{field.nome}</Label>
+                <div className='mt-3'>
+                  <Label className='mt-2 text-base'>Locatário</Label>
+                  {(locacaoLocatarios.fields.length > 0) ? (
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                      {locacaoLocatarios.fields.map((field, index) => (
+                        <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                          <Label >{field.nome}</Label>
+                          <button disabled={disabled}
+                            className='border bg-zinc-200 hover:bg-zinc-400'
+                            type="button"
+                            onClick={() => {
+                              locacaoLocatarios.remove(index);
+                            }}
+                          >
+                            <X className='px-1'></X>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                      <div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
                         <button disabled={disabled}
                           className='border bg-zinc-200 hover:bg-zinc-400'
                           type="button"
                           onClick={() => {
-                            locacaoLocatarios.remove(index);
+                            handlerSelProp('locatarios');
                           }}
                         >
-                          <X className='px-1'></X>
+                          <Search className='px-1'></Search>
                         </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
                 {!!createLocacaoMethods?.formState?.errors?.locatarios && (
                   <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.locatarios.message}</p>
                 )}
@@ -378,13 +401,13 @@ export const LocacaoFormContent = ({
               <Card id='teste' className='h-full'>
                 <div className="flex  justify-end">
                   <Button onClick={() => { handleSelectedImovel(undefined) }}
-                    className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                    className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                 </div>
                 <CardHeader>
                   <h1 className='flex items-center justify-center font-bold'>Selecionar Imóvel</h1>
                 </CardHeader>
                 <CardContent className='mt-2 h-120'>
-                  <ListarImoveis limitView={1} exclude='' onSelectImovel={handleSelectedImovel} />
+                  <ListarImoveisLocacao limitView={1} exclude='' onSelectImovel={handleSelectedImovel} />
                 </CardContent>
               </Card>
             )}
@@ -394,13 +417,13 @@ export const LocacaoFormContent = ({
               <Card id='teste' className='h-full'>
                 <div className="flex  justify-end">
                   <Button onClick={() => { handleSelectedProp(undefined) }}
-                    className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                    className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                 </div>
                 <CardHeader>
                   <h1 className='flex items-center justify-center font-bold'>Selecionar Locatário</h1>
                 </CardHeader>
                 <CardContent className='mt-2 h-120'>
-                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude='' onSelectCliente={handleSelectedProp} />
+                  <ListarClientes limitView={1} txtVinc='Selecionar' exclude='' onSelectCliente={handleSelectedProp} />
                 </CardContent>
               </Card>
             )}
@@ -416,9 +439,9 @@ export const LocacaoFormContent = ({
                     className="mt-1"
                     disabled={disabled}
                     placeholder="Valor do Aluguel"
-                    {...createLocacaoMethods.register('valor_aluguel')}
+                    {...createLocacaoMethods.register('valorAluguel')}
                   />
-                  {createLocacaoMethods.formState?.errors?.valor_aluguel?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.valor_aluguel?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.valorAluguel?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.valorAluguel?.message}</p>}
                 </Label>
               </div>
               <div className={(isPortrait ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4")}>
@@ -441,7 +464,7 @@ export const LocacaoFormContent = ({
                     type="date"
                     disabled={disabled}
                     placeholder="Data Fim"
-                    {...createLocacaoMethods.register('dataFim')}                    
+                    {...createLocacaoMethods.register('dataFim')}
                   />
                   {createLocacaoMethods.formState?.errors?.dataFim?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.dataFim?.message}</p>}
                 </Label>
@@ -455,9 +478,52 @@ export const LocacaoFormContent = ({
                     type="number"
                     disabled={disabled}
                     placeholder="Dia de vencimento"
-                    {...createLocacaoMethods.register('dia_vencimento')}
+                    {...createLocacaoMethods.register('diaVencimento')}
                   />
-                  {createLocacaoMethods.formState?.errors?.dia_vencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.dia_vencimento?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.diaVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.diaVencimento?.message}</p>}
+                </Label>
+              </div>
+
+              <div className="mt-2 flex justify-center">
+                <h1>Seguro Incêndio</h1>
+              </div>
+              <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
+                <Label className="text-base">
+                  Apólice
+                  <Input
+                    type="text"
+                    className="mt-1"
+                    disabled={disabled}
+                    placeholder="Nº apólice"
+                    {...createLocacaoMethods.register('seguroIncendio.numeroApolice')}
+                  />
+                  {createLocacaoMethods.formState?.errors?.seguroIncendio?.numeroApolice?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.seguroIncendio?.numeroApolice?.message}</p>}
+                </Label>
+              </div>
+
+              <div className={(isPortrait ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4")}>
+                <Label className="text-base">
+                  Data de Início
+                  <Input
+                    type='date'
+                    className="mt-2"
+                    disabled={disabled}
+                    placeholder="Data de Início"
+                    {...createLocacaoMethods.register('seguroIncendio.vigenciaInicio')}
+                  />
+                  {createLocacaoMethods.formState?.errors?.seguroIncendio?.vigenciaInicio?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{createLocacaoMethods.formState?.errors?.seguroIncendio?.vigenciaInicio?.message}</p>}
+                </Label>
+
+                <Label className="text-base">
+                  Data Fim
+                  <Input
+                    className="mt-2"
+                    type="date"
+                    disabled={disabled}
+                    placeholder="Data Fim"
+                    {...createLocacaoMethods.register('seguroIncendio.vigenciaFim')}
+                  />
+                  {createLocacaoMethods.formState?.errors?.seguroIncendio?.vigenciaFim?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.seguroIncendio?.vigenciaFim?.message}</p>}
                 </Label>
               </div>
 
@@ -468,7 +534,7 @@ export const LocacaoFormContent = ({
 
               <div className='mt-2'>
                 <Label className='text-base'>Tipo de Garantia</Label>
-                <div className='mt-2'>
+                <div className='mt-2 mr-5'>
                   <Controller
                     name="garantiaLocacaoTipo"
                     control={createLocacaoMethods.control}
@@ -479,7 +545,7 @@ export const LocacaoFormContent = ({
                         onValueChange={(value: GarantiaLocacao) => { field.onChange(value); handlerChangeGarantia(value) }}
                         value={field.value}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className='h-4'>
                           <SelectValue placeholder="Selecione a garantia" />
                         </SelectTrigger>
                         <SelectContent>
@@ -507,53 +573,56 @@ export const LocacaoFormContent = ({
                 <Card id='teste' className='h-full'>
                   <div className="flex  justify-end">
                     <Button onClick={() => { handleSelectFiador(undefined) }}
-                      className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                      className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                   </div>
                   <CardHeader>
                     <h1 className='flex items-center justify-center font-bold'>Selecionar Fiador</h1>
                   </CardHeader>
                   <CardContent className='mt-2 h-120'>
-                    <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude='' onSelectCliente={handleSelectFiador} />
+                    <ListarClientes limitView={1} txtVinc='Selecionar' exclude='' onSelectCliente={handleSelectFiador} />
                   </CardContent>
                 </Card>
-
-
-                {/* <Card>
-                  <CardHeader>
-                    <h1 className='flex items-center justify-center font-bold'>Selecionar o Fiador</h1>
-                  </CardHeader>
-                  <CardContent className='mt-2 h-120 text-base'>
-                    <ListarClientes limitView={1} txtVinc='Vincular Locação' onSelectCliente={handleSelectFiador} exclude='' />
-                  </CardContent>
-                </Card> */}
               </div>
             )}
 
-            {(locacaoFiadores.fields.length > 0) && (
-              <div>
-                <div className={(isPortrait ? "" : "grid grid-cols-1 gap-4 flex items-center")}>
-                  <Button onClick={() => { handlerSelProp('fiadores') }} disabled={disabled}>
-                    <Search className="mr-2 h-4 w-4" />
-                    Fiadores
-                  </Button>
+            {(selGarantia === GarantiaLocacao.FIADOR && !selFiador) && (
+              (locacaoFiadores.fields.length > 0) ? (
+                <div>
+                  <Label className='text-base'>Fiador</Label>
+                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                    {locacaoFiadores.fields.map((field, index) => (
+                      <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                        <Label >{field.nome}</Label>
+                        <button disabled={disabled}
+                          className='border bg-zinc-200 hover:bg-zinc-400'
+                          type="button"
+                          onClick={() => locacaoFiadores.remove(index)}
+                        >
+                          <X className='px-1'></X>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-
-                <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                  {locacaoFiadores.fields.map((field, index) => (
-                    <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                      <Label >{field.nome}</Label>
-                      <button disabled={disabled}
-                        className='border bg-zinc-200 hover:bg-zinc-400'
-                        type="button"
-                        onClick={() => locacaoFiadores.remove(index)}
-                      >
-                        <X className='px-1'></X>
-                      </button>
+              ) :
+                (
+                  <div>
+                    <Label className='text-base'>Fiador</Label>
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                      <div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                        <button disabled={disabled}
+                          className='border bg-zinc-200 hover:bg-zinc-400'
+                          type="button"
+                          onClick={() => handlerSelProp('fiadores')}
+                        >
+                          <Search className='px-1'></Search>
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                )
+            )
+            }
 
             {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
               <div className='mt-2 text-base'>
@@ -592,12 +661,41 @@ export const LocacaoFormContent = ({
                   />
                   {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message}</p>}
                 </div>
+                <div className='mt-2 text-base'>
+                  <Label className='text-base'>Locao depósito</Label>
+                  <div className='mt-2 mr-5'>
+                    <Controller
+                      name="depCalcao.localDeposito"
+                      control={createLocacaoMethods.control}
+
+                      render={({ field }) => (
+                        <Select
+                          disabled={disabled}
+                          onValueChange={(value: LocalDeposito) => field.onChange(value)}
+                          value={field.value}
+                        >
+                          <SelectTrigger className='h-4'>
+                            <SelectValue placeholder="Selecione a garantia" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {LOCAL_DEPOSITO_OPTIONS.map((local) => (
+                              <SelectItem className='text-base' key={local.label} value={local.value}>
+                                {local.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    <span>{createLocacaoMethods?.formState?.errors?.garantiaLocacaoTipo?.message}</span>
+                  </div>
+                </div>
               </div>
             )}
 
             <div className='mt-2 text-base'>
               <Label className='text-base'>Situação da Locação</Label>
-              <div className='mt-2'>
+              <div className='mt-2 mr-5'>
                 <Controller
                   name="status"
                   control={createLocacaoMethods.control}
@@ -608,7 +706,7 @@ export const LocacaoFormContent = ({
                       onValueChange={(value: LocacaoStatus) => field.onChange(value)}
                       value={field.value}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className='h-4'>
                         <SelectValue placeholder="Selecione a garantia" />
                       </SelectTrigger>
                       <SelectContent>
@@ -643,13 +741,13 @@ export const LocacaoFormSubmitButton = ({
       <Button
         type="submit"
         disabled={
-          disabled 
+          disabled
           ||
           !createLocacaoMethods.formState.isDirty
           || !createLocacaoMethods.formState.isValid
         }
       >
-        Finalizar Cadastro
+        Criar Locação
       </Button>
     </div>
   )

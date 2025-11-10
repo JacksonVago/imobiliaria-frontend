@@ -72,7 +72,7 @@ export default function ListarClientes({
   txtVinc: string
   limitView: number
   exclude: string
-  onSelectCliente: (cliente: Pessoa | undefined) => void
+  onSelectCliente: ((cliente: Pessoa) => void) | undefined
 }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
@@ -109,7 +109,9 @@ export default function ListarClientes({
   //always that we go to out of the total pages, we will go to the first page
 
   useEffect(() => {
-    glb_params.updTitle_form('Clientes');
+    if (!onSelectCliente){
+      glb_params.updTitle_form('Clientes');
+    }
     if (totalPages && page > totalPages) {
       navigate({
         search: `?page=1&limit=${limit}&search=${search}`
@@ -141,21 +143,20 @@ export default function ListarClientes({
   }
 
   const handleClickVerDetalhes = (id: number) => () => {
-    console.log(id);
-    console.log(`${ROUTE.CLIENTES}/${id}`);
     navigate(`${ROUTE.CLIENTES}/${id}`)
   }
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && clientes?.length === 0)
-
+  console.log(data);
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
-      <div className="grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+      {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Clientes</h1>
         )}
-        <Button onClick={handleClickCreateCliente}>
+        <Button onClick={handleClickCreateCliente} size={"sm"}>
           <Plus className="h-4 w-4" />Criar Cliente
         </Button>
       </div>
@@ -193,11 +194,14 @@ export default function ListarClientes({
                     }}
 
                 >{cliente?.nome}</span>
-                <Badge variant="secondary">
-                  {cliente?.locatarios?.length}
-                  {cliente?.locatarios?.length && cliente?.locatarios?.length > 1
-                    ? ' clientes'
-                    : ' cliente'}
+                <Badge variant="secondary">                  
+                  {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
+                    ? 'Locatário'
+                    : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
+                    ? 'Proprietário'
+                    : (cliente?.fiador
+                    ? 'Fiador'
+                    : 'Cliente')))}
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -216,7 +220,7 @@ export default function ListarClientes({
               </dl>
             </CardContent>
             <CardFooter>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-10">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -229,11 +233,10 @@ export default function ListarClientes({
                 >
                   Ver detalhes
                 </Button>
-                {txtVinc !== '' && (
+                {(txtVinc !== '' && onSelectCliente) && (
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="w-full"
                     onClick={() => {
                       onSelectCliente(cliente);
                     }}
@@ -256,11 +259,11 @@ export default function ListarClientes({
       <Pagination>
         <PaginationContent>
           {/* Previous & Next Buttons */}
-          <PaginationItem>
+          <PaginationItem key={"prev"}>
             <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 1 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
-          <PaginationItem>
+          <PaginationItem key={"next"}>
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}
               aria-disabled={(page > (!totalPages ? 1 : totalPages - 1) ? "true" : "false")}

@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Link } from 'react-router-dom'
 import { useGlobalParams } from '@/globals/GlobalParams'
+import { useMediaQuery } from 'react-responsive'
 
 export function NavMain({
   items
@@ -34,10 +35,10 @@ export function NavMain({
 }) {
   //Globals
   const glb_params = useGlobalParams();
+  const isMobile = useMediaQuery({ query: '(min-width: 700px)' })
 
   return (
     <SidebarGroup className='font-[Poppins-Regular]'>
-      <SidebarGroupLabel className="my-2 flex justify-center" style={{ "fontSize": "1.5rem" }}>Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
@@ -45,7 +46,7 @@ export function NavMain({
               <SidebarMenuButton className="py-5" asChild tooltip={item.title}>
                 <Link to={item.url}>
                   <item.icon />
-                  <span style={{ "fontSize": "1rem" }}>{item.title}</span>
+                  <span style={{ "fontSize": isMobile ? "1rem" : "0.80rem" }}>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (

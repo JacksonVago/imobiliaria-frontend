@@ -51,6 +51,10 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
   { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
   { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' },
+  { value: 'CREATE_CLIENTE', label: 'Criar Cliente' },
+  { value: 'UPDATE_CLIENTE', label: 'Atualizar Cliente' },
+  { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
+  { value: 'VIEW_CLIENTES', label: 'Ver Clientes' },
   { value: 'CREATE_TIPO', label: 'Criar Tipo de imóvel' },
   { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
   { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
@@ -58,7 +62,15 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
   { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
   { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
-  { value: 'VIEW_LOCACOES', label: 'Ver Locações' }
+  { value: 'VIEW_LOCACOES', label: 'Ver Locações' },
+  { value: 'CREATE_LANCAMENTO', label: 'Criar Lançamento' },
+  { value: 'UPDATE_LANCAMENTO', label: 'Atualizar Lançamento' },
+  { value: 'DELETE_LANCAMENTO', label: 'Excluir Lançamento' },
+  { value: 'VIEW_LANCAMENTOS', label: 'Ver Lançamentos' },
+  { value: 'CREATE_PAGAMENTO', label: 'Criar Pagamento' },
+  { value: 'UPDATE_PAGAMENTO', label: 'Atualizar pagamento' },
+  { value: 'DELETE_PAGAMENTO', label: 'Excluir Pagamento' },
+  { value: 'VIEW_PAGAMENTOS', label: 'Ver Pagamentos' },
 ]
 
 const imoveisPermissions: { value: Permission; label: string }[] = [
@@ -80,6 +92,27 @@ const pessoasPermissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
   { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
   { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' }
+]
+
+const clientesPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_CLIENTE', label: 'Criar Cliente' },
+  { value: 'UPDATE_CLIENTE', label: 'Atualizar Cliente' },
+  { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
+  { value: 'VIEW_CLIENTES', label: 'Ver Clientes' }
+]
+
+const lancamentoPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_LANCAMENTO', label: 'Criar Lançamento' },
+  { value: 'UPDATE_LANCAMENTO', label: 'Atualizar Lançamento' },
+  { value: 'DELETE_LANCAMENTO', label: 'Excluir Lançamento' },
+  { value: 'VIEW_LANCAMENTOS', label: 'Ver Lançamentos' }
+]
+
+const pagamentoPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_PAGAMENTO', label: 'Criar Pagamento' },
+  { value: 'UPDATE_PAGAMENTO', label: 'Atualizar Pagamento' },
+  { value: 'DELETE_PAGAMENTO', label: 'Excluir Pagamento' },
+  { value: 'VIEW_PAGAMENTOS', label: 'Ver Pagamentos' }
 ]
 
 const locacoesPermissions: { value: Permission; label: string }[] = [
@@ -105,8 +138,9 @@ const loginSchema = z.object({
 
 //type LoginSchema = z.infer<typeof loginSchema>
 
-export const getUsers = () => {
-  return api.get<User[]>('/users/collaborators')
+export const getUsers = async () => {
+  const response = await api.get<User[]>('/users/collaborators')
+  return response;
 }
 
 export const createUser = ({
@@ -195,7 +229,7 @@ export const ListarColaboradores = () => {
   const { data: usersData, isLoading } = useQuery({
     queryKey: [QueryKeys.USERS_LIST],
     queryFn: getUsers
-  })
+  })  
 
   const createUserMutation = useMutation({
     mutationFn: createUser,
@@ -295,6 +329,7 @@ export const ListarColaboradores = () => {
   })
 
   const users = usersData?.data
+console.log('usersData', usersData);
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user)
@@ -513,7 +548,7 @@ export const ListarColaboradores = () => {
         <div className="w-1/3">
           <h2 className="mb-4 text-lg font-semibold">Colaboradores</h2>
           <ScrollArea className="h-[600px] rounded-md border p-4">
-            {users?.map((user) => (
+            {(users && users.length > 0) ? users?.map((user) => (
               <div
                 key={user.id}
                 className={cn(
@@ -569,8 +604,9 @@ export const ListarColaboradores = () => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </div>
-            ))}
+              </div>))
+              : <div>Não há coilaboradores cadastrados.</div>
+            }
           </ScrollArea>
         </div>
 
@@ -579,8 +615,8 @@ export const ListarColaboradores = () => {
             <>
               <h2 className="text-lg font-semibold">Permissões de {selectedUser.name}</h2>
               <ScrollArea className="h-full max-h-[500px] rounded-md border p-4">
-                <div className="space-y-2">
-                  <>
+                <div className="grid grid-cols-2 gap-1">
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
                     <h3 className="text-lg font-semibold">Imoveis</h3>
                     {imoveisPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
@@ -600,8 +636,8 @@ export const ListarColaboradores = () => {
                         </label>
                       </div>
                     ))}
-                  </>
-                  <>
+                  </div>
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
                     <h3 className="text-lg font-semibold">Locações</h3>
                     {locacoesPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
@@ -621,10 +657,10 @@ export const ListarColaboradores = () => {
                         </label>
                       </div>
                     ))}
-                  </>
-                  <>
-                    <h3 className="text-lg font-semibold">Pessoas</h3>
-                    {pessoasPermissions.map((permission) => (
+                  </div>
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Clientes</h3>
+                    {clientesPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
                           id={permission.value}
@@ -642,7 +678,49 @@ export const ListarColaboradores = () => {
                         </label>
                       </div>
                     ))}
-                  </>
+                  </div>
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Lançamentos</h3>
+                    {lancamentoPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Boletos</h3>
+                    {pagamentoPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </ScrollArea>
               <Button onClick={handleSavePermissions}>Salvar permissões</Button>

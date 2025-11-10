@@ -15,6 +15,7 @@ import api from '@/services/axios/api'
 import { Controller, FormProvider, UseFormReturn } from 'react-hook-form'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { ClienteSchema } from '@/schemas/cliente.schema'
+import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 
 export const ClienteFormRoot = ({
   children,
@@ -75,7 +76,14 @@ export const ClienteFormContent = ({
               type="text"
               disabled={disabled}
               placeholder="CPF ou CNPJ"
-              {...createClienteMethods.register('documento')}
+              {...createClienteMethods.register('documento',
+                {
+                  onChange: async (e) => {
+                    const { value } = e.target;
+                    e.target.value = formatCpfCnpj(value);
+                  }
+                }
+              )}
               helperText={createClienteMethods.formState?.errors?.documento?.message}
             />
           </Label>
@@ -87,40 +95,47 @@ export const ClienteFormContent = ({
               type="tel"
               disabled={disabled}
               placeholder="Telefone"
-              {...createClienteMethods.register('telefone')}
+              {...createClienteMethods.register('telefone',
+                {
+                  onChange: async (e) => {
+                    const { value } = e.target;
+                    e.target.value = formatPhone(value);
+                  }
+                }
+              )}
               helperText={createClienteMethods.formState?.errors?.telefone?.message}
             />
           </Label>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Label className="text-base">
-            Estado
-            <div className="mt-2">
-            <Controller
-              name="estadoCivil"
-              control={createClienteMethods.control}
-              render={({ field }) => (
-                <Select
-                  disabled={disabled}
-                  onValueChange={(value) => field.onChange(value)}
-                  value={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Estado civil" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ESTADO_CIVIL_OPTIONS.map((estadoCivil) => (
-                      <SelectItem key={estadoCivil.label} value={estadoCivil.value}>
-                        {estadoCivil.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            Estado Civil
+            <div className="mt-2 mr-6">
+              <Controller
+                name="estadoCivil"
+                control={createClienteMethods.control}
+                render={({ field }) => (
+                  <Select
+                    disabled={disabled}
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Estado civil" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ESTADO_CIVIL_OPTIONS.map((estadoCivil) => (
+                        <SelectItem key={estadoCivil.label} value={estadoCivil.value}>
+                          {estadoCivil.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {!!createClienteMethods?.formState?.errors?.estado?.message && (
+                <span>{createClienteMethods?.formState?.errors?.estado?.message}</span>
               )}
-            />
-            {!!createClienteMethods?.formState?.errors?.estado?.message && (
-              <span>{createClienteMethods?.formState?.errors?.estado?.message}</span>
-            )}
             </div>
           </Label>
           <Label className="text-base">

@@ -63,6 +63,7 @@ export const empresaSchema = z.object({
         })
     ])
     .optional(),
+  tipoId: z.coerce.number().min(1, 'Tipo de lançamento é obrigatório'),
 
 })
 

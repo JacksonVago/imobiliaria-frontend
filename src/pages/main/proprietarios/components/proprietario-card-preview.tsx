@@ -69,23 +69,6 @@ export const ProprietarioCardImoveisContent = ({
       <div>
         <h4 className="mb-2 font-semibold">Imóveis:</h4>
         <ul className="space-y-2">
-          {/*proprietario?.imoveis?.slice(0, 3).map((imovel) => (
-            <li key={imovel.id} className="flex items-center justify-between text-sm">
-              <span className="flex items-center">
-                <Home className="mr-2 h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{imovel?.title}</span>
-              </span>
-              <span className="whitespace-nowrap font-semibold">
-                R$ {imovel?.valor_aluguel?.toLocaleString('pt-BR')}
-              </span>
-            </li>
-          ))*/}
-
-          {/*!!proprietario?.imovel?.length && proprietario?.imovel?.length > 3 && (
-            <li className="text-sm text-muted-foreground">
-              + {proprietario?.imoveis?.length - 3} imóveis
-            </li>
-          )*/}
           {!!proprietario?.imovel && (
             <li className="text-sm text-muted-foreground">
               + 1 imóveis

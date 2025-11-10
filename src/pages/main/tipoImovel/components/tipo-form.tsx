@@ -262,7 +262,7 @@ export const LocacaoFormContent = ({
           shouldValidate: true
         }
       );
-      createLocacaoMethods.setValue('valor_aluguel', (imovel.valor_aluguel ? imovel.valor_aluguel: 0), {
+      createLocacaoMethods.setValue('valorAluguel', (imovel.valorAluguel ? imovel.valorAluguel: 0), {
         shouldDirty: true,
         shouldValidate: true
       }
@@ -275,7 +275,7 @@ export const LocacaoFormContent = ({
           shouldValidate: false
         }
       );
-      createLocacaoMethods.setValue('valor_aluguel', 0, {
+      createLocacaoMethods.setValue('valorAluguel', 0, {
         shouldDirty: false,
         shouldValidate: false
       }
@@ -412,9 +412,9 @@ export const LocacaoFormContent = ({
                     className="mt-1"
                     disabled={disabled}
                     placeholder="Valor do Aluguel"
-                    {...createLocacaoMethods.register('valor_aluguel')}
+                    {...createLocacaoMethods.register('valorAluguel')}
                   />
-                  {createLocacaoMethods.formState?.errors?.valor_aluguel?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.valor_aluguel?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.valorAluguel?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.valorAluguel?.message}</p>}
                 </Label>
               </div>
               <div className={(isPortrait ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4")}>
@@ -451,9 +451,9 @@ export const LocacaoFormContent = ({
                     type="number"
                     disabled={disabled}
                     placeholder="Dia de vencimento"
-                    {...createLocacaoMethods.register('dia_vencimento')}
+                    {...createLocacaoMethods.register('diaVencimento')}
                   />
-                  {createLocacaoMethods.formState?.errors?.dia_vencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.dia_vencimento?.message}</p>}
+                  {createLocacaoMethods.formState?.errors?.diaVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.diaVencimento?.message}</p>}
                 </Label>
               </div>
 

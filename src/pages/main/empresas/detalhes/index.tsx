@@ -6,7 +6,7 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {  Edit } from 'lucide-react'
+import { Edit } from 'lucide-react'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
@@ -27,24 +27,53 @@ export const DetalhesEmpresaForm = () => {
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   //const params = useParams();
-  
+
   //Globals
   const glb_params = useGlobalParams();
 
-  console.log(id);
+  console.log(`/empresas/${glb_params.id_empresa ? glb_params.id_empresa : 0}`);
   const { data: empresa } = useQuery({
-    queryKey: ['empresa', id],
+    queryKey: ['empresa', (glb_params.id_empresa ? glb_params.id_empresa : 0)],
     queryFn: async () => {
-      const { data } = await api.get<Empresa>(`/empresas/${id}`)
-      return data
-    },
-    enabled: !!id
+      try {
+        const data = await api.get<Empresa>(`/empresas/${glb_params.id_empresa ? glb_params.id_empresa : 0}`)
+        //console.log(data.data.id ? data.data.id.toString() : 'test');
+        console.log(data);
+        console.log(data.data);
+        glb_params.updId_empresa(data.data.id ? data.data.id.toString() : '0')
+        return data.data;
+      }
+      catch (error) {
+        if (axios.isAxiosError(error)) {
+          // Check if there's a response and data within the error
+          if (error.response && error.response.data) {
+            console.error('Error message from server:', error.response.data);
+            toast({
+              title: 'Erro ao atualizar as configurações',
+              description: error.response.data.message,
+            })
+
+            // You can also set this error message to a state to display it in your UI
+          } else {
+            console.error('Axios error without response data:', error.message);
+          }
+        } else {
+          console.error('Non-Axios error:', error);
+          toast({
+            title: 'Erro',
+            description: error instanceof Error ? error.message : 'Ocorreu um erro ao atualizar as configurações. Tente novamente.',
+            variant: 'destructive'
+          })
+        }
+      }
+    }
   })
+
 
   const createEmpresa = useMutation({
     mutationFn: async (data: FormData) => {
 
-        return await api.post<Empresa>(`/empresas`, data, {
+      return await api.post<Empresa>(`/empresas`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     },
@@ -73,6 +102,7 @@ export const DetalhesEmpresaForm = () => {
     try {
       const form = new FormData()
 
+      console.log(id);
       if (data?.nome) {
         form.append('nome', data.nome)
       }
@@ -125,7 +155,7 @@ export const DetalhesEmpresaForm = () => {
       }
 
       console.log(data?.avisosReajusteLocacao);
-      if (data?.avisosReajusteLocacao) {        
+      if (data?.avisosReajusteLocacao) {
         form.append('avisosReajusteLocacao', data.avisosReajusteLocacao.toString())
       }
 
@@ -152,19 +182,19 @@ export const DetalhesEmpresaForm = () => {
       if (data?.porcentagemComissao) {
         form.append('porcentagemComissao', data.porcentagemComissao.toString())
       }
-            
+
       if (data?.emiteBoleto) {
         form.append('emiteBoleto', data.emiteBoleto.toString())
       }
-      
+
       if (data?.valorTaxaBoleto) {
         form.append('valorTaxaBoleto', data.valorTaxaBoleto.toString())
-      }      
-      
+      }
+
       if (data?.emissaoBoletoAntecedencia) {
         form.append('emissaoBoletoAntecedencia', data.emissaoBoletoAntecedencia.toString())
-      }      
-      
+      }
+
       if (data?.porcentagemMultaAtraso) {
         form.append('porcentagemMultaAtraso', data.porcentagemMultaAtraso.toString())
       }
@@ -172,31 +202,36 @@ export const DetalhesEmpresaForm = () => {
       if (data?.porcentagemJurosAtraso) {
         form.append('porcentagemJurosAtraso', data.porcentagemJurosAtraso.toString())
       }
-
-      if (id !== undefined && id > 0){
-      await updateEmpresa.mutateAsync(form)
+      if (data?.tipoId) {
+        form.append('tipoId', data.tipoId.toString());
       }
-      else{
-        
-  const dataObject = Object.fromEntries(form.entries());
-  const jsonData = JSON.stringify(dataObject);
-  console.log(jsonData);
+
+
+      if (glb_params.id_empresa !== undefined && Number(glb_params.id_empresa) > 0) {
+        await updateEmpresa.mutateAsync(form)
+      }
+      else {
+
+        const dataObject = Object.fromEntries(form.entries());
+        const jsonData = JSON.stringify(dataObject);
+        console.log(jsonData);
 
         await createEmpresa.mutateAsync(form)
       }
 
       toast({
-        title: 'Empresa atualizado com sucesso',
-        description: `Empresa atualizado com sucesso`
+        title: 'Configurações atualizado com sucesso',
+        description: `Configurações atualizado com sucesso`
 
-      })
+      });
+      setIsEditingPersonalInfo(!isEditingPersonalInfo);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Check if there's a response and data within the error
         if (error.response && error.response.data) {
           console.error('Error message from server:', error.response.data);
           toast({
-            title: 'Erro ao criar tipo de imóvel',
+            title: 'Erro ao atualizar as configurações',
             description: error.response.data.message,
           })
 
@@ -208,7 +243,7 @@ export const DetalhesEmpresaForm = () => {
         console.error('Non-Axios error:', error);
         toast({
           title: 'Erro',
-          description: error instanceof Error ? error.message : 'Ocorreu um erro ao criar o tipo de imóvel. Tente novamente.',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao atualizar as configurações. Tente novamente.',
           variant: 'destructive'
         })
       }
@@ -233,9 +268,8 @@ export const DetalhesEmpresaForm = () => {
 
   React.useEffect(() => {
     glb_params.updTitle_form('Configurações');
-    if (empresa) empresaMethods.reset(defaultValues)
-    if (id === undefined){
-      setIsEditingPersonalInfo(true);
+    if (empresa) {
+      empresaMethods.reset(defaultValues)
     }
   }, [defaultValues])
 
@@ -256,12 +290,13 @@ export const DetalhesEmpresaForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <h2 className="mb-4 mt-8 text-xl font-bold">Configurações</h2>
+        <CardTitle className="flex items-center justify-end">
+          {/*<h2 className="mb-4 mt-8 text-xl font-bold">Configurações</h2>*/}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+            className='bg-gray-100'
           >
             <Edit className="mr-2 h-4 w-4" />
             {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -277,12 +312,11 @@ export const DetalhesEmpresaForm = () => {
           <div className="mt-4">
             {disabled && (
               <Button
-                className="w-full"
                 disabled={
                   !empresaMethods.formState.isDirty || !empresaMethods.formState.isValid
                 }
               >
-                Salvar Alterações
+               Salvar Alterações
               </Button>
             )}
           </div>
@@ -347,7 +381,7 @@ export default function DetalhesEmpresa() {
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
-      <DetalhesEmpresaForm/>
+      <DetalhesEmpresaForm />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { Pagamento } from "./pagamento";
+import { Pagamento } from "./boleto";
 
 export interface Anexo {
     id:number;

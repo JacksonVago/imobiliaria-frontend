@@ -1,5 +1,5 @@
 import { GarantiaLocacao } from '@/enums/locacao/enums-locacao'
-import { LocacaoStatus } from '@/interfaces/locacao'
+import { LocacaoStatus, LocalDeposito } from '@/interfaces/locacao'
 import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
 import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
 import { z } from 'zod'
@@ -119,8 +119,8 @@ const baseLocacaoSchema = z.object({
   documentosToDeleteIds: z.array(z.number()).optional(),
   dataInicio: z.string().min(1, 'Data de início é obrigatória'),
   dataFim: z.string().min(1, 'Data de fim é obrigatória'),
-  valor_aluguel: z.number().min(0, 'Valor do aluguel deve ser positivo'),
-  dia_vencimento: z
+  valorAluguel: z.number().min(0, 'Valor do aluguel deve ser positivo'),
+  diaVencimento: z
     .union([
       z.number().min(1, 'Dia de vencimento é obrigatório'),
       z
@@ -135,10 +135,10 @@ const baseLocacaoSchema = z.object({
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
   imovelId: z.number().min(1, 'Id do imóvel e obrigatório')
-    /*.transform((val) => {
-      const num = Number(val)
-      return isNaN(num) ? undefined : num
-    })*/
+  /*.transform((val) => {
+    const num = Number(val)
+    return isNaN(num) ? undefined : num
+  })*/
   ,
 })
 
@@ -188,16 +188,16 @@ export const locacaoSchema = z.object({
     .optional(),
 
   documentosToDeleteIds: z.array(z.number()).optional(),
-  dataInicio: z.string().transform((val)=>{
-    const data:string = val;
-    return moment(data.substring(0,10)).format("YYYY-MM-DD");
+  dataInicio: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
   }),
-  dataFim: z.string().transform((val)=>{
-     const data:string = val;
-     return moment(data.substring(0,10)).format("YYYY-MM-DD");
-   }),
-  valor_aluguel: z.coerce.number().min(1, 'Valor do aluguel é obrigatório'),
-  dia_vencimento: z
+  dataFim: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+  }),
+  valorAluguel: z.coerce.number().min(1, 'Valor do aluguel é obrigatório'),
+  diaVencimento: z
     .union([
       z.number().min(1, 'Dia de vencimento é obrigatório'),
       z
@@ -212,14 +212,14 @@ export const locacaoSchema = z.object({
   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
   imovelId: z.coerce.number().min(1, 'Id do imóvel e obrigatório'),
-  locatarios: z.array(    z.object(
-      {
-        nome: z.string(),
-        id: z.number()
-      }
-    )
+  locatarios: z.array(z.object(
+    {
+      nome: z.string(),
+      id: z.number()
+    }
+  )
 
-  ).min(1, {message: 'Locatário é obrigatório'}),
+  ).min(1, { message: 'Locatário é obrigatório' }),
   fiadores: z.array(
     z.object(
       {
@@ -248,86 +248,24 @@ export const locacaoSchema = z.object({
   ).optional(),
   depCalcao: z.object(
     {
-      valorDeposito: z.number().min(1, 'Valor do depósito é obrigatório').optional(),
-      quantidadeMeses: z.number().min(1, 'Quantidade de meses é obrigatório').optional(),
+      valorDeposito: z.coerce.number().min(1, 'Valor do depósito é obrigatório').optional(),
+      quantidadeMeses: z.coerce.number().min(1, 'Quantidade de meses é obrigatório').optional(),
+      localDeposito: z.enum(Object.values(LocalDeposito) as [string, ...string[]]).optional(),
     }
   ).optional(),
+  seguroIncendio: z.object(
+    {
+      numeroApolice: z.string().min(1, 'Número da apólice do seguro de incêndio é obrigatório'),
+      vigenciaInicio: z.string().transform((val) => {
+        const data: string = val;
+        return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+      }),
+      vigenciaFim: z.string().transform((val) => {
+        const data: string = val;
+        return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+      }),
+    }
+  ),
 });
-
-// export const locacaoSchema = z.object({
-//   documentos: z.array(
-//     z.object({
-//       file: z.instanceof(File),
-//       size: z
-//         .number()
-//         .max(MAX_DOCUMENT_FILE_SIZE, `Documento não pode ter mais que ${MAX_DOCUMENT_FILE_SIZE / 1024 / 1024}MB`)
-//         .optional(),
-//       type: z
-//         .string()
-//         .refine((val) => ACCEPTED_DOCUMENT_TYPES.includes(val), {
-//           message: 'Tipo de arquivo não suportado. Envie um formato válido.'
-//         })
-//         .optional(),
-//       id: z.number().optional(),
-//     })
-//   ).optional(),
-
-//   documentosToDeleteIds: z.array(z.number()).optional(),
-
-//   dataInicio: z.coerce.date('Data de início inválida'),
-
-//   dataFim: z.coerce.date('Data de término inválida'),
-
-//   valor_aluguel: z.coerce.number()
-//     .refine((val) => val > 0, { message: 'Valor do aluguel obrigatório e maior que zero.' }),
-
-//   dia_vencimento: z.coerce.number()
-//     .int({ message: 'Dia de vencimento deve ser inteiro.' })
-//     .min(1, { message: 'Dia de vencimento obrigatório' }),
-
-//   status: z.enum(Object.values(LocacaoStatus) as [string, ...string[]]),
-
-//   garantiaLocacaoTipo: z.enum(Object.values(GarantiaLocacao) as [string, ...string[]]),
-
-//   imovelId: z.coerce.number()
-//     .int({ message: 'Imóvel obrigatório e inteiro.' })
-//     .min(1, { message: 'Imóvel obrigatório' }),
-
-//   locatarios: z.array(
-//     z.object({
-//       nome: z.string(),
-//       id: z.number(),
-//     })
-//   ).min(1, 'Locatário é obrigatório'),
-
-//   fiadores: z.array(
-//     z.object({
-//       nome: z.string(),
-//       id: z.number(),
-//     })
-//   ).optional(),
-
-//   imoveis: z.array(
-//     z.object({
-//       nome: z.string(),
-//       id: z.number(),
-//     })
-//   ).optional(),
-
-//   tituloCap: z.object({
-//     numeroTitulo: z.string(),
-//   }).optional(),
-
-//   seguroFianca: z.object({
-//     numeroSeguro: z.string(),
-//   }).optional(),
-
-//   depCalcao: z.object({
-//     valorDeposito: z.coerce.number()
-//       .refine((val) => val > 0, { message: 'Valor do depósito obrigatório e maior que zero.' }),
-//     quantidadeMeses: z.coerce.number()
-//       .refine((val) => val > 0, { message: 'Valor do depósito obrigatório e maior que zero.' }),
-//   }).optional(),
-// });
 
 export type LocacaoSchema = z.infer<typeof locacaoSchema>

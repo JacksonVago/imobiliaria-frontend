@@ -20,5 +20,5 @@ export interface Pessoa {
   documentos?:GenericAnexo[]
   fiador?: Fiador
   proprietarios?: Proprietario[]
-  locatarios?: Locatario[];
+  locatarios?: Locatario[]
 }

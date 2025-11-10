@@ -69,9 +69,6 @@ export const CriarCliente = () => {
   });
 
 
-  console.log('clienteMethods errors', clienteMethods.formState.errors)
-  console.log('clienteMethods dirtyFields', clienteMethods.formState.isDirty)
-  console.log('isvalid', clienteMethods.formState.isValid)
   const onSubmitClienteData = async (data: ClienteSchema) => {
     //try {
     const form = new FormData()

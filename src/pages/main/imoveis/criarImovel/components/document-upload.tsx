@@ -87,7 +87,12 @@ export function DocumentUpload({
 
     //also for existant docs, set the id to delete
     if (documents[index]?.id) {
-      setValue(
+      setValue("documentosToDeleteIds", [...(watch("documentosToDeleteIds") || []), {id: documents[index].id, file: documents[index].name}], {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true
+      })
+      /*setValue(
         'documentosToDeleteIds',
         [...(watch('documentosToDeleteIds') || []), documents[index].id],
         {
@@ -95,7 +100,7 @@ export function DocumentUpload({
           shouldDirty: true,
           shouldTouch: true
         }
-      )
+      )*/
     }
   }
 

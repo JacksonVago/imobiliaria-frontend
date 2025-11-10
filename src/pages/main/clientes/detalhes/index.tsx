@@ -62,8 +62,9 @@ import { Locacao } from '@/interfaces/locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
 //import { boolean } from 'zod';
-import ListarImoveis from '../../imoveis/listarImoveis';
+import ListarImoveis, { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
+import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
 
 // Mock data for demonstration
 /*const cliente = {
@@ -88,7 +89,7 @@ import { useMediaQuery } from 'react-responsive';
     {
       id: 'rent001',
       imovel: 'Apartamento Centro',
-      valor_aluguel: 1500,
+      valorAluguel: 1500,
       dataInicio: '2023-01-01',
       dataFim: '2024-01-01',
       status: 'Ativo'
@@ -96,7 +97,7 @@ import { useMediaQuery } from 'react-responsive';
     {
       id: 'rent002',
       imovel: 'Casa de Praia',
-      valor_aluguel: 2000,
+      valorAluguel: 2000,
       dataInicio: '2023-06-01',
       dataFim: null,
       status: 'Ativo'
@@ -104,7 +105,7 @@ import { useMediaQuery } from 'react-responsive';
     {
       id: 'rent003',
       imovel: 'Kitnet Universitária',
-      valor_aluguel: 800,
+      valorAluguel: 800,
       dataInicio: '2022-03-01',
       dataFim: '2023-02-28',
       status: 'Encerrado'
@@ -337,11 +338,14 @@ export const DetalhesClienteForm = ({
     }
   }, [id, cliente, documentFiles])
 
+  console.log('cliente methods', clienteMethods.formState.errors);
+  console.log('cliente methods', clienteMethods.formState.isDirty);
+  console.log('cliente methods', clienteMethods.formState.isValid)
   /*const handleDeleteProprietario = () => {
     deleteClienteMutation.mutate()
   }*/
 
-  const hasLocatario = !!cliente?.proprietarios?.length;
+  const hasLocatario = !!cliente?.locatarios?.length;
 
   return (
     <Card>
@@ -430,16 +434,17 @@ export default function DetalhesCliente() {
   console.log(id);
   console.log(cliente);
 
-  let imovelStatus = ImovelStatus.DISPONIVEL;
+  let imovelStatus = ImovelStatus.ALUGADO;
 
-  const { data: imoveisLocacao } = useQuery({
+  const { data } = useQuery({
     queryKey: ['locacoes', imovelStatus],
     queryFn: async () => {
-      const { data } = await api.get<Imovel[]>(`/imoveis/locacao/?imovelStatus=${imovelStatus}`)
+      const { data } = await api.get<BasePaginationData<Imovel>>(`/imoveis/locacao/?imovelStatus=${imovelStatus}`)
       return data
     },
   })
 
+  const imoveisLocacao = data?.data || [];
   /*const { data } = useQuery({
     queryKey: [],
     queryFn: async () => {
@@ -565,7 +570,7 @@ export default function DetalhesCliente() {
     const formData = new FormData();
 
     formData.append('pessoaId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString(): ""));
+    formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString(): ""));
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
     //Gravar dados das propriedades
@@ -604,11 +609,11 @@ export default function DetalhesCliente() {
       //setSelImovelAlt('');
       clientePropAlt.reset();
       setPropEdit(proprietario);
-      //setCotaImovelAlt(proprietario.cota_imovel);
+      //setCotaImovelAlt(proprietario.cotaImovel);
       //setSelImovelAlt(proprietario.imovelId.toString());
       setPropImovelIdAlt(proprietario.imovelId);
       clientePropAlt.setValue('imovelId', proprietario.imovelId);
-      clientePropAlt.setValue('cota_imovel', proprietario.cota_imovel);
+      clientePropAlt.setValue('cotaImovel', proprietario.cotaImovel);
     }
   }
 
@@ -634,7 +639,7 @@ export default function DetalhesCliente() {
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
       formData.append('pessoaId', propEdit.pessoaId.toString());
-      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString(): ""));
+      formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString(): ""));
       formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
       console.log(formData);
@@ -668,18 +673,11 @@ export default function DetalhesCliente() {
 
   const handlerEditLocacao = (locacao: Locacao) => {
     if (locacao) {
-      //setCotaImovelAlt(0);
       setPropImovelIdAlt(0);
-      //setSelImovelAlt('');
       imovelLocAlt.reset();
-      //setLocEdit(locacao);
-      //setCotaImovelAlt(proprietario.cota_imovel);
-      //setSelImovelAlt(proprietario.imovelId.toString());
-      //setPropImovelIdAlt(proprietario.imovelId);
-      //imovelLocAlt.setValue('dataInicio', new Date(moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD")));
       imovelLocAlt.setValue('dataInicio', moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD"));
       imovelLocAlt.setValue('dataFim', moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD"));
-      imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
+      imovelLocAlt.setValue('valorAluguel', locacao.valorAluguel);
       imovelLocAlt.setValue('status', locacao.status);
       imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
       imovelLocAlt.setValue('imovelId', locacao.imovelId);
@@ -687,72 +685,6 @@ export default function DetalhesCliente() {
     }
   }
 
-  /*const handleDeleteLocacao = (propriedade: Proprietario) => {
-    //Gravar dados das propriedades
-    api.delete(`locacoes/${propriedade.id}`).
-      then(result => {
-        toast({
-          title: 'Locação excluída com sucesso',
-          description: `Locação excluída com sucesso`
-        });
-      });
-  }
-
-  function handlerUpdateLocacao(data: LocacaoSchema) {
-    const formData = new FormData();
-
-    console.log(locEdit);
-    console.log(data);
-
-    if (locEdit) {
-      formData.append('id', locEdit.id.toString());
-      formData.append('pessoaId', locEdit.pessoaId.toString());
-      formData.append('cota_imovel', data.cota_imovel.toString());
-      formData.append('imovelId', data.imovelId.toString());
-
-      console.log(formData);
-    }
-
-  }
-
-  function handleSubmitLocacao(data: LocacaoSchema) {
-    const formData = new FormData();
-
-    console.log(JSON.stringify(data.fiadores));
-    console.log(data?.fiadores?.map(x => { return x.id; }).toString());
-
-
-    formData.append('dataInicio', data.dataInicio);
-    formData.append('dataFim', moment((data.dataFim ? data.dataFim : '')).format("YYYY-MM-DD"));
-    formData.append('valor_aluguel', ( data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
-    formData.append('status', data.status);
-    formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', moment((data.dia_vencimento ? data.dia_vencimento : '')).format("YYYY-MM-DD"));
-    formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
-    formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
-    formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
-    formData.append('numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
-    formData.append('valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito.toString() : '0'));
-    formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
-    formData.append('locatario', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
-
-    console.log(formData.values());
-
-    api.post(`locacoes`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).
-      then(result => {
-        toast({
-          title: 'Locação criada com sucesso',
-          description: `Locação criada com sucesso`
-        });
-        let tst =result.statusText;
-        tst = "";
-      });
-  }*/
- 
   const handlerDetailImovel = (id: number) => {
     navigate(`${ROUTE.IMOVEIS}/${id}`)
   }
@@ -839,37 +771,6 @@ export default function DetalhesCliente() {
     }
 
   }
-
-  //const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
-  //SUPABASE_URL="https://jrseqfittadsxfbmlwvz.supabase.co"
-  //SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg"
-  //const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
-
-  //const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-  /*const handleDownload = async (filePath: string, fileName: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from('your-bucket-name') // Replace with your bucket name
-        .download(filePath);
-
-      if (error) {
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName; // Desired filename for download
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      //console.error('Error downloading file:', error.message);
-      console.error('Error downloading file:', error);
-    }
-  };*/
 
   const handlerSelImovel = (origin: string) => {
 
@@ -1027,10 +928,10 @@ export default function DetalhesCliente() {
                           className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                       </div>
                       <CardHeader>
-                        <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
+                        <DialogTitle className='flex items-center justify-center'>Selecionar o Imóvel</DialogTitle>
                       </CardHeader>
                       <CardContent className='mt-2 h-120'>
-                        <ListarImoveis limitView={1} exclude={cliente && cliente?.proprietarios ? cliente?.proprietarios?.map((proper) => { return proper.id }).toString() : ''} onSelectImovel={handleSelectImovel} />
+                        <ListarImoveisLocacao limitView={1} exclude={cliente && cliente?.proprietarios ? cliente?.proprietarios?.map((prop) => { return prop.imovelId }).toString() : ''} onSelectImovel={handleSelectImovel} />
                       </CardContent>
                     </Card>
                   )}
@@ -1038,8 +939,8 @@ export default function DetalhesCliente() {
                   <div>
                     <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
                     <Input id="cotaImovel" type="number" placeholder="0.00"
-                      {...clienteProp.register('cota_imovel')}
-                      helperText={clienteProp.formState?.errors?.cota_imovel?.message}
+                      {...clienteProp.register('cotaImovel')}
+                      helperText={clienteProp.formState?.errors?.cotaImovel?.message}
                     />
                   </div>
                   <DialogFooter>
@@ -1066,7 +967,7 @@ export default function DetalhesCliente() {
                   <div className="grid grid-cols-2 gap-4">
                     <Label className="font-semibold">Cota do imóvel</Label>
                     <p>
-                      % {proprietario.cota_imovel.toLocaleString('pt-BR')}
+                      % {proprietario.cotaImovel.toLocaleString('pt-BR')}
                     </p>
                   </div>
 
@@ -1146,9 +1047,9 @@ export default function DetalhesCliente() {
                         <div>
                           <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
                           <Input id="cotaImovel" type="number" placeholder="0.00"
-                            {...clientePropAlt.register('cota_imovel')}
-                            helperText={clientePropAlt.formState?.errors?.cota_imovel?.message}
-                            onChange={(e) => { clientePropAlt.setValue('cota_imovel', parseFloat(e.target.value)) }}
+                            {...clientePropAlt.register('cotaImovel')}
+                            helperText={clientePropAlt.formState?.errors?.cotaImovel?.message}
+                            onChange={(e) => { clientePropAlt.setValue('cotaImovel', parseFloat(e.target.value)) }}
                           />
                         </div>
                         <DialogFooter>
@@ -1175,227 +1076,6 @@ export default function DetalhesCliente() {
         <TabsContent value="locacoes" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[1.3rem]">Locações</h2>
-            {/* <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  onClick={handlerNewLoc}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nova Locação
-                </Button>
-              </DialogTrigger>
-              <DialogContent className='font-[Poppins-regular]'>
-                <DialogHeader>
-                  <DialogTitle>Adicionar Nova Locação</DialogTitle>
-                  <DialogDescription>
-                    Preencha os detalhes da nova locação para este cliente.
-                  </DialogDescription>
-                </DialogHeader>
-                <form className="space-y-4" onSubmit={locacaoMethods.handleSubmit(handleSubmitLocacao)}>
-                  <div style={{ display: (!selFiador ? 'block' : 'none') }}>
-                    <Label className="text-base">
-                      Imóvel
-                      <div className="mt-2">
-                        <Controller
-                          name="imovelId"
-                          control={locacaoMethods.control}
-                          render={({ field }) => (
-                            <Select
-                              onValueChange={(value) => {
-                                field.onChange(value)
-                                locacaoMethods.setValue('valor_aluguel', imoveisLocacao?.filter(x => x.id === parseFloat(value))[0].valor_aluguel || 0)
-                                locacaoMethods.setValue('imovelId', parseFloat(value));
-
-                              }}
-                              value={field.value?.toString()}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione o imóvel" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {imoveisLocacao?.map((locacao) => (
-                                  <SelectItem value={locacao.id.toString()}>{locacao.tipo.toString() + ", " + locacao.endereco.logradouro.toString() + " " + locacao.endereco.bairro + " " + locacao.endereco.cidade}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                        {!!locacaoMethods?.formState?.errors?.imovelId?.message && (
-                          <span>{locacaoMethods?.formState?.errors?.imovelId?.message}</span>
-                        )}
-                      </div>
-                    </Label>
-                    <div className='mt-2'>
-                      <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
-                      <Input id="valor_aluguel" type="number" placeholder="0.00"
-                        {...locacaoMethods.register('valor_aluguel')}
-                        helperText={locacaoMethods.formState?.errors?.valor_aluguel?.message}
-                        onChange={(e) => { locacaoMethods.setValue('valor_aluguel', parseFloat(e.target.value)) }}
-                      />
-                    </div>
-                    <div className='mt-2'>
-                      <Label htmlFor="dataInicio">Data de Início</Label>
-                      <Input id="dataInicio" type="date"
-                        {...locacaoMethods.register('dataInicio')}
-                        helperText={locacaoMethods.formState?.errors?.dataInicio?.message}
-                        onChange={(e) => { locacaoMethods.setValue('dataInicio', e.target.value) }}
-                      />
-                    </div>
-                    <div className='mt-2'>
-                      <Label htmlFor="dataFim">Data de Fim (opcional)</Label>
-                      <Input id="dataFim" type="date"
-                        {...locacaoMethods.register('dataFim')}
-                        helperText={locacaoMethods.formState?.errors?.dataFim?.message}
-                        onChange={(e) => { locacaoMethods.setValue('dataFim', e.target.value) }}
-                      />
-                    </div>
-                    <div className='mt-2'>
-                      <Label htmlFor="diaVencto">Dia de Vencimento</Label>
-                      <Input id="diaVencto" type="number"
-                        {...locacaoMethods.register('dia_vencimento')} placeholder='0'
-                        helperText={locacaoMethods.formState?.errors?.dia_vencimento?.message}
-                        onChange={(e) => { locacaoMethods.setValue('dia_vencimento', parseInt(e.target.value)) }}
-                      />
-                    </div>
-                    <div className='mt-2'>
-                      <Label htmlFor="observacoes">Observações</Label>
-                      <Textarea id="observacoes" placeholder="Detalhes adicionais sobre a locação" />
-                    </div>
-                    <div className='mt-2'>
-                      <Label htmlFor="Garantia">Tipo de Garantia</Label>
-                      <Select
-                        onValueChange={(e: GarantiaLocacao) => { handlerChangeGarantia(e) }
-                        }>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a garantia" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {GARANTIA_LOCACAO_OPTIONS.map((garantia) => (
-                            <SelectItem key={garantia.label} value={garantia.value}>
-                              {garantia.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {(selGarantia === GarantiaLocacao.FIADOR && selFiador) && (
-                    <div>
-                      <Card>
-                        <CardHeader>
-                          <DialogTitle className='flex items-center'>Selecionar o Fiador</DialogTitle>
-                        </CardHeader>
-                        <CardContent className='mt-2 h-120'>
-                          <ListarClientes limitView={1} txtVinc='Vincular Locação' onSelectCliente={handleSelectFiador} exclude='' />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-
-                  {(locacaoFiadores.fields.length > 0) && (
-                    <div>
-                      <div className="grid grid-cols-2 gap-2 items-center justify-between">
-                        <Label>Fiadores</Label>
-                        <button
-                          className='border bg-zinc-200 hover:bg-zinc-400 rounded'
-                          type="button"
-                          onClick={() => { setSelFiador(true) }}
-                        >
-                          Adicionar
-                        </button>
-                      </div>
-                      {locacaoFiadores.fields.map((field, index) => (
-                        <div className='flex items-center gap-2 mt-2'>
-                          <Label >{field.nome}</Label>
-                          <button
-                            className='border bg-zinc-200 hover:bg-zinc-400'
-                            type="button"
-                            onClick={() => locacaoFiadores.remove(index)}
-                          >
-                            <X className='px-1'></X>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    // <div>
-                    //   <div className='mt-2'>
-                    //     <Label>Fiador: {selFiador?.nome}</Label>
-                    //   </div>
-                    // </div>
-                  )}
-
-                  {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
-                    <div className='mt-2'>
-                      <Label htmlFor="titulocap">Número do Título</Label>
-                      <Input id="titulocap" type="number"
-                        {...locacaoMethods.register('tituloCap.numeroTitulo')}
-                        helperText={locacaoMethods.formState?.errors?.tituloCap?.numeroTitulo?.message}
-                        onChange={(e) => { locacaoMethods.setValue('tituloCap.numeroTitulo', e.target.value) }}
-                      />
-                    </div>
-                  )}
-
-                  {selGarantia === GarantiaLocacao.SEGURO_FIANCA && (
-                    <div className='mt-2'>
-                      <Label htmlFor="numseguro">Número do Seguro</Label>
-                      <Input id="numseguro" type="number"
-                        {...locacaoMethods.register('seguroFianca.numeroSeguro')}
-                        helperText={locacaoMethods.formState?.errors?.seguroFianca?.numeroSeguro?.message}
-                        onChange={(e) => { locacaoMethods.setValue('seguroFianca.numeroSeguro', e.target.value) }}
-                      />
-                    </div>
-                  )}
-
-                  {selGarantia === GarantiaLocacao.DEPOSITO_CALCAO && (
-                    <div>
-                      <div className='mt-2'>
-                        <Label htmlFor="valdepCalcao">Valor do depósito</Label>
-                        <Input id="valdepCalcao" type="number" placeholder='0,00'
-                          {...locacaoMethods.register('depCalcao.valorDeposito')}
-                          helperText={locacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message}
-                          onChange={(e) => { locacaoMethods.setValue('depCalcao.valorDeposito', parseFloat(e.target.value)) }}
-                        />
-                      </div>
-                      <div className='mt-2'>
-                        <Label htmlFor="qtddepCalcao">Quantidade de meses</Label>
-                        <Input id="qtddepCalcao" type="number"
-                          {...locacaoMethods.register('depCalcao.quantidadeMeses')}
-                          helperText={locacaoMethods.formState?.errors?.depCalcao?.quantidadeMeses?.message}
-                          onChange={(e) => { locacaoMethods.setValue('depCalcao.quantidadeMeses', parseFloat(e.target.value)) }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className='mt-2'>
-                    <Label htmlFor="status">Situação da Locação</Label>
-                    <Select
-                      onValueChange={(e: LocacaoStatus) => {
-                        locacaoMethods.setValue('status', e)
-                      }
-                      }>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a situação" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STATUS_LOCACAO_OPTIONS.map((status) => (
-                          <SelectItem key={status.label} value={status.value}>
-                            {status.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type="submit"
-                      >Adicionar Locação</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog> */}
           </div>
 
           <div className={(isPortrait ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1')}>
@@ -1413,7 +1093,7 @@ export default function DetalhesCliente() {
                       <div className="grid grid-cols-2 gap-4 flex items-center mt-2">
                         <Label>Valor do Aluguel</Label>
                         <p className="font-semibold">
-                          R$ {locacao.valor_aluguel.toLocaleString('pt-BR')}
+                          R$ {locacao.valorAluguel.toLocaleString('pt-BR')}
                         </p>
                       </div>
                       <div className="grid grid-cols-2 gap-4 items-center mt-4">
@@ -1477,7 +1157,7 @@ export default function DetalhesCliente() {
                                       <Select
                                         onValueChange={(value) => {
                                           field.onChange(value)
-                                          imovelLocAlt.setValue('valor_aluguel', imoveisLocacao?.filter(x => x.id === parseFloat(value))[0].valor_aluguel || 0)
+                                          imovelLocAlt.setValue('valorAluguel', imoveisLocacao?.filter(x => x.id === parseFloat(value))[0].valorAluguel || 0)
                                           imovelLocAlt.setValue('imovelId', parseFloat(value));
 
                                         }}
@@ -1500,11 +1180,11 @@ export default function DetalhesCliente() {
                                 </div>
                               </Label>
                               <div className='mt-2'>
-                                <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
-                                <Input id="valor_aluguel" type="number" placeholder="0.00"
-                                  {...imovelLocAlt.register('valor_aluguel')}
-                                  helperText={imovelLocAlt.formState?.errors?.valor_aluguel?.message}
-                                  onChange={(e) => { imovelLocAlt.setValue('valor_aluguel', parseFloat(e.target.value)) }}
+                                <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
+                                <Input id="valorAluguel" type="number" placeholder="0.00"
+                                  {...imovelLocAlt.register('valorAluguel')}
+                                  helperText={imovelLocAlt.formState?.errors?.valorAluguel?.message}
+                                  onChange={(e) => { imovelLocAlt.setValue('valorAluguel', parseFloat(e.target.value)) }}
                                 />
                               </div>
                               <div className='mt-2'>
@@ -1526,9 +1206,9 @@ export default function DetalhesCliente() {
                               <div className='mt-2'>
                                 <Label htmlFor="diaVencto">Dia de Vencimento</Label>
                                 <Input id="diaVencto" type="number"
-                                  {...imovelLocAlt.register('dia_vencimento')} placeholder='0'
-                                  helperText={imovelLocAlt.formState?.errors?.dia_vencimento?.message}
-                                  onChange={(e) => { imovelLocAlt.setValue('dia_vencimento', parseInt(e.target.value)) }}
+                                  {...imovelLocAlt.register('diaVencimento')} placeholder='0'
+                                  helperText={imovelLocAlt.formState?.errors?.diaVencimento?.message}
+                                  onChange={(e) => { imovelLocAlt.setValue('diaVencimento', parseInt(e.target.value)) }}
                                 />
                               </div>
                               <div className='mt-2'>
@@ -1709,7 +1389,7 @@ export default function DetalhesCliente() {
                 <div className="grid grid-cols-2 gap-4 flex items-center mt-2">
                   <Label>Valor do Aluguel</Label>
                   <p className="font-semibold">
-                    R$ {locacao.valor_aluguel.toLocaleString('pt-BR')}
+                    R$ {locacao.valorAluguel.toLocaleString('pt-BR')}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">

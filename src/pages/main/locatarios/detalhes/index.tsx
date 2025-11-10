@@ -73,7 +73,7 @@ import { Pessoa } from '@/interfaces/pessoa'
     {
       id: 'rent001',
       imovel: 'Apartamento Centro',
-      valor_aluguel: 1500,
+      valorAluguel: 1500,
       dataInicio: '2023-01-01',
       dataFim: '2024-01-01',
       status: 'Ativo'
@@ -81,7 +81,7 @@ import { Pessoa } from '@/interfaces/pessoa'
     {
       id: 'rent002',
       imovel: 'Casa de Praia',
-      valor_aluguel: 2000,
+      valorAluguel: 2000,
       dataInicio: '2023-06-01',
       dataFim: null,
       status: 'Ativo'
@@ -89,7 +89,7 @@ import { Pessoa } from '@/interfaces/pessoa'
     {
       id: 'rent003',
       imovel: 'Kitnet Universitária',
-      valor_aluguel: 800,
+      valorAluguel: 800,
       dataInicio: '2022-03-01',
       dataFim: '2023-02-28',
       status: 'Encerrado'
@@ -536,8 +536,8 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
-                    <Input id="valor_aluguel" type="number" placeholder="0.00" />
+                    <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
+                    <Input id="valorAluguel" type="number" placeholder="0.00" />
                   </div>
                   <div>
                     <Label htmlFor="dataInicio">Data de Início</Label>
@@ -572,7 +572,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
                   <div>
                     <Label>Valor do Aluguel</Label>
                     <p className="font-semibold">
-                      R$ {locacao.valor_aluguel.toLocaleString('pt-BR')}
+                      R$ {locacao.valorAluguel.toLocaleString('pt-BR')}
                     </p>
                   </div>
                   <div>
@@ -617,8 +617,8 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
-                        <Input id="valor_aluguel" type="number" placeholder="0.00" />
+                        <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
+                        <Input id="valorAluguel" type="number" placeholder="0.00" />
                       </div>
                       <div>
                         <Label htmlFor="dataInicio">Data de Início</Label>

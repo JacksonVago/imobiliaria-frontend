@@ -9,7 +9,7 @@ type globalParams = {
     token:string;
     id_orig:string;
     pastaOrig:string;
-    local:string;
+    id_empresa:string;
     bluetooth_dev:any;
     title_form:string;
     origin_url:string;
@@ -18,7 +18,7 @@ type globalParams = {
     updId_orig: (id_orig: globalParams['id_orig']) => void;
     updToken: (token: globalParams['token']) => void;
     updPastaOrig: (pastaOrig: globalParams['pastaOrig']) => void;
-    updlocal: (local: globalParams['local']) => void;
+    updId_empresa: (id_empresa: globalParams['id_empresa']) => void;
     updBluetooth_dev: (bluetooth_dev:globalParams['bluetooth_dev']) => void;
     updTitle_form: (title_form:globalParams['title_form']) => void;
     updOrigin_url: (origin_url:globalParams['origin_url']) => void;
@@ -31,7 +31,7 @@ export const useGlobalParams = create<globalParams>((set)=>(
     token:'',
     id_orig:'',
     pastaOrig:'',
-    local:'',
+    id_empresa:'',
     bluetooth_dev:null,
     title_form:'',
     origin_url:'',
@@ -40,7 +40,7 @@ export const useGlobalParams = create<globalParams>((set)=>(
     updId_orig: (Pid_orig:string) => set(() => ({ id_orig: Pid_orig })),
     updToken: (Ptoken:string) => set(() => ({ token: Ptoken })),
     updPastaOrig: (PpastaOrig:string) => set(() => ({ pastaOrig: PpastaOrig })),
-    updlocal: (Plocal:string) => set(() => ({ local: Plocal })),
+    updId_empresa: (Pid_empresa:string) => set(() => ({ id_empresa: Pid_empresa })),
     updBluetooth_dev: (Pblue:any) => set(() => ({ bluetooth_dev: Pblue })),
     updTitle_form: (Ptitle:any) => set(() => ({ title_form: Ptitle })),
     updOrigin_url:(Porigin:any) => set(() => ({ origin_url: Porigin })),

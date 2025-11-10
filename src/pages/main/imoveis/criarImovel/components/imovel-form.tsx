@@ -52,6 +52,10 @@ export const ImovelFormContent = ({
     queryFn: () => getTipos()
   });
 
+  console.log('imovel dados', createImovelMethods.formState.errors);
+  console.log('imovel dados', createImovelMethods.formState.isValid);
+  console.log('imovel dados', createImovelMethods.formState.isDirty);
+
   return (
     <div className="space-y-4">
       <div>
@@ -79,7 +83,7 @@ export const ImovelFormContent = ({
                 onChange: async (e) => {
                   let cep = e.target.value?.replace(/\D/g, '') // Remove caracteres não numéricos
                   const cleanedCep = cep
-                  7                  // Formata o CEP para o formato '#####-###'
+                  // Formata o CEP para o formato '#####-###'
                   console.log('first cep', cep)
                   if (cep.length > 5) {
                     cep = `${cep.slice(0, 5)}-${cep.slice(5, 8)}`
@@ -314,41 +318,6 @@ export const ImovelFormContent = ({
           </Label>
         </div>
 
-        <div className='mt-2 mr-5'>
-          <Label className='text-base font-[Poppins-Regular]'>
-            Finalidade
-            <div className='mt-2'>
-              <Controller
-                name="finalidade"
-                control={createImovelMethods.control}
-                render={({ field }) => (
-                  <Select
-                    disabled={disabled}
-                    aria-label={field.value}
-                    onValueChange={(value) => field.onChange(value)}
-                    value={field.value}
-                  >
-                    <SelectTrigger value={field.value}>
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {IMOVEL_FINALIDADE.map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {createImovelMethods.formState.errors.finalidade?.message &&
-                (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                  {createImovelMethods.formState.errors.finalidade.message}
-                </p>)}
-            </div>
-          </Label>
-        </div>
-
         {/* VALORES */}
         <div className="flex justify-center font-[Poppins-ExtraLight]">
           <Label className='font-bold text-lg'>VALORES DO IMÓVEL</Label>
@@ -359,13 +328,14 @@ export const ImovelFormContent = ({
             <Input
               className="mt-2"
               type="number"
+              step="any"
               disabled={disabled}
               placeholder="Taxa Administrativa"
-              {...createImovelMethods.register('porcentagem_lucro_imobiliaria')}
+              {...createImovelMethods.register('porcentagemLucroImobiliaria')}
             />
-            {createImovelMethods.formState.errors.porcentagem_lucro_imobiliaria?.message &&
+            {createImovelMethods.formState.errors.porcentagemLucroImobiliaria?.message &&
               (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.porcentagem_lucro_imobiliaria.message}
+                {createImovelMethods.formState.errors.porcentagemLucroImobiliaria.message}
               </p>)}
           </Label>
 
@@ -381,91 +351,11 @@ export const ImovelFormContent = ({
               type="number"
               disabled={disabled}
               placeholder="Valor do aluguel"
-              {...createImovelMethods.register('valor_aluguel')}
+              {...createImovelMethods.register('valorAluguel')}
             />
-            {createImovelMethods.formState.errors.valor_aluguel?.message &&
+            {createImovelMethods.formState.errors.valorAluguel?.message &&
               (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_aluguel.message}
-              </p>)}
-          </Label>
-          <Label className='text-base font-[Poppins-Regular]'>
-            Venda
-            <Label className='text-[0.7rem]'> (opcional)</Label>
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Valor de venda"
-              {...createImovelMethods.register('valor_venda')}
-            />
-            {createImovelMethods.formState.errors.valor_venda?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_venda.message}
-              </p>)}
-          </Label>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Label className='text-base font-[Poppins-Regular]'>
-            Água
-            <Label className='text-[0.7rem]'> (opcional)</Label>
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Valor da água"
-              {...createImovelMethods.register('valor_agua')}
-            />
-            {createImovelMethods.formState.errors.valor_agua?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_agua.message}
-              </p>)}
-          </Label>
-          <Label className='text-base font-[Poppins-Regular]'>
-            Taxa de lixo
-            <Label className='text-[0.7rem]'> (opcional)</Label>
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Valor da taxa de lixo"
-              {...createImovelMethods.register('valor_taxa_lixo')}
-            />
-            {createImovelMethods.formState.errors.valor_taxa_lixo?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_taxa_lixo.message}
-              </p>)}
-          </Label>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Label className='text-base font-[Poppins-Regular]'>
-            Condomínio
-            <Label className='text-[0.7rem]'> (opcional)</Label>
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Valor do condomínio"
-              {...createImovelMethods.register('valor_condominio')}
-            />
-            {createImovelMethods.formState.errors.valor_condominio?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_condominio.message}
-              </p>)}
-          </Label>
-          <Label className='text-base font-[Poppins-Regular]'>
-            IPTU
-            <Label className='text-[0.7rem]'> (opcional)</Label>
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Valor do IPTU"
-              {...createImovelMethods.register('valor_iptu')}
-            />
-            {createImovelMethods.formState.errors.valor_iptu?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createImovelMethods.formState.errors.valor_iptu.message}
+                {createImovelMethods.formState.errors.valorAluguel.message}
               </p>)}
           </Label>
         </div>
@@ -486,6 +376,7 @@ export const ImovelFormSubmitButton = ({
       <Button
         type="submit"
         className="mt-4"
+        size={"sm"}
         disabled={
           disabled
           ||
@@ -493,7 +384,7 @@ export const ImovelFormSubmitButton = ({
           !createImovelMethods.formState.isValid
         }
       >
-        Salvar e Continuar
+        Criar Imóvel
       </Button>
     </div>
   )

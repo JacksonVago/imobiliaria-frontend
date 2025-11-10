@@ -106,6 +106,11 @@ export default function ListarLocacoes({
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || undefined
 
+  console.log(isBigScreen);
+  console.log(isPortrait);
+  console.log(isTablet);
+  console.log(isMobile);
+
   const { data, isLoading } = useQuery(
     useGetLocacoesQueryOptions({
       page,
@@ -187,23 +192,39 @@ export default function ListarLocacoes({
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
-      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {/* <div className={(isPortrait ? 'grid grid-cols-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isTablet ? 'grid grid-cols-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isMobile ? 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center')}> */}
-        <h1 className="text-2xl font-bold">Locações</h1>
-        <Button onClick={handleClickCreateLocacao}>
+        {/* <h1 className="text-2xl font-bold">Locações</h1> */}
+        <Button onClick={handleClickCreateLocacao} size={"sm"}>
           <Plus className="h-4 w-4" />Criar Locação
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            onChange={handleSearchChange}
-            value={search}
-            placeholder="Buscar locações"
-            className="pl-8"
-          />
+      <div className={isTablet ? 'grid grid-cols-6 gap-4' : 'grid grid-cols-1 gap-4'}>
+        <div className="col-span-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              onChange={handleSearchChange}
+              value={search}
+              placeholder="Buscar locações"
+              className="pl-8"
+            />
+          </div>
+        </div>
+        <div>
+          <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
+            <SelectTrigger className="w-[160px] h-6">
+              <SelectValue placeholder="Situação" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_LOCACAO_OPTIONS.map((value) => (
+                <SelectItem key={value.label} value={value.label}>
+                  {value.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -215,26 +236,6 @@ export default function ListarLocacoes({
             Nenhuma locação encontrado para a busca atual.
           </p>
         )}
-
-        <div className='mt-2'>
-          <Label className='text-base font-[Poppins-Regular]'>
-            Situação da Locação
-            <div className='mt-2'>
-              <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Situação" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_LOCACAO_OPTIONS.map((value) => (
-                    <SelectItem key={value.label} value={value.label}>
-                      {value.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </Label>
-        </div>
 
         {/* locações Cards */}
         {locacoes?.map((locacao) => (
@@ -259,9 +260,9 @@ export default function ListarLocacoes({
             <CardContent className="flex-grow">
               <dl className="grid grid-cols-2 gap-1 text-sm">
                 <dt className="font-semibold">Valor do Aluguel:</dt>
-                <dd className="truncate">{locacao?.valor_aluguel}</dd>
+                <dd className="truncate">{locacao?.valorAluguel}</dd>
                 <dt className="font-semibold">Dia de vencimento:</dt>
-                <dd className="truncate">{locacao?.dia_vencimento || 'N/A'}</dd>
+                <dd className="truncate">{locacao?.diaVencimento || 'N/A'}</dd>
                 <dt className="font-semibold">Situacao:</dt>
                 <dd style={{
                   fontSize: (isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),

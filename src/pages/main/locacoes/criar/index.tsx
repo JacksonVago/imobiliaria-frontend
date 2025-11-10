@@ -107,16 +107,20 @@ export default function CriarLocacao (){
 
     formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
     formData.append('dataFim', moment(data.dataFim).format('YYYY-MM-DD'));
-    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
+    formData.append('valorAluguel', (data.valorAluguel ? data.valorAluguel.toString() : "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() :"0"));
+    formData.append('diaVencimento', (data.diaVencimento ? data.diaVencimento.toString() :"0"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
     formData.append('numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
     formData.append('valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito.toString() : '0'));
     formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
+    formData.append('localDeposito', (data.depCalcao?.localDeposito ? data.depCalcao?.localDeposito : ''));
+    formData.append('numeroApolice', data.seguroIncendio.numeroApolice);
+    formData.append('vigenciaInicio', moment(data.seguroIncendio.vigenciaInicio).format('YYYY-MM-DD'));
+    formData.append('vigenciaFim', moment(data.seguroIncendio.vigenciaFim).format('YYYY-MM-DD'));
     formData.append('pessoaId', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
 
     console.log(formData.values());

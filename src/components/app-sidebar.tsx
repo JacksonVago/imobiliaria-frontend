@@ -1,6 +1,6 @@
 'use client'
 
-import { Cog, House,  HousePlus, Lock, LogOut, Shapes, Users } from 'lucide-react'
+import { Banknote, CircleDollarSign, Cog, House,  HousePlus, Lock, LogOut, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 import logo  from '../assets/logo-molina.png';
 
@@ -22,8 +22,18 @@ const data = {
   navMain: [
     {
       title: 'Configurações',
-      url: ROUTE.EMPRESA + "/1",
+      url: ROUTE.EMPRESA + "/0",
       icon: Cog
+    },
+    {
+      title: 'Clientes',
+      url: ROUTE.CLIENTES,
+      icon: Users
+    },
+    {
+      title: 'Tipo de Lançamento',
+      url: ROUTE.TIPOLANCAMENTO,
+      icon: Shapes
     },
     {
       title: 'Tipo de Imóvel',
@@ -40,6 +50,16 @@ const data = {
       url: ROUTE.LOCACOES,
       icon: HousePlus
     },
+    {
+      title: 'Lancamentos',
+      url: ROUTE.LANCAMENTOS,
+      icon: Banknote
+    },
+    {
+      title: 'Boletos',
+      url: ROUTE.PAGAMENTOS,
+      icon: CircleDollarSign
+    },
     /*{
       title: 'Proprietários',
       url: ROUTE.PROPRIETARIOS,
@@ -50,11 +70,6 @@ const data = {
       url: ROUTE.LOCATARIOS,
       icon: Users
     },*/
-    {
-      title: 'Clientes',
-      url: ROUTE.CLIENTES,
-      icon: Users
-    },
     {
       title: 'Permissões/Colaboradores',
       url: ROUTE.COLABORADORES,
@@ -100,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar className="border-r bg-white font-[Poppins-Regular]" variant="inset" {...props}>
-      <SidebarHeader>
+      <SidebarHeader>        
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className='my-5 flex justify-center'>

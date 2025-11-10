@@ -5,7 +5,7 @@ export interface Proprietario {
   id: number;
   pessoa?: Pessoa;
   pessoaId: number;
-  cota_imovel:number;
+  cotaImovel:number;
   imovel?: Imovel;
   imovelId:number;
   

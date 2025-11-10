@@ -17,18 +17,20 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { ImovelTipo } from '@/enums/imovel/enums-imovel'
+import { ImovelStatus, ImovelTipo } from '@/enums/imovel/enums-imovel'
 import { ROUTE } from '@/enums/routes.enum'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Endereco } from '@/interfaces/endereco'
 import { Imovel } from '@/interfaces/imovel'
+import { TipoImovel } from '@/interfaces/tipoimovel'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { MapPin, Plus, Search } from 'lucide-react'
-import { useEffect } from 'react'
+import { IdCard, MapPin, Pencil, Plus, Search, Table } from 'lucide-react'
+import moment from 'moment'
+import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -51,6 +53,11 @@ export interface BasePaginationData<T> {
   totalPages: number
   currentPosition: number
 }
+
+export const getTipos = async () => {
+  return await api.get<TipoImovel[]>('tipoimovel')
+}
+
 
 // API & Query Logic
 export const getImoveis = async ({ page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
@@ -126,11 +133,21 @@ export default function ListarImoveis({
   const glb_params = useGlobalParams();
   const { resetStatePessoa } = usePessoa();
 
+  const [showcard, setShowCard] = useState(!!onSelectImovel);
+
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || ''
   const tipo = searchParams.get('tipo') || undefined
+
+  //Consulta Tipo imóvel
+  const {
+    data: imovelTipo
+  } = useQuery({
+    queryKey: ['imovelTipo'],
+    queryFn: () => getTipos()
+  });
 
   const { data, isLoading } = useQuery(
     useGetImoveisQueryOptions({
@@ -173,9 +190,8 @@ export default function ListarImoveis({
 
   //always that we go to out of the total pages, we will go to the first page
   useEffect(() => {
-    glb_params.updTitle_form('Imóveis');
-
     if (onSelectImovel === undefined) {
+      glb_params.updTitle_form('Imóveis');
       glb_params.updPastaOrig('personal-info');
       resetStatePessoa();
     }
@@ -207,23 +223,8 @@ export default function ListarImoveis({
   }
 
   const handlerChangeTipo = (tipo: string) => {
-    let tipo_aux: ImovelTipo | null;
-
-    switch (tipo.toUpperCase()) {
-      case "CASA":
-        tipo_aux = ImovelTipo.CASA;
-        break;
-      case "APARTAMENTO":
-        tipo_aux = ImovelTipo.APARTAMENTO;
-        break;
-      case "TERRENO":
-        tipo_aux = ImovelTipo.TERRENO;
-        break;
-      default:
-        tipo_aux = null;
-    }
     navigate({
-      search: `?page=1&limit=${limit}&search=${search}&tipo=${(tipo_aux !== null ? tipo_aux : '')}`
+      search: `?page=1&limit=${limit}&search=${search}&tipo=${tipo}`
     })
   }
 
@@ -239,7 +240,6 @@ export default function ListarImoveis({
 
   const handlerClickMaps = (endereco: Endereco) => {
     const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
-    console.log(urlGoogleMaps);
     window.open(urlGoogleMaps);
   }
 
@@ -247,15 +247,28 @@ export default function ListarImoveis({
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
-        <h1 className="text-2xl font-bold">Imoveis</h1>
-        {(isAdmin || 
+        {!onSelectImovel && (
+          <div className='grid grid-cols-3'>
+            {showcard ?
+              (<Table onClick={() => { setShowCard(!showcard) }} color='black' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' />)
+            }
+            {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
+          <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
+            onClick={() => { setShowCard(!showcard) }}>
+              {showcard ? (<Table color='black' />) : (<IdCard color='black' />)}
+            
+          </Button>*/}
+          </div>
+        )}
+        {((isAdmin ||
           user?.permissions.includes("ALL") ||
-         user?.permissions.includes("CREATE_IMOVEL")
-        ) && (
-          <Button onClick={handleClickCreateImovel}>
-            <Plus className="mr-2 h-4 w-4" /> Criar imovel
-          </Button>
-        )
+          user?.permissions.includes("CREATE_IMOVEL")
+        ) && !onSelectImovel) && (
+            <Button size={"sm"} onClick={handleClickCreateImovel}>
+              <Plus className="mr-2 h-4 w-4" /> Criar imovel
+            </Button>
+          )
         }
       </div>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -271,13 +284,15 @@ export default function ListarImoveis({
         {/* Filter Selects */}
         <div className="flex gap-2">
           <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="h-4 w-[160px]">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="casa">Casa</SelectItem>
-              <SelectItem value="apartamento">Apartamento</SelectItem>
-              <SelectItem value="terreno">Terreno</SelectItem>
+              {imovelTipo?.data.map((value) => (
+                <SelectItem key={value.id} value={value.id.toString()}>
+                  {value.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {/* ... other filters ... */}
@@ -292,93 +307,142 @@ export default function ListarImoveis({
         )}
 
         {/* Imoveis Cards */}
-        {imoveis?.map((imovel) => (
-          <Card key={imovel.id} className="">
-            {/*(imovel?.imovelPhotos?.length ? imovel?.imovelPhotos?.length : 0) > 0 ? (
-              <Carousel  autoplay={true}>
-                <CarouselContent>
-                  {imovel?.imovelPhotos && (
-                    imovel?.imovelPhotos.map((image, index: number) => (
-                      <CarouselItem key={index} className="">
-                        <div className="p-1">
-                          <Card>
-                            <CardContent className="relative flex aspect-square items-center justify-center p-2">
-                              <img
-                                src={'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + image.url}
-                                alt={`Property image ${index + 1}`}
-                                className="h-full w-full rounded-md object-cover"
-                              />
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </CarouselItem>
-                    ))
-                  )}
-                </CarouselContent>
-                <CarouselPrevious type="button" className={((imovel.imovelPhotos ? imovel.imovelPhotos?.length : 0) > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")} />
-                <CarouselNext type="button" className={((imovel.imovelPhotos ? imovel.imovelPhotos?.length : 0) > (isBigScreen ? 7 : isPortrait ? 4 : isTablet ? 4 : 2) ? "flex" : "hidden")} />
-              </Carousel>
-            ) : (
-              <div className="rounded-md bg-muted py-8 text-center">
-                <p className="text-muted-foreground">Nenhuma imagem adicionada</p>
-              </div>
-            )*/}
 
-            <CardHeader className="flex flex-row justify-between">
-              <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
-              <Badge
-                variant="secondary"
-                className={cn('mt-2', {
-                  'bg-blue-50 text-blue-800': imovel?.tipo.name === ImovelTipo.APARTAMENTO,
-                  'bg-yellow-50 text-yellow-800': imovel?.tipo.name === ImovelTipo.TERRENO,
-                  'bg-green-50 text-green-800': imovel?.tipo.name === ImovelTipo.CASA
-                })}
-              >
-                {imovel?.tipo.name}
-              </Badge>
-            </CardHeader>
-            <CardContent>
-              <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                  onClick={() => { handlerClickMaps(imovel?.endereco) }}
-                  color='green'
-                />
-                {getEnderecoFormatado(imovel?.endereco)}
-              </p>
-              <span className="text-lg font-bold">
-                Aluguel R$ {imovel?.valor_aluguel?.toLocaleString('pt-BR')}
-              </span>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className='grid grid-cols-2 gap-4'>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
-                >
-                  Ver detalhes
-                </Button>
-                {onSelectImovel && (
-                  <Button
+        {showcard ? (
+          <>
+            {imoveis?.map((imovel) => (
+              <Card key={imovel.id} className="">
+                <CardHeader className="flex flex-row justify-between">
+                  <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
+                  <Badge
                     variant="secondary"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => {
-                      onSelectImovel(imovel);
-                    }}
-                    style={{
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                      textWrap: 'inherit'
-                    }}
-
+                    className={cn('mt-2', {
+                      'bg-blue-50 text-blue-800': imovel?.tipo.name === ImovelTipo.APARTAMENTO,
+                      'bg-yellow-50 text-yellow-800': imovel?.tipo.name === ImovelTipo.TERRENO,
+                      'bg-green-50 text-green-800': imovel?.tipo.name === ImovelTipo.CASA
+                    })}
                   >
-                    Selecionar Imóvel
-                  </Button>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                    {imovel?.tipo.name}
+                  </Badge>
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                    <MapPin className="inline-block h-4 w-4 cursor-pointer"
+                      onClick={() => { handlerClickMaps(imovel?.endereco) }}
+                      color='green'
+                    />
+                    {getEnderecoFormatado(imovel?.endereco)}
+                  </p>
+                  <div className='grid grid-cols-2'>
+                    <span className="text-lg font-bold">
+                      Aluguel R$ {imovel?.valorAluguel?.toLocaleString('pt-BR')}
+                    </span>
+                    <div className='flex justify-end'>
+                      <Badge
+                        variant="secondary"
+                        className={cn('mt-2', {
+                          'bg-blue-50 text-blue-800': imovel?.status === ImovelStatus.ALUGADO,
+                          'bg-green-50 text-yellow-800': imovel?.status === ImovelStatus.DISPONIVEL,
+                          'bg-red-50 text-green-800': imovel?.status === ImovelStatus.INDISPONIVEL
+                        })}
+                      >
+                        {imovel?.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <div className='grid grid-cols-2 gap-10'>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
+                    >
+                      Ver detalhes
+                    </Button>
+                    {onSelectImovel && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          onSelectImovel(imovel);
+                        }}
+                        style={{
+                          fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                          textWrap: 'inherit'
+                        }}
+
+                      >
+                        Selecionar
+                      </Button>
+                    )}
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <div className='col-span-3'>
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="border-b p-2 text-left">Endereço</th>
+                  <th className="border-b p-2 text-left">Período</th>
+                  <th className="border-b p-2 text-left">Valor Aluguel</th>
+                  <th className="border-b p-2 text-left">Locatário</th>
+                  <th className="border-b p-2 text-left"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {imoveis?.map((imovel) => (
+                  <tr key={imovel.id} className="hover:bg-gray-100">
+                    <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                      {getEnderecoFormatado(imovel?.endereco)}
+                    </td>
+                    <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                      {imovel.locacoes && (
+                        imovel.locacoes.map((locacao) => (
+                          <div>
+                            {moment(locacao.dataInicio).format("DD/MM/YYYY") + ' - ' + (locacao.dataFim ? moment(locacao.dataFim).format("DD/MM/YYYY") : "")}
+                          </div>
+                        ))
+                      )}
+
+                    </td>
+                    <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                      {imovel.valorAluguel}
+                    </td>
+                    <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                      {imovel.locacoes && (
+                        imovel.locacoes.map((locacao) => (
+                          <div>
+                            {locacao.locatarios && (
+                              locacao.locatarios.map((locatario) => (
+                                locatario.pessoa?.nome
+                              ))
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </td>
+                    <td className="border-b p-2">
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
+                        >
+                          Ver detalhes
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+        }
+
       </div>
 
       {/* Pagination */}

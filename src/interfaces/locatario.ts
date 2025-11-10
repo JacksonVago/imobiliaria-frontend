@@ -1,5 +1,5 @@
 import { Locacao } from './locacao'
-import { Pagamento } from './pagamento';
+import { Pagamento } from './boleto';
 import { Pessoa } from './pessoa'
 
 export interface Locatario {

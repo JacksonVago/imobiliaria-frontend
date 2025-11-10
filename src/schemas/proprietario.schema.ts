@@ -85,7 +85,7 @@ export const propImoveSchema = z.object({
         })
     ])
     .refine((val) => val !== undefined, 'Imóvel é obrigatório'),
-  cota_imovel: z
+  cotaImovel: z
     .union([
       z.number().min(1, 'Cota é obrigatório'),
       z

@@ -74,7 +74,7 @@ import { useAuth } from '@/hooks/auth/use-auth'
 const createLocacaoSchema = z.object({
   dataInicio: z.string().min(1, 'Data de início é obrigatória'),
   dataFim: z.string().optional(),
-  valor_aluguel: z.number().min(0, 'Valor do aluguel deve ser positivo')
+  valorAluguel: z.number().min(0, 'Valor do aluguel deve ser positivo')
   // locatarioId: z.number().min(1, 'Locatário é obrigatório'),
   // imovelId: z.number().min(1, 'Imóvel é obrigatório')
 })
@@ -168,11 +168,8 @@ export const getFormattedDefaultValues = (imovel: Imovel | undefined) => {
     status: imovel?.status || undefined,
     description: imovel?.description || undefined,
     tipo: imovel?.tipo,
-    porcentagem_lucro_imobiliaria: imovel?.porcentagem_lucro_imobiliaria || undefined,
-    valor_iptu: imovel?.valor_iptu || undefined,
-    valor_aluguel: imovel?.valor_aluguel || undefined,
-    valor_condominio: imovel?.valor_condominio || undefined,
-    valor_venda: imovel?.valor_venda || undefined,
+    porcentagemLucroImobiliaria: imovel?.porcentagemLucroImobiliaria || undefined,
+    valorAluguel: imovel?.valorAluguel || undefined,
 
     //address
     bairro: imovel?.endereco?.bairro || undefined,
@@ -485,9 +482,6 @@ export const DetalhesImovel = () => {
       transformNullToUndefined(locacaoAtiva)
     }
 
-    console.log(glb_params.pastaOrig);
-    console.log(activeTab);
-
     if (glb_params.pastaOrig === '') {
       glb_params.updPastaOrig('personal-info');
     }
@@ -548,30 +542,11 @@ export const DetalhesImovel = () => {
     if (data.finalidade) {
       form.append('finalidade', data.finalidade)
     }
-    if (hasValues(data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria : "")) {
-      form.append('porcentagem_lucro_imobiliaria', data.porcentagem_lucro_imobiliaria ? data.porcentagem_lucro_imobiliaria.toString() : "")
+    if (hasValues(data.porcentagemLucroImobiliaria ? data.porcentagemLucroImobiliaria : "")) {
+      form.append('porcentagemLucroImobiliaria', data.porcentagemLucroImobiliaria ? data.porcentagemLucroImobiliaria.toString() : "")
     }
-    if (data.valor_aluguel) {
-      form.append('valor_aluguel', data.valor_aluguel.toString())
-    }
-    if (data.valor_venda) {
-      form.append('valor_venda', data.valor_venda.toString())
-    }
-
-    if (data.valor_agua) {
-      form.append('valor_agua', data.valor_agua.toString())
-    }
-
-    if (data.valor_condominio) {
-      form.append('valor_condominio', data.valor_condominio.toString())
-    }
-
-    if (data.valor_iptu) {
-      form.append('valor_iptu', data.valor_iptu.toString())
-    }
-
-    if (data.valor_taxa_lixo) {
-      form.append('valor_taxa_lixo', data.valor_taxa_lixo.toString())
+    if (data.valorAluguel) {
+      form.append('valorAluguel', data.valorAluguel.toString())
     }
 
     if (data.logradouro) {
@@ -640,8 +615,8 @@ export const DetalhesImovel = () => {
   const initialDefaultValues = {
     dataFim: (locacaoAtiva?.dataFim ? moment(locacaoAtiva?.dataInicio).format("DD/MM/YYYY") : moment(new Date()).format("DD/MM/YYYY")),
     dataInicio: (locacaoAtiva?.dataInicio ? moment(locacaoAtiva?.dataInicio).format("DD/MM/YYYY") : moment(new Date()).format("DD/MM/YYYY")),
-    valor_aluguel: locacaoAtiva?.valor_aluguel,
-    dia_vencimento: locacaoAtiva?.dia_vencimento,
+    valorAluguel: locacaoAtiva?.valorAluguel,
+    diaVencimento: locacaoAtiva?.diaVencimento,
     status: locacaoAtiva?.status,
     garantiaLocacaoTipo: locacaoAtiva?.garantiaLocacaoTipo
       ? mappGarantyType(locacaoAtiva.garantiaLocacaoTipo)
@@ -715,7 +690,7 @@ export const DetalhesImovel = () => {
     }
 
     formData.append('imovelId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+    formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString() : ""));
     formData.append('pessoaId', (data.pessoaId ? data.pessoaId.toString() : ""));
 
     linkProprietarioMutation.mutate({ data: formData });
@@ -741,7 +716,7 @@ export const DetalhesImovel = () => {
       setPropEdit(proprietario);
       imovelPropAlt.setValue('pessoaId', proprietario.pessoaId);
       imovelPropAlt.setValue('imovelId', proprietario.imovelId);
-      imovelPropAlt.setValue('cota_imovel', proprietario.cota_imovel);
+      imovelPropAlt.setValue('cotaImovel', proprietario.cotaImovel);
       imovelPropAlt.setValue('proprietarios', (proprietario.pessoa ? [{ nome: proprietario.pessoa?.nome, id: proprietario.pessoaId }] : []));
       imovelPropers.append((proprietario.pessoa ? [{ nome: proprietario.pessoa?.nome, id: proprietario.pessoaId }] : []));
     }
@@ -758,7 +733,7 @@ export const DetalhesImovel = () => {
 
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
-      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
+      formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString() : ""));
       formData.append('pessoaId', (data.pessoaId ? data.pessoaId.toString() : ""));
       formData.append('imovelId', propEdit.imovelId.toString());
 
@@ -808,7 +783,7 @@ export const DetalhesImovel = () => {
 
             locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
             locacaoMethods.setValue('imovelId', (id! ? id : 0));
-            locacaoMethods.setValue('valor_aluguel', (imovel?.valor_aluguel ? imovel?.valor_aluguel : 0))
+            locacaoMethods.setValue('valorAluguel', (imovel?.valorAluguel ? imovel?.valorAluguel : 0))
             //locacaoMethods.setValue('pessoaId', proprietario.id);
             locacaoMethods.setValue('imovelId', id!);
           }
@@ -837,7 +812,7 @@ export const DetalhesImovel = () => {
     locacaoMethods.reset();
     locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
     locacaoMethods.setValue('imovelId', (id! ? id : 0));
-    locacaoMethods.setValue('valor_aluguel', (imovel?.valor_aluguel ? imovel?.valor_aluguel : 0))
+    locacaoMethods.setValue('valorAluguel', (imovel?.valorAluguel ? imovel?.valorAluguel : 0))
     setOpenLoc(!openLoc);
   }*/
 
@@ -855,8 +830,8 @@ export const DetalhesImovel = () => {
       locacaoMethodsAlt.setValue('locatarios', (locacao.locatarios ? locacao.locatarios.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
       locacaoMethodsAlt.setValue('dataInicio', moment(locacao.dataInicio).format("YYYY-MM-DD"));
       locacaoMethodsAlt.setValue('dataFim', moment(locacao.dataFim).format("YYYY-MM-DD"));
-      locacaoMethodsAlt.setValue('valor_aluguel', locacao.valor_aluguel);
-      locacaoMethodsAlt.setValue('dia_vencimento', locacao.dia_vencimento);
+      locacaoMethodsAlt.setValue('valorAluguel', locacao.valorAluguel);
+      locacaoMethodsAlt.setValue('diaVencimento', locacao.diaVencimento);
       locacaoMethodsAlt.setValue('status', locacao.status);
       locacaoMethodsAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
       locacaoMethodsAlt.setValue('depCalcao.quantidadeMeses', (locacao.garantiaDepositoCalcao?.quantidadeMeses ? locacao.garantiaDepositoCalcao?.quantidadeMeses : 0));
@@ -886,7 +861,7 @@ export const DetalhesImovel = () => {
     if (locEdit) {
       locacaoMethodsAlt.setValue('dataInicio', data.dataInicio);
       locacaoMethodsAlt.setValue('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
-      locacaoMethodsAlt.setValue('valor_aluguel', data.valor_aluguel);
+      locacaoMethodsAlt.setValue('valorAluguel', data.valorAluguel);
       locacaoMethodsAlt.setValue('status', data.status);
       locacaoMethodsAlt.setValue('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
       locacaoMethodsAlt.setValue('imovelId', data.imovelId);
@@ -912,10 +887,10 @@ export const DetalhesImovel = () => {
 
     formData.append('dataInicio', data.dataInicio);
     formData.append('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
-    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : "0"));
+    formData.append('valorAluguel', (data.valorAluguel ? data.valorAluguel.toString() : "0"));
     formData.append('status', data.status);
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : "0"));
+    formData.append('diaVencimento', (data.diaVencimento ? data.diaVencimento.toString() : "0"));
     formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
     formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
     formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -1121,7 +1096,6 @@ export const DetalhesImovel = () => {
                         !imovelMethods.formState.isDirty || !imovelMethods.formState.isValid
                       }
                       type="submit"
-                      className="w-full"
                     >
                       Salvar Alterações
                     </Button>
@@ -1196,7 +1170,7 @@ export const DetalhesImovel = () => {
                         <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
                       </CardHeader>
                       <CardContent className='mt-2 h-120'>
-                        <ListarClientes limitView={1} txtVinc='Vincular Propriedade' exclude={imovel && imovel?.proprietarios ? imovel?.proprietarios?.map((porp) => { return porp.id }).toString() : ''} onSelectCliente={handleSelectProp} />
+                        <ListarClientes limitView={1} txtVinc='Selecionar' exclude={imovel && imovel?.proprietarios ? imovel?.proprietarios?.map((porp) => { return porp.id }).toString() : ''} onSelectCliente={handleSelectProp} />
                       </CardContent>
                     </Card>
                   )}
@@ -1204,8 +1178,8 @@ export const DetalhesImovel = () => {
                     <div>
                       <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
                       <Input id="cotaImovel" type="number" placeholder="0.00"
-                        {...imovelProp.register('cota_imovel')}
-                        helperText={imovelProp.formState?.errors?.cota_imovel?.message}
+                        {...imovelProp.register('cotaImovel')}
+                        helperText={imovelProp.formState?.errors?.cotaImovel?.message}
                       />
                     </div>
                   )}
@@ -1222,14 +1196,14 @@ export const DetalhesImovel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{proprietario.pessoa?.nome}</span>
-                  <Badge variant="default">{proprietario.cota_imovel}</Badge>
+                  <Badge variant="default">{proprietario.cotaImovel}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <Label className="font-semibold">Cota do imóvel</Label>
                   <p>
-                    % {proprietario.cota_imovel.toLocaleString('pt-BR')}
+                    % {proprietario.cotaImovel.toLocaleString('pt-BR')}
                   </p>
                 </div>
 
@@ -1238,13 +1212,13 @@ export const DetalhesImovel = () => {
                   <div className=''>
                     <Mail className='text-gray-500' />
                   </div>
-                  <div className='text-gray-500'>
+                  <div className='text-gray-500 col-span-9'>
                     {proprietario.pessoa?.email?.toString()}
                   </div>
                 </div>
                 <div className='grid grid-cols-10 flex justify-items-start'>
                   <Phone className='text-gray-500' />
-                  <div className='text-gray-500'>
+                  <div className='text-gray-500 col-span-9'>
                     {proprietario.pessoa?.telefone?.toString()}
                   </div>
 
@@ -1337,8 +1311,8 @@ export const DetalhesImovel = () => {
                           <div>
                             <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
                             <Input id="cotaImovel" type="number" placeholder="0.00"
-                              {...imovelPropAlt.register('cota_imovel')}
-                              helperText={imovelPropAlt.formState?.errors?.cota_imovel?.message}
+                              {...imovelPropAlt.register('cotaImovel')}
+                              helperText={imovelPropAlt.formState?.errors?.cotaImovel?.message}
                             />
                           </div>
                         </>
@@ -1438,11 +1412,11 @@ export const DetalhesImovel = () => {
                     {!selPessoa && (
                       <div>
                         <div className='mt-2'>
-                          <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
+                          <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
                           <Input type="number" placeholder="0.00"
-                            {...locacaoMethods.register('valor_aluguel')}
-                            helperText={locacaoMethods.formState?.errors?.valor_aluguel?.message}
-                            onChange={(e) => { locacaoMethods.setValue('valor_aluguel', parseFloat(e.target.value)) }}
+                            {...locacaoMethods.register('valorAluguel')}
+                            helperText={locacaoMethods.formState?.errors?.valorAluguel?.message}
+                            onChange={(e) => { locacaoMethods.setValue('valorAluguel', parseFloat(e.target.value)) }}
                           />
                         </div>
                         <div className='mt-2'>
@@ -1463,9 +1437,9 @@ export const DetalhesImovel = () => {
                         <div className='mt-2'>
                           <Label htmlFor="diaVencto">Dia de Vencimento</Label>
                           <Input id="diaVencto" type="number"
-                            {...locacaoMethods.register('dia_vencimento')} placeholder='0'
-                            helperText={locacaoMethods.formState?.errors?.dia_vencimento?.message}
-                            onChange={(e) => { locacaoMethods.setValue('dia_vencimento', parseInt(e.target.value)) }}
+                            {...locacaoMethods.register('diaVencimento')} placeholder='0'
+                            helperText={locacaoMethods.formState?.errors?.diaVencimento?.message}
+                            onChange={(e) => { locacaoMethods.setValue('diaVencimento', parseInt(e.target.value)) }}
                           />
                         </div>
                         <div className='mt-2'>
@@ -1619,7 +1593,7 @@ export const DetalhesImovel = () => {
                 <div className="grid grid-cols-2 gap-4 flex items-center mt-2">
                   <Label>Valor do Aluguel</Label>
                   <p className="font-semibold">
-                    R$ {locacao.valor_aluguel.toLocaleString('pt-BR')}
+                    R$ {locacao.valorAluguel.toLocaleString('pt-BR')}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 items-center mt-4">
@@ -1786,10 +1760,10 @@ export const DetalhesImovel = () => {
                         {!selPessoa && (
                           <div>
                             <div className='mt-2'>
-                              <Label htmlFor="valor_aluguel">Valor do Aluguel</Label>
+                              <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
                               <Input type="number" placeholder="0.00"
-                                {...locacaoMethodsAlt.register('valor_aluguel')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.valor_aluguel?.message}
+                                {...locacaoMethodsAlt.register('valorAluguel')}
+                                helperText={locacaoMethodsAlt.formState?.errors?.valorAluguel?.message}
                               />
                             </div>
                             <div className='mt-2'>
@@ -1809,8 +1783,8 @@ export const DetalhesImovel = () => {
                             <div className='mt-2'>
                               <Label htmlFor="diaVencto">Dia de Vencimento</Label>
                               <Input type="number"
-                                {...locacaoMethodsAlt.register('dia_vencimento')} placeholder='0'
-                                helperText={locacaoMethodsAlt.formState?.errors?.dia_vencimento?.message}
+                                {...locacaoMethodsAlt.register('diaVencimento')} placeholder='0'
+                                helperText={locacaoMethodsAlt.formState?.errors?.diaVencimento?.message}
                               />
                             </div>
                             <div className='mt-2'>

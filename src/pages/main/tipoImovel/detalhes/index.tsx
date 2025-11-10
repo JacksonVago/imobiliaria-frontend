@@ -43,53 +43,6 @@ import { useMediaQuery } from 'react-responsive';
 import moment from 'moment';
 //import { Locatario } from '@/interfaces/locatario';
 
-// Mock data for demonstration
-/*const locacao = {
-  id: 'cli001',
-  nome: 'Ana Oliveira',
-  documento: '123.456.789-00',
-  profissao: 'Professora',
-  estadoCivil: 'CASADO',
-  email: 'ana.oliveira@email.com',
-  telefone: '(11) 98765-4321',
-  statu: PessoaStatus.ATIVA,
-  endereco: {
-    rua: 'Rua das Flores',
-    numero: '123',
-    complemento: 'Apto 45',
-    bairro: 'Jardim Primavera',
-    cidade: 'São Paulo',
-    estado: 'SP',
-    cep: '01234-567'
-  },
-  locacoes: [
-    {
-      id: 'rent001',
-      imovel: 'Apartamento Centro',
-      valor_aluguel: 1500,
-      dataInicio: '2023-01-01',
-      dataFim: '2024-01-01',
-      status: 'Ativo'
-    },
-    {
-      id: 'rent002',
-      imovel: 'Casa de Praia',
-      valor_aluguel: 2000,
-      dataInicio: '2023-06-01',
-      dataFim: null,
-      status: 'Ativo'
-    },
-    {
-      id: 'rent003',
-      imovel: 'Kitnet Universitária',
-      valor_aluguel: 800,
-      dataInicio: '2022-03-01',
-      dataFim: '2023-02-28',
-      status: 'Encerrado'
-    }
-  ]
-}*/
-
 const fetchDocumentFiles = async (documents: Locacao['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
@@ -229,10 +182,10 @@ export const DetalhesLocacaoForm = ({
 
       formData.append('dataInicio', moment(data.dataInicio).format('YYYY-MM-DD'));
       formData.append('dataFim', moment(data.dataFim).format('YYYY-MM-DD'));
-      formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : '0'));
+      formData.append('valorAluguel', (data.valorAluguel ? data.valorAluguel.toString() : '0'));
       formData.append('status', data.status);
       formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-      formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : "0"));
+      formData.append('diaVencimento', (data.diaVencimento ? data.diaVencimento.toString() : "0"));
       formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
       formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
       formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
@@ -282,8 +235,8 @@ export const DetalhesLocacaoForm = ({
       //...transformNullToUndefined(locacao || {}),
       dataInicio: moment(locacao?.dataInicio).format('YYYY-MM-DD'),
       dataFim: moment(locacao?.dataFim).format('YYYY-MM-DD'),
-      valor_aluguel: locacao?.valor_aluguel,
-      dia_vencimento: locacao?.dia_vencimento,
+      valorAluguel: locacao?.valorAluguel,
+      diaVencimento: locacao?.diaVencimento,
       status: locacao?.status || 'ATIVA',
       documentos: documentFiles?.filter((doc) => doc !== null),
       garantiaLocacaoTipo: locacao?.garantiaLocacaoTipo,
@@ -326,7 +279,7 @@ export const DetalhesLocacaoForm = ({
   const hasLocatario = !!locacao?.locatarios?.length;
 
   console.log(locacaoMethods.getValues());
-  console.log(locacaoMethods.formState.errors.dia_vencimento);
+  console.log(locacaoMethods.formState.errors.diaVencimento);
 
   return (
     <Card>
@@ -530,325 +483,10 @@ export default function DetalhesLocacao() {
     deletelocacaoMutation.mutate()
   }
 
-  /*function handleSubmitPropriedade(data: PropImovelSchema) {
-    console.log(data);
-
-    const formData = new FormData();
-
-    formData.append('pessoaId', (id!! ? id.toString() : '0'));
-    formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
-    formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
-
-    //Gravar dados das propriedades
-    api.put(`proprietarios/${id}/vincular-imovel/${data.imovelId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).
-      then(result => {
-        toast({
-          title: 'Propriedade adicionada com sucesso',
-          description: `Propriedade adicionada com sucesso`
-        });
-      });
-
-
-  }
-
-  const handlerNewProp = () => {
-    setCotaImovel(0);
-    setPropImovelId(0);
-    setSelImovel('');
-    locacaoProp.reset();
-    locacaoProp.setValue('pessoaId', id!)
-  }
-
-  const handlerEditPropriedade = (locatario: Locatario) => {
-    if (locatario) {
-      setCotaImovelAlt(0);
-      setPropImovelIdAlt(0);
-      setSelImovelAlt('');
-      locacaoPropAlt.reset();
-      setPropEdit(proprietario);
-      setCotaImovelAlt(proprietario.cota_imovel);
-      setSelImovelAlt(proprietario.imovelId.toString());
-      setPropImovelIdAlt(proprietario.imovelId);
-      locacaoPropAlt.setValue('imovelId', proprietario.imovelId);
-      locacaoPropAlt.setValue('cota_imovel', proprietario.cota_imovel);
-    }
-  }
-
-  const handleDeletePropriedade = (locatario: Locatario) => {
-    //Gravar dados das propriedades
-    api.delete(`proprietarios/${propriedade.id}`).
-      then(result => {
-        toast({
-          title: 'Propriedade excluída com sucesso',
-          description: `Propriedade excluída com sucesso`
-        });
-      });
-  }
-
-  function handlerUpdatePropriedade(data: PropImovelSchema) {
-    const formData = new FormData();
-
-    console.log(propEdit);
-    console.log(data);
-
-    if (propEdit) {
-      formData.append('id', propEdit.id.toString());
-      formData.append('pessoaId', propEdit.pessoaId.toString());
-      formData.append('cota_imovel', (data.cota_imovel ? data.cota_imovel.toString() : ""));
-      formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
-
-      console.log(formData);
-
-      api.put(`proprietarios/${propEdit.id}/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).
-        then(result => {
-          toast({
-            title: 'Propriedade altarada com sucesso',
-            description: `Propriedade altarada com sucesso`
-          });
-          let tst = result.statusText;
-          tst = "";
-        });
-    }
-
-  }*/
-
-  //Locação 
-  /*const handlerNewLoc = () => {
-    setCotaImovel(0);
-    setPropImovelId(0);
-    setSelImovel('');
-    locacaoMethods.reset();
-    locacaoMethods.setValue('status', LocacaoStatus.AGUARDANDO_DOCUMENTOS);
-    //locacaoMethods.setValue('pessoaId', (id! ? id : 0));
-    console.log((id! ? id : 0));
-  }*/
-
-  /*const handlerEditLocacao = (locacao: Locacao) => {
-    if (locacao) {
-      setCotaImovelAlt(0);
-      setPropImovelIdAlt(0);
-      setSelImovelAlt('');
-      imovelLocAlt.reset();
-      setLocEdit(locacao);
-      //setCotaImovelAlt(proprietario.cota_imovel);
-      //setSelImovelAlt(proprietario.imovelId.toString());
-      //setPropImovelIdAlt(proprietario.imovelId);
-      imovelLocAlt.setValue('dataInicio', moment(locacao.dataInicio).format("YYYY-MM-DD"));
-      imovelLocAlt.setValue('dataFim', new Date(moment(locacao.dataFim).format("YYYY-MM-DD")));
-      imovelLocAlt.setValue('valor_aluguel', locacao.valor_aluguel);
-      imovelLocAlt.setValue('status', locacao.status);
-      imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
-      imovelLocAlt.setValue('imovelId', locacao.imovelId);
-      imovelLocAlt.setValue('fiadores', (locacao.fiadores ? locacao.fiadores.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
-    }
-  }*/
-
-  /*const handleDeleteLocacao = (propriedade: Proprietario) => {
-    //Gravar dados das propriedades
-    api.delete(`locacoes/${propriedade.id}`).
-      then(result => {
-        toast({
-          title: 'Locação excluída com sucesso',
-          description: `Locação excluída com sucesso`
-        });
-        let tst = result.statusText;
-        tst = "";
-      });
-  }*/
-
-  /*function handlerUpdateLocacao(data: LocacaoSchema) {
-    const formData = new FormData();
-
-    console.log(locEdit);
-    console.log(data);
-
-    if (locEdit) {
-      formData.append('id', locEdit.id.toString());
-      formData.append('pessoaId', locEdit.pessoaId.toString());
-      formData.append('cota_imovel', data.cota_imovel.toString());
-      formData.append('imovelId', data.imovelId.toString());
-
-      console.log(formData);
-
-      api.put(`locacoes/${locEdit.id}/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).
-        then(result => {
-          toast({
-            title: 'Locação altarada com sucesso',
-            description: `Locação altarada com sucesso`
-          });
-
-        });
-    }
-
-  }*/
-
-  /*function handleSubmitLocacao(data: LocacaoSchema) {
-    const formData = new FormData();
-
-    console.log(JSON.stringify(data.fiadores));
-    console.log(data?.fiadores?.map(x => { return x.id; }).toString());
-
-
-    formData.append('dataInicio', moment(data.dataInicio).format("YYYY-MM-DD"));
-    formData.append('dataFim', moment(data.dataFim).format("YYYY-MM-DD"));
-    formData.append('valor_aluguel', (data.valor_aluguel ? data.valor_aluguel.toString() : ""));
-    formData.append('status', data.status);
-    formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : '0'));
-    formData.append('dia_vencimento', (data.dia_vencimento ? data.dia_vencimento.toString() : ""));
-    formData.append('garantiaLocacaoTipo', data.garantiaLocacaoTipo);
-    formData.append('fiador', (data.fiadores ? data.fiadores.map(x => { return x.id; }).toString() : ''));
-    formData.append('numeroTitulo', (data.tituloCap?.numeroTitulo ? data.tituloCap?.numeroTitulo.toString() : '0'));
-    formData.append('numeroSeguro', (data.seguroFianca?.numeroSeguro ? data.seguroFianca?.numeroSeguro.toString() : '0'));
-    formData.append('valorDeposito', (data.depCalcao?.valorDeposito ? data.depCalcao?.valorDeposito.toString() : '0'));
-    formData.append('quantidadeMeses', (data.depCalcao?.quantidadeMeses ? data.depCalcao?.quantidadeMeses.toString() : '0'));
-    //formData.append('pessoaId', (data.pessoaId! ? data.pessoaId.toString() : '0'));
-
-    console.log(formData.values());
-
-    api.post(`locacoes`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).
-      then(result => {
-        toast({
-          title: 'Locação criada com sucesso',
-          description: `Locação criada com sucesso`
-        });
-        let tst = result.statusText;
-        tst = "";
-      });
-  }
-      */
+  
   const handlerDetailLocatario = (id: number) => {
     navigate(`${ROUTE.CLIENTES}/${id}`)
   }
-
-  /*const handleSelectFiador = (fiador: Pessoa | undefined) => {
-    console.log(selGarantia);
-    setSelFiador(false);
-    if (fiador) {
-      locacaoFiadores.append({
-        nome: fiador.nome,
-        id: fiador.id
-      });
-    }
-    console.log(locacaoFiadores);
-  }*/
-
-  /*const handlerChangeGarantia = (e: GarantiaLocacao) => {
-    let bol_limpa = {
-      fiador: true,
-      calcao: true,
-      seguro: true,
-      titulo: true,
-    };
-
-    setSelGarantia(e);
-    console.log(e);
-
-    locacaoMethods.setValue('garantiaLocacaoTipo', e);
-
-    switch (e) {
-      case GarantiaLocacao.DEPOSITO_CALCAO:
-        bol_limpa.calcao = false;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.FIADOR:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = false;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.SEGURO_FIANCA:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = false;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.TITULO_CAPITALIZACAO:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = false;
-        break;
-    }
-
-    //limpa fiador
-    if (bol_limpa.fiador) {
-      if (locacaoFiadores.fields.length > 0) {
-        for (let i = 0; i < locacaoFiadores.fields.length; i++) {
-          locacaoFiadores.remove(i);
-        }
-      }
-      setSelFiador(false);
-    }
-    else {
-      setSelFiador(true);
-    }
-
-    if (bol_limpa.calcao) {
-      locacaoMethods.setValue('depCalcao.valorDeposito', 0);
-      locacaoMethods.setValue('depCalcao.quantidadeMeses', 0);
-    }
-
-    if (bol_limpa.seguro) {
-      locacaoMethods.setValue('seguroFianca.numeroSeguro', '0');
-    }
-
-    if (bol_limpa.titulo) {
-      locacaoMethods.setValue('tituloCap.numeroTitulo', '0');
-    }
-
-  }*/
-
-  /*const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
-  //SUPABASE_URL="https://jrseqfittadsxfbmlwvz.supabase.co"
-  //SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg"
-  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-  const handleDownload = async (filePath: string, fileName: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from('your-bucket-name') // Replace with your bucket name
-        .download(filePath);
-
-      if (error) {
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName; // Desired filename for download
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      //console.error('Error downloading file:', error.message);
-      console.error('Error downloading file:', error);
-    }
-  };*/
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">

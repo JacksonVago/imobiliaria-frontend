@@ -3,22 +3,18 @@ import { Endereco } from './endereco'
 import { Locacao } from './locacao'
 //import { Locatario } from './locatario'
 import { Proprietario } from './proprietario'
+import { TipoImovel } from './tipoimovel'
 
 export interface Imovel {
   id: number
   title: string
   status: ImovelStatus
   description?: string
-  tipo: {id:number, name: string}
+  tipo: TipoImovel
   tipoId: number
 
-  porcentagem_lucro_imobiliaria: number
-  valor_iptu?: number
-  valor_condominio?: number
-  valor_aluguel?: number
-  valor_venda?: number
-  valor_agua?: number
-  valor_taxa_lixo?: number
+  porcentagemLucroImobiliaria: number
+  valorAluguel?: number
 
   enderecoId: number
   endereco: Endereco

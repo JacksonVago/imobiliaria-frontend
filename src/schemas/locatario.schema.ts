@@ -52,41 +52,7 @@ export const locatarioSchema = z.object({
     )
     .optional(),
   documentosToDeleteIds: z.array(z.number()).optional()
-  // dataInicio: z
-  //   .string()
-  //   .refine((dateStr) => !isNaN(new Date(dateStr).getTime()), {
-  //     message: 'Data de início inválida'
-  //   })
-  //   .transform((dateStr) => new Date(dateStr)),
-
-  // observacoes: z.string().optional(),
-  // documentos: z.array(
-  //   z.object({
-  //     file: z.instanceof(File),
-  //     size: z
-  //       .number()
-  //       .max(
-  //         MAX_DOCUMENT_FILE_SIZE,
-  //         `O tamanho do documento não pode ser maior que ${MAX_DOCUMENT_FILE_SIZE / 1024 / 1024}MB.`
-  //       ),
-  //     type: z
-  //       .string()
-  //       .refine(
-  //         (type) => ACCEPTED_DOCUMENT_TYPES.includes(type),
-  //         'Tipo de arquivo não suportado. Por favor, envie um formato válido.'
-  //       )
-  //   })
-  // ),
-  //locacao data
-  // valor_aluguel: z.number().or(z.string().transform(Number)),
-  //FIXME: handle this, because some months have 31 days, 30 days, 28 days
-  // diaVencimentoPagamento: z.coerce
-  //   .number()
-  //   .min(1, 'Dia de vencimento é obrigatório')
-  //   .max(28, 'Dia de vencimento inválido'),
-
-  //garantia de locacao
-  // garantiaLocacaoTipo: z.enum()
+  
 })
 
 export type GarantiaLocacaoTypes =

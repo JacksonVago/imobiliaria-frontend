@@ -8,7 +8,7 @@ export const imovelSchema1 = z.object({
   tipo: z.enum(Object.values(ImovelTipo) as [string, ...string[]]),
   status: z.enum(Object.values(ImovelStatus) as [string, ...string[]]),
   finalidade: z.enum(Object.values(ImovelFinalidade) as [string, ...string[]]),
-  porcentagem_lucro_imobiliaria : z
+  porcentagemLucroImobiliaria : z
         .string()
         .min(2, 'Porcentagem de lucro é obrigatório'),
 // ...existing code...
@@ -39,7 +39,7 @@ export const imovelSchema1 = z.object({
     ])
     .refine((val) => val !== undefined, 'Número é obrigatório'),*/
 // ...existing code...
-  valor_aluguel: z
+  valorAluguel: z
     .union([
       z.number(),
       z.string().transform((val) => (val === '' ? undefined : Number(val))),
@@ -47,7 +47,7 @@ export const imovelSchema1 = z.object({
     ])
     .optional()
     .transform((val) => (val === '' ? undefined : val)),
-  valor_venda: z
+  valorVenda: z
     .union([
       z.number(),
       z.string().transform((val) => (val === '' ? undefined : Number(val))),
@@ -55,7 +55,7 @@ export const imovelSchema1 = z.object({
     ])
     .optional()
     .transform((val) => (val === '' ? undefined : val)),
-  valor_agua: z
+  valorAgua: z
     .union([
       z.number(),
       z.string().transform((val) => (val === '' ? undefined : Number(val))),
@@ -63,38 +63,6 @@ export const imovelSchema1 = z.object({
     ])
     .optional()
     .transform((val) => (val === '' ? undefined : val)),
-  valor_condominio: z
-    .union([
-      z.number(),
-      z.string().transform((val) => (val === '' ? undefined : Number(val))),
-      z.literal('')
-    ])
-    .optional()
-    .transform((val) => (val === '' ? undefined : val)),
-  valor_iptu: z
-    .union([
-      z.number(),
-      z.string().transform((val) => (val === '' ? undefined : Number(val))),
-      z.literal('')
-    ])
-    .optional()
-    .transform((val) => (val === '' ? undefined : val)),
-  valor_taxa_lixo: z
-    .union([
-      z.number(),
-      z.string().transform((val) => (val === '' ? undefined : Number(val))),
-      z.literal('')
-    ])
-    .optional()
-    .transform((val) => (val === '' ? undefined : val)),    
-  /*
-  valor_aluguel: z.number().or(z.string().transform(Number)).optional(),
-  valor_venda: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_agua: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_condominio: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_iptu: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_taxa_lixo: z.number().optional().or(z.string().transform(Number)).optional(),
-  */
 
   logradouro: z.string().min(1, 'Logradouro é obrigatório'),
   /*numero: z
@@ -151,36 +119,13 @@ export const imovelSchema1 = z.object({
   documentosToDeleteIds: z.array(z.number()).optional()
 
 })
-// .any()
-// .optional()
-// .refine((files) => !files || files?.length === 0, 'Document is required.')
-// .refine(
-//   (files) => {
-//     return files?.[0]?.size <= MAX_DOCUMENT_FILE_SIZE
-//   },
-//   `O tamanho da imagem não pode ser maior que ${MAX_DOCUMENT_FILE_SIZE / 1024 / 1024}MB`
-// )
-// .refine(
-//   (files) => ACCEPTED_IMAGES_MIME_TYPES.includes(files?.[0]?.type),
-//   'Tipo de arquivo não suportado. Por favor, envie uma imagem.'
-// )
-
-//TODO: campos relacionados a ocorrencias
 
 export const imovelSchema = z.object({
   description: z.string().optional(),
-  //tipo: z.coerce.number().min(1, 'Tipo é obrigatório').or(z.string().transform(Number)),
-  /*tipo: z.object(
-      {
-        name: z.string(),
-        id: z.number()
-      }
-    ).optional(),*/
   tipoId: z.coerce.number().min(1, 'Tipo é obrigatório').or(z.string().transform(Number)),
-  //tipo: z.enum(Object.values(ImovelTipo) as [string, ...string[]],{required_error:'Tipo é obrigatório'}),
   status: z.enum(Object.values(ImovelStatus) as [string, ...string[]],{required_error:'Situação é obrigatório'}),
   finalidade: z.enum(Object.values(ImovelFinalidade) as [string, ...string[]],{required_error:'Finalidade é obrigatório'}),
-  porcentagem_lucro_imobiliaria: z
+  porcentagemLucroImobiliaria: z
     .union([
       z.number({invalid_type_error:'Taxa administrativa é obrigatório'}).min(1, {message: 'Taxa administrativa é obrigatório'}),
       z
@@ -192,12 +137,7 @@ export const imovelSchema = z.object({
         })
     ])
     .refine((val) => val !== undefined, 'Número é obrigatório'),
-  valor_aluguel: z.coerce.number().or(z.string().transform(Number)),
-  valor_venda: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_agua: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_condominio: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_iptu: z.number().optional().or(z.string().transform(Number)).optional(),
-  valor_taxa_lixo: z.number().optional().or(z.string().transform(Number)).optional(),
+  valorAluguel: z.coerce.number().or(z.string().transform(Number)),
 
   logradouro: z.string().min(1, 'Logradouro é obrigatório'),
   numero: z.string()

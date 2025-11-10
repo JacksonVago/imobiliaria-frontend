@@ -26,10 +26,6 @@ export type Permission =
   | 'UPDATE_PROPRIETARIO'
   | 'DELETE_PROPRIETARIO'
   | 'VIEW_PROPRIETARIOS'
-  | 'CREATE_PESSOA'
-  | 'UPDATE_PESSOA'
-  | 'DELETE_PESSOA'
-  | 'VIEW_PESSOAS'
   | 'CREATE_LOCACAO'
   | 'UPDATE_LOCACAO'
   | 'DELETE_LOCACAO'
@@ -38,15 +34,33 @@ export type Permission =
   | 'UPDATE_CLIENTE'
   | 'DELETE_CLIENTE'
   | 'VIEW_CLIENTES'
+  | 'CREATE_LANCAMENTO'
+  | 'UPDATE_LANCAMENTO'
+  | 'DELETE_LANCAMENTO'
+  | 'VIEW_LANCAMENTOS'
   | 'CREATE_TIPO'
   | 'UPDATE_TIPO'
   | 'DELETE_TIPO'
   | 'VIEW_TIPOS'
+  | 'CREATE_PESSOA'
+  | 'UPDATE_PESSOA'
+  | 'DELETE_PESSOA'
+  | 'VIEW_PESSOAS'
+  | 'CREATE_TIPOLANCAMENTO'
+  | 'UPDATE_TIPOLANCAMENTO'
+  | 'DELETE_TIPOLANCAMENTO'
+  | 'VIEW_TIPOLANCAMENTOS'
+  | 'CREATE_PAGAMENTO'
+  | 'UPDATE_PAGAMENTO'
+  | 'DELETE_PAGAMENTO'
+  | 'VIEW_PAGAMENTOS'
 
 export const userPermissions: {
   [key in Permission]: string
 } = {
   ALL: 'Todas as permissões',
+  UPDATE_EMPRESA: 'Atualizar Empresa',
+  VIEW_EMPRESAS: 'Visualizar Empresas',
   CREATE_IMOVEL: 'Criar imóveis',
   UPDATE_IMOVEL: 'Atualizar imóveis',
   DELETE_IMOVEL: 'Deletar imóveis',
@@ -67,6 +81,10 @@ export const userPermissions: {
   UPDATE_CLIENTE: 'Atualizar clientes',
   DELETE_CLIENTE: 'Deletar clientes',
   VIEW_CLIENTES: 'Visualizar clientes',
+  CREATE_LANCAMENTO: 'Criar lançamento',
+  UPDATE_LANCAMENTO: 'Atualizar lançamento',
+  DELETE_LANCAMENTO: 'Deletar lançamento',
+  VIEW_LANCAMENTOS: 'Visualizar lançamentos',
   CREATE_TIPO: 'Criar tipos de imóvel',
   UPDATE_TIPO: 'Atualizar tipos de imóvel',
   DELETE_TIPO: 'Deletar tipos de imóvel',
@@ -75,8 +93,14 @@ export const userPermissions: {
   UPDATE_PESSOA: 'Atualizar Pessoa',
   DELETE_PESSOA: 'Deletar Pessoa',
   VIEW_PESSOAS: 'Visualizar Pessoas',
-  UPDATE_EMPRESA: 'Atualizar Empresa',
-  VIEW_EMPRESAS: 'Visualizar Empresas',
+  CREATE_TIPOLANCAMENTO: 'Criar tipos de lançamento',
+  UPDATE_TIPOLANCAMENTO: 'Atualizar tipos de lançamento',
+  DELETE_TIPOLANCAMENTO: 'Deletar tipos de lançamento',
+  VIEW_TIPOLANCAMENTOS: 'Visualizar tipos de lançamentos',
+  CREATE_PAGAMENTO: 'Criar pagamento',
+  UPDATE_PAGAMENTO: 'Atualizar pagamento',
+  DELETE_PAGAMENTO: 'Deletar pagamento',
+  VIEW_PAGAMENTOS: 'Visualizar pagamentos',
 
 }
 

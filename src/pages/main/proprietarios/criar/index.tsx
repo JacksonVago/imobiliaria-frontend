@@ -21,7 +21,7 @@ export interface DefaultCadastroImovelFormProps {
 interface CriarImovelData {
   nome: string
   endereco: Endereco
-  valor_aluguel: number
+  valorAluguel: number
   valorAgua?: number
   valorCondominio?: number
   valorIptu?: number

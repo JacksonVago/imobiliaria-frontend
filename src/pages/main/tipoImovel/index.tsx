@@ -12,6 +12,7 @@ import { queryClient } from '@/services/react-query/query-client'
 import axios from 'axios'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
 // Types
 /*interface GetTipoParams {
@@ -76,6 +77,8 @@ export default function ListarTipos() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [newTipo, setNewTipo] = React.useState({ name: '' })
+  //Globals
+  const glb_params = useGlobalParams();
 
   //const [searchParams, setSearchTerm] = useSearchParams();
   //const page = Number(searchParams.get('page')) || 1;
@@ -85,7 +88,7 @@ export default function ListarTipos() {
     useGetTiposQueryOptions()
   )
 
-  const tipos = data?.data;
+  const tipos = data?.data;  
 
   const createTipoMutation = useMutation({
     mutationFn: createTipo,
@@ -95,7 +98,7 @@ export default function ListarTipos() {
       });
       toast({
         title: 'Tipo de imóvel criado',
-        description: 'O novo tipo de imóvel foi criado com sucesso.'
+        description: 'O novo tipo de imóvel foi criado com sucesso.',                
       })
       setIsCreateDialogOpen(false)
       setNewTipo({ name: '' })
@@ -147,6 +150,10 @@ export default function ListarTipos() {
       })
     }
   })
+
+  React.useEffect(() => {
+    glb_params.updTitle_form('Tipos de imóvel');
+  }, [])
 
   const updateTipoMutation = useMutation({
     mutationFn: putUpdateTipo,
@@ -204,7 +211,7 @@ export default function ListarTipos() {
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="text-2xl font-bold">Cadastro de Tipo de Imóvel</h1>
+        {/* <h1 className="text-2xl font-bold">Cadastro de Tipo de Imóvel</h1> */}
         <Dialog
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
@@ -213,7 +220,7 @@ export default function ListarTipos() {
           }}
         >
           <DialogTrigger asChild>
-            <Button>
+            <Button size={"sm"}>
               <Plus className="mr-2 h-4 w-4" /> Criar Tipo de Imóvel
             </Button>
           </DialogTrigger>

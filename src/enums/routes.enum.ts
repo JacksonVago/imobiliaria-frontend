@@ -21,6 +21,11 @@ export enum ROUTE {
   LOCACOES_CRIAR = '/locacoes/criar',
   LOCACOES_DETALHES = '/locacoes/:id',
 
+  // Locações routes
+  LANCAMENTOS = '/lancamentos',
+  LANCAMENTOS_CRIAR = '/lancamentos/criar',
+  LANCAMENTOS_DETALHES = '/lancamentos/:id',
+
   // Clientes routes
   CLIENTES = '/pessoas',
   CLIENTES_CRIAR = '/pessoas/criar',
@@ -45,6 +50,16 @@ export enum ROUTE {
   TIPOIMOVEL = '/tipoimovel',
   TIPOIMOVEL_CRIAR = '/tipoimovel/criar',
   TIPOIMOVEL_DETALHES = '/tipoimovel/:id',
+
+  //TipoLancamento routes
+  TIPOLANCAMENTO = '/tipolancamento',
+  TIPOLANCAMENTO_CRIAR = '/tipolancamento/criar',
+  TIPOLANCAMENTO_DETALHES = '/tipolancamento/:id',
+
+  //Pagamento routes
+  PAGAMENTOS = '/pagamentos',
+  PAGAMENTOS_CRIAR = '/pagamentos/criar',
+  PAGAMENTOS_DETALHES = '/pagamentos/:id',
 
   // Error routes
   NOT_FOUND = '*',

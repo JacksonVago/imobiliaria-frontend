@@ -1,3 +1,4 @@
+import { useGlobalParams } from '@/globals/GlobalParams'
 import { toast } from '@/hooks/use-toast'
 import { Permission, UserRole } from '@/interfaces/user'
 import api from '@/services/axios/api'
@@ -5,7 +6,7 @@ import { isAxiosError } from 'axios'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 import { createContext, useEffect, useState } from 'react'
 
-interface UserInfo {  
+interface UserInfo {
   id: string
   login: string
   name: string
@@ -96,7 +97,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUserData = async () => {
     try {
       const userData = await getUserInfo()
-      console.log(userData)
       setUser(userData)
     } catch (error) {
       //TODO: handle error (logout, refresh token, etc)
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   async function register(data: RegisterData) {
     try {
       await postRegister(data)
-    } catch (error) {}
+    } catch (error) { }
   }
 
   const logout = () => {
@@ -145,6 +145,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     destroyCookie(null, STORAGE_ACCESS_TOKEN_KEY, { path: '/' })
   }
 
+  //Globals
+  const glb_params = useGlobalParams();
+
+  console.log(glb_params.id_empresa);
+
+  //Verifica se tem empresa  e guarda
   const isAdmin = user?.role === 'ADMIN'
   const values: AuthContextData = {
     user,

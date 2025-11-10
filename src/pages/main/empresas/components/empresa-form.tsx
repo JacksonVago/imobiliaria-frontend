@@ -14,9 +14,17 @@ import { ApiCep } from '@/interfaces/cep'
 import api from '@/services/axios/api'
 import { Controller, UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
-import { formatCpfCnpj } from '@/utils/format-cpfcnpj'
+import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
 import { useState } from 'react'
+import { any } from 'zod'
+import { TipoLancamento } from '@/interfaces/lancamentotipo'
+import { useMediaQuery } from 'react-responsive'
+import { useQuery } from '@tanstack/react-query'
+
+export const getTipos = async () => {
+  return await api.get<TipoLancamento[]>('tipolancamento')
+}
 
 export const EmpresaFormRoot = ({
   children,
@@ -39,7 +47,17 @@ export const EmpresaFormContent = ({
   createEmpresaMethods: UseFormReturn<EmpresaSchema>
   disabled?: boolean
 }) => {
-  const [showBoleto, setShowBoleto] = useState(false);
+  const [showBoleto, setShowBoleto] = useState(createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false);
+  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' });
+
+  //Consulta Tipo imóvel
+  const {
+    data: tipoLancamento
+  } = useQuery({
+    queryKey: ['tipolancamento'],
+    queryFn: () => getTipos()
+  });
+
   return (
     <>
       <div className="space-y-4 font-[Poppins-Regular]">
@@ -99,10 +117,15 @@ export const EmpresaFormContent = ({
             Telefone
             <Input
               className="mt-2"
-              type="tel"
+              type="text"
               disabled={disabled}
               placeholder="Telefone"
-              {...createEmpresaMethods.register('telefone')}
+              {...createEmpresaMethods.register('telefone', {
+                onChange: async (e) => {
+                  const { value } = e.target;
+                  e.target.value = formatPhone(value);
+                }
+              })}
             />
             {createEmpresaMethods.formState.errors.telefone?.message &&
               (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
@@ -374,7 +397,7 @@ export const EmpresaFormContent = ({
               type="number"
               disabled={disabled}
               placeholder="Porcentagem comissão"
-              {...createEmpresaMethods.register('porcentagemComissao', {valueAsNumber:true})}
+              {...createEmpresaMethods.register('porcentagemComissao', { valueAsNumber: true })}
             />
             {createEmpresaMethods.formState.errors.porcentagemComissao?.message &&
               (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
@@ -393,6 +416,7 @@ export const EmpresaFormContent = ({
             Boletos
           </label>
           <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
+            checked={createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false}
             onCheckedChange={(checked) => { createEmpresaMethods.setValue("emiteBoleto", (checked ? "S" : "N")); setShowBoleto(!showBoleto); }}>
             <Thumb className="SwitchThumb" />
           </Switch>
@@ -406,6 +430,7 @@ export const EmpresaFormContent = ({
                 <Input
                   className="mt-2"
                   type="number"
+                  step="any"
                   disabled={disabled}
                   placeholder="Taxa"
                   {...createEmpresaMethods.register('valorTaxaBoleto')}
@@ -415,6 +440,40 @@ export const EmpresaFormContent = ({
                     {createEmpresaMethods.formState.errors.valorTaxaBoleto.message}
                   </p>)}
               </Label>
+              <div className='mt-2 mr-5'>
+                <Label className='text-base font-[Poppins-Regular]'>
+                  Tipo de Lançamento
+                  <div className='mt-2 border rounded-md'>
+                    <Controller
+                      name="tipoId"
+                      control={createEmpresaMethods.control}
+
+                      render={({ field }) => (
+                        <Select
+                          disabled={disabled}
+                          onValueChange={(value) => field.onChange(value)}
+                          value={String(field.value)}
+                        >
+                          <SelectTrigger className='h-4'>
+                            <SelectValue placeholder="Selecione o tipo de lançamento" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tipoLancamento?.data.map((tipo) => (
+                              <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                                {tipo.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {createEmpresaMethods.formState.errors.tipoId?.message &&
+                      (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                        {createEmpresaMethods.formState.errors.tipoId.message}
+                      </p>)}
+                  </div>
+                </Label>
+              </div>
               <Label className="text-base">
                 Dias de antecedência para emissão de boletos
                 <Input
@@ -429,6 +488,7 @@ export const EmpresaFormContent = ({
                     {createEmpresaMethods.formState.errors.emissaoBoletoAntecedencia.message}
                   </p>)}
               </Label>
+
               <Label className="text-base">
                 Porcentagem de Multa por atraso
                 <Input
@@ -450,7 +510,7 @@ export const EmpresaFormContent = ({
                   type="number"
                   disabled={disabled}
                   placeholder="Porcentagem de juros"
-                  {...createEmpresaMethods.register('porcentagemJurosAtraso', {valueAsNumber:true})}
+                  {...createEmpresaMethods.register('porcentagemJurosAtraso', { valueAsNumber: true })}
                 />
                 {createEmpresaMethods.formState.errors.porcentagemJurosAtraso?.message &&
                   (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
