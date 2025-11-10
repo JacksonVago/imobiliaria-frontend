@@ -81,8 +81,6 @@ export const DetalhesLocacaoForm = ({
   desvincularlocacaoImovel?: () => void
 }) => {
 
-  const navigate = useNavigate()
-
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
 
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)

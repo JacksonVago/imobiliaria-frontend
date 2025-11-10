@@ -17,19 +17,16 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select'
-import { ImovelStatus, ImovelTipo } from '@/enums/imovel/enums-imovel'
-import { ROUTE } from '@/enums/routes.enum'
-import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
-import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { useAuth } from '@/hooks/auth/use-auth'
-import { Endereco } from '@/interfaces/endereco'
+import { ImovelTipo } from '@/enums/imovel/enums-imovel'
+import { useGlobalParams } from '@/globals/GlobalParams'
+import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { Imovel } from '@/interfaces/imovel'
 import { TipoImovel } from '@/interfaces/tipoimovel'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, MapPin, Pencil, Plus, Search, Table } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Search } from 'lucide-react'
+import { useEffect } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -120,8 +117,6 @@ export default function ListarImoveisLocacao({
     //onSelectImovel: (imovel: Imovel | undefined) => void
     onSelectImovel: ((imovel: Imovel) => void) | undefined
 }) {
-    const { user } = useAuth();
-    const isAdmin = user?.role === 'ADMIN';
     const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
     const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
     const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -130,9 +125,6 @@ export default function ListarImoveisLocacao({
     const navigate = useNavigate()
     //Globals
     const glb_params = useGlobalParams();
-    const { resetStatePessoa } = usePessoa();
-
-    const [showcard, setShowCard] = useState(!!onSelectImovel);
 
     const [searchParams, setSearchTerm] = useSearchParams();
     const page = Number(searchParams.get('page')) || 1
@@ -161,8 +153,6 @@ export default function ListarImoveisLocacao({
     console.log(data?.data?.data);
     const imoveis = data?.data?.data || []
     const totalPages = data?.data?.totalPages
-    //const googleMaps = "https://www.google.com/maps/place/R.+Jo%C3%A3o+Kopke,+236+-+Bom+Retiro,+S%C3%A3o+Paulo+-+SP,+01124-030";
-    const googleMaps = "https://www.google.com/maps/place/";
 
 
     //always that we go to out of the total pages, we will go to the first page
@@ -206,10 +196,6 @@ export default function ListarImoveisLocacao({
 
     // UI Logic
     const hasSearchResults = Boolean(!isLoading && search && imoveis?.length === 0)
-
-    const handleClickVerDetalhes = (id: string) => {
-        navigate(`${ROUTE.IMOVEIS}/${id}`)
-    }
 
     return (
         <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">

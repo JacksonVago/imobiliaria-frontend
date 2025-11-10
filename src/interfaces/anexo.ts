@@ -1,4 +1,4 @@
-import { Pagamento } from "./boleto";
+import { Boleto } from "./boleto";
 
 export interface Anexo {
     id:number;
@@ -6,6 +6,6 @@ export interface Anexo {
     tipo:string;
     createdAt:string;
     updatedAt:string;
-    Pagamentos?:Pagamento;
+    Boletos?:Boleto;
   }
   

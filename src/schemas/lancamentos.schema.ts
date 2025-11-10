@@ -1,6 +1,4 @@
 import { LancamentoStatus } from "@/enums/locacao/enums-locacao";
-import { MAX_DOCUMENT_FILE_SIZE } from "@/pages/main/imoveis/constants/max_document_file_size";
-import { ACCEPTED_DOCUMENT_TYPES } from "@/pages/main/proprietarios/constants/accepted-document-types";
 import moment from "moment";
 import { z } from "zod";
 

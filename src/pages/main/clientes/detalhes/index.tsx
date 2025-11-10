@@ -62,7 +62,7 @@ import { Locacao } from '@/interfaces/locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
 //import { boolean } from 'zod';
-import ListarImoveis, { BasePaginationData } from '../../imoveis/listarImoveis';
+import { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
 

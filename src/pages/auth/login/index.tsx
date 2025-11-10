@@ -4,13 +4,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { toast } from '@/hooks/use-toast'
-import { Permission, User } from '@/interfaces/user'
+import { User } from '@/interfaces/user'
 import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Eye, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { set, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
 
@@ -106,6 +106,9 @@ export function Login() {
             if (loginUser?.id) {
               putUpdateUser(loginUser.id, { login: data.login, password: data.password, newpassword: data.newpassword })
                 .then((response) => {
+                  if (response){
+                    console.log(response.data);
+                  }
                   setUpdPassword(false);
                   toast({
                     title: 'Atualização de senha',
@@ -157,13 +160,15 @@ export function Login() {
     if (loginUser) {
       postLogin({ login: loginUser.login, password: pwd })
         .then((response) => {
-          setError('password', {});
+          if (response) {
+            setError('password', {});
+          }
         })
         .catch((error) => {
           if (axios.isAxiosError(error)) {
             // Check if there's a response and data within the error
             if (error.response && error.response.data) {
-              setError('password', { message: error.response.data.message.toString().indexOf('not strong') > -1 ? 'Senha inválida' : error.response.data.message});
+              setError('password', { message: error.response.data.message.toString().indexOf('not strong') > -1 ? 'Senha inválida' : error.response.data.message });
             } else {
               console.error('Axios error without response data:', error.message);
             }

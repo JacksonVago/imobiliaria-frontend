@@ -17,9 +17,7 @@ import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
 import { useState } from 'react'
-import { any } from 'zod'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
-import { useMediaQuery } from 'react-responsive'
 import { useQuery } from '@tanstack/react-query'
 
 export const getTipos = async () => {
@@ -48,7 +46,6 @@ export const EmpresaFormContent = ({
   disabled?: boolean
 }) => {
   const [showBoleto, setShowBoleto] = useState(createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false);
-  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' });
 
   //Consulta Tipo imóvel
   const {

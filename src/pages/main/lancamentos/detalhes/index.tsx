@@ -10,9 +10,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -177,6 +176,7 @@ export const DetalhesLancamento = () => {
 
       });
       setIsCreateDialogOpen(false);
+      setIsEditing(false);
 
     } catch (error) {
 

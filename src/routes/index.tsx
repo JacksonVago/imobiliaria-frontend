@@ -32,7 +32,6 @@ import DetalhesEmpresa from '@/pages/main/empresas/detalhes'
 import ListarLancamentos from '@/pages/main/lancamentos'
 import ListarTiposLancamento from '@/pages/main/tipolancamento'
 import { DetalhesLancamento } from '@/pages/main/lancamentos/detalhes'
-import ListarPagamentos from '@/pages/main/boletos'
 import { DetalhesBoleto } from '@/pages/main/boletos/detalhes'
 import ListarBoletos from '@/pages/main/boletos'
 
@@ -233,7 +232,7 @@ export const RoutesComponent = () => {
             path={ROUTE.PAGAMENTOS}
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
-                <ListarBoletos exclude='' limitView={3} onSelectBoleto={undefined}/>
+                <ListarBoletos exclude='' limitView={3}/>
               </ProtectedRoute>
             }
           />

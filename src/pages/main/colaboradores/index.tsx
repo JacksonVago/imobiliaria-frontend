@@ -87,12 +87,12 @@ const imoveisPermissions: { value: Permission; label: string }[] = [
   { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' }
 ]*/
 
-const pessoasPermissions: { value: Permission; label: string }[] = [
+/*const pessoasPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
   { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
   { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
   { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' }
-]
+]*/
 
 const clientesPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_CLIENTE', label: 'Criar Cliente' },

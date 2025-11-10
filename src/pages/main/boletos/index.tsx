@@ -84,11 +84,11 @@ export const useGetBoletosQueryOptions = ({
 export default function ListarBoletos({
   limitView,
   exclude,
-  onSelectBoleto
+  //onSelectBoleto
 }: {
   limitView: number
   exclude: string
-  onSelectBoleto: ((pagamento: Boleto) => void) | undefined
+  //onSelectBoleto: ((pagamento: Boleto) => void) | undefined
 }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })

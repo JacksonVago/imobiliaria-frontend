@@ -36,14 +36,13 @@ import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { CircleCheck, Pencil, Plus, Trash2 } from 'lucide-react'
+import { CircleCheck, Pencil, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller, FormProvider } from 'react-hook-form'
 import { LancamentoStatus, BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
 //import { boolean } from 'zod';
 import { useMediaQuery } from 'react-responsive';
-import { Lancamento } from '@/interfaces/lancamentos'
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
@@ -121,21 +120,6 @@ export const DetalhesBoleto = () => {
   })
 
   const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
-
-  console.log('boleto detalhes:', boleto);
-  const createBoleto = useMutation({
-    mutationFn: async (data: FormData) => {
-
-      return await api.post<Boleto>(`/pagamentos`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-    },
-    onSuccess: () => {
-      ['boleto','documentFiles', id].forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: [key] })
-      })
-    }
-  })
 
   const updateBoleto = useMutation({
     mutationFn: async (data: FormData) => {
@@ -215,6 +199,7 @@ export const DetalhesBoleto = () => {
       }
 
       await updateBoleto.mutateAsync(form)
+      setIsEditing(false);
       /*
       if (titulo === "Criar novo pagamento") {
         await createPagamento.mutateAsync(form)
@@ -294,20 +279,6 @@ export const DetalhesBoleto = () => {
 
   const handleDeletePagamento = (idBoleto: number) => {
     deleteBoleto.mutate(idBoleto);
-  }
-
-  const handleEditBoleto = (boleto: Boleto) => {
-    setTitulo("Alterar Boleto")
-    setIsCreateDialogOpen(true);
-    boletoMethods.setValue("id", boleto.id);
-    boletoMethods.setValue("dataPagamento", moment.utc(boleto.dataPagamento).format("YYYY-MM-DD"));
-    boletoMethods.setValue("dataEmissao", moment.utc(boleto.dataEmissao).format("YYYY-MM-DD"));
-    boletoMethods.setValue("dataVencimento", moment.utc(boleto.dataVencimento).format("YYYY-MM-DD"));
-    boletoMethods.setValue("valorOriginal", boleto.valorOriginal);
-    boletoMethods.setValue("valorPago", boleto.valorPago);
-    boletoMethods.setValue("status", boleto.status);
-    boletoMethods.setValue("locatarioId", (boleto.locatario ? boleto.locatario.id : 0));
-    boletoMethods.setValue("locacaoId", boleto.locacaoId);
   }
 
   return (

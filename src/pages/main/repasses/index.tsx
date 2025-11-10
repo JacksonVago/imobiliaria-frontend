@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/pagination'
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { MapPin, Receipt, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -24,7 +24,6 @@ import { Endereco } from '@/interfaces/endereco'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
 import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/services/react-query/query-client'
 import { Boleto } from '@/interfaces/boleto'
 import { cn } from '@/lib/utils'
 import { BoletoStatus } from '@/enums/locacao/enums-locacao'
@@ -84,11 +83,9 @@ export const useGetRepassesQueryOptions = ({
 export default function ListarBoletos({
   limitView,
   exclude,
-  onSelectRepasse
 }: {
   limitView: number
   exclude: string
-  onSelectRepasse: ((pagamento: Boleto) => void) | undefined
 }) {
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
@@ -185,6 +182,7 @@ export default function ListarBoletos({
 
   const handleExcluirBoleto = async (boletoId: number) => {
     try {
+      return await api.delete(`pagamentos/${boletoId}`);
     } catch (error) {
       toast({ title: 'Erro ao excluir boleto.', variant: 'destructive' });
     }
