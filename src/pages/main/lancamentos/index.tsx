@@ -11,7 +11,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { MapPin, Pencil, Plus, Receipt, Search } from 'lucide-react'
+import { MapPin, Pencil, Receipt, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'

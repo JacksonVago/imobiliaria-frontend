@@ -52,7 +52,6 @@ import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/auth/use-auth'
-import { PageLoader } from '@/pages/assistant/page-loader'
 import { Loader } from '@/components/ui/loader'
 
 export const getTipos = async () => {
@@ -71,7 +70,7 @@ export const DetalhesLancamento = () => {
   const [titulo, setTitulo] = React.useState("Criar novo lançamento")
   const disabled = isEditing
 
-  const [searchParams, setSearchTerm] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   const dataInicial = searchParams.get('dataInicial') || '';
