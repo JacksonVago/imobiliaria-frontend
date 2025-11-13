@@ -41,7 +41,7 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {  Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
+import { Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -65,6 +65,7 @@ import { useGlobalParams } from '@/globals/GlobalParams';
 import { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
+import { useAuth } from '@/hooks/auth/use-auth'
 
 // Mock data for demonstration
 /*const cliente = {
@@ -151,6 +152,8 @@ export const DetalhesClienteForm = ({
   desvincularClienteImovel?: () => void
 }) => {
 
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
   const disabled = isEditingPersonalInfo
@@ -159,7 +162,7 @@ export const DetalhesClienteForm = ({
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   //const params = useParams();
-  
+
   //Globals
   const glb_params = useGlobalParams();
 
@@ -360,14 +363,20 @@ export const DetalhesClienteForm = ({
               </Button>
             )}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
-          </Button>
+          {(isAdmin ||
+            user?.permissions.includes("ALL") ||
+            user?.permissions.includes("UPDATE_PESSOA")
+          ) && (
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
+              </Button>
+            )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -395,10 +404,14 @@ export const DetalhesClienteForm = ({
 }
 
 export default function DetalhesCliente() {
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   //const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  //const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 400px)' })
 
   const navigate = useNavigate()
   //const [formInitialized, setFormInitialized] = React.useState(false) // Controle de inicialização
@@ -570,7 +583,7 @@ export default function DetalhesCliente() {
     const formData = new FormData();
 
     formData.append('pessoaId', (id!! ? id.toString() : '0'));
-    formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString(): ""));
+    formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString() : ""));
     formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
     //Gravar dados das propriedades
@@ -639,7 +652,7 @@ export default function DetalhesCliente() {
     if (propEdit) {
       formData.append('id', propEdit.id.toString());
       formData.append('pessoaId', propEdit.pessoaId.toString());
-      formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString(): ""));
+      formData.append('cotaImovel', (data.cotaImovel ? data.cotaImovel.toString() : ""));
       formData.append('imovelId', (data.imovelId ? data.imovelId.toString() : ""));
 
       console.log(formData);
@@ -838,10 +851,16 @@ export default function DetalhesCliente() {
         <h1 className="text-3xl font-bold">{cliente?.nome}</h1>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir Cliente
-            </Button>
+            {(isAdmin ||
+              user?.permissions.includes("ALL") ||
+              user?.permissions.includes("DELETE_PESSOA")
+            ) && (
+
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir Cliente
+                </Button>
+              )}
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -876,11 +895,17 @@ export default function DetalhesCliente() {
         <TabsContent value="propriedades" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[1.3rem]">Propriedades</h2>
-            <Button
-              onClick={handlerNewProp}>
-              <Plus className="mr-2 h-4 w-4" />
-              Propriedade
-            </Button>
+            {(isAdmin ||
+              user?.permissions.includes("ALL") ||
+              user?.permissions.includes("UPDATE_PROPRIETARIO")
+            ) && (
+                <Button
+                  size={"sm"}
+                  onClick={handlerNewProp}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Propriedade
+                </Button>
+              )}
             <Dialog open={openImovel} onOpenChange={setOpenImovel}>
               <DialogContent>
                 <DialogHeader>
@@ -945,7 +970,7 @@ export default function DetalhesCliente() {
                   </div>
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="submit"
+                      <Button type="submit" size={"sm"}
                       >Adicionar Propriedade</Button>
                     </DialogClose>
                   </DialogFooter>
@@ -954,7 +979,7 @@ export default function DetalhesCliente() {
             </Dialog>
           </div>
 
-          <div className={(isTablet ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1')}>
+          <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {cliente?.proprietarios?.map((proprietario) => (
               <Card key={proprietario.id}>
                 <CardHeader>
@@ -973,7 +998,7 @@ export default function DetalhesCliente() {
 
                   <Label className="font-semibold">Dados do imóvel</Label>
                   <p>
-                    {proprietario.imovel?.tipo.toString() + ', ' +
+                    {proprietario.imovel?.tipo.name + ' - ' +
                       proprietario.imovel?.endereco.logradouro.toString() + ' ' +
                       proprietario.imovel?.endereco.numero.toString() + ' ' +
                       proprietario.imovel?.endereco.complemento?.toString() + ' ' +
@@ -981,30 +1006,41 @@ export default function DetalhesCliente() {
                       proprietario.imovel?.endereco.cidade.toString()}
 
                   </p>
-                  <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
-                    <Button
-                      className='col-start-3'
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => { handlerDetailImovel(proprietario.imovelId) }}
-                      style={
-                        {
-                          fontSize: '0.8rem',
-                        }}
-                    >
-                      Ver detalhes
-                    </Button>
-                  </div>
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("VIEW_IMOVELS")
+                  ) && (
+                      <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
+                        <Button
+                          className='col-start-3'
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { handlerDetailImovel(proprietario.imovelId) }}
+                          style={
+                            {
+                              fontSize: '0.8rem',
+                            }}
+                        >
+                          Ver detalhes
+                        </Button>
+                      </div>
+                    )}
                   <hr className="border-t border-gray-300 mt-3" />
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm"
-                        onClick={() => { handlerEditPropriedade(proprietario) }}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar
-                      </Button>
+                      {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("UPDATE_PROPRIETARIO")
+                      ) && (
+
+                          <Button variant="outline" size="sm"
+                            onClick={() => { handlerEditPropriedade(proprietario) }}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Button>
+                        )}
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -1061,11 +1097,16 @@ export default function DetalhesCliente() {
                       </form>
                     </DialogContent>
                   </Dialog>
-                  <Button variant="destructive" size="sm"
-                    onClick={() => { handleDeletePropriedade(proprietario) }}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </Button>
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("DELETE_PROPRIETARIO")
+                  ) && (
+                      <Button variant="destructive" size="sm"
+                        onClick={() => { handleDeletePropriedade(proprietario) }}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </Button>
+                    )}
                 </CardFooter>
               </Card>
             ))}
@@ -1078,7 +1119,7 @@ export default function DetalhesCliente() {
             <h2 className="text-2xl font-bold text-[1.3rem]">Locações</h2>
           </div>
 
-          <div className={(isPortrait ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1')}>
+          <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {cliente?.locatarios?.map((locatario) => (
               locatario.locacoes?.map((locacao) => {
                 return (
@@ -1109,34 +1150,44 @@ export default function DetalhesCliente() {
                       <div className="grid grid-cols-2 gap-3 items-center mt-4">
                         <Label>Imóvel</Label>
                         <p className="flex flex-col items-center text-[0.70rem]">
-                          {locacao.imovel?.tipo.toString() + ", " + locacao.imovel?.endereco.logradouro.toString() + " " + locacao.imovel?.endereco.bairro + " " + locacao.imovel?.endereco.cidade}
+                          {locacao.imovel?.tipo.name + " - " + locacao.imovel?.endereco.logradouro.toString() + " " + locacao.imovel?.endereco.bairro + " " + locacao.imovel?.endereco.cidade}
                         </p>
                       </div>
-                      <div className='grid grid-cols-3 gap-4 flex items-end mt-2'>
-                        <Button
-                          className='col-start-3'
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
-                          style={
-                            {
-                              fontSize: '0.8rem',
-                            }}
-                        >
-                          Ver detalhes
-                        </Button>
-                      </div>
+                      {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("VIEW_IMOVELS")
+                      ) && (
+                          <div className='grid grid-cols-3 gap-4 flex items-end mt-2'>
+                            <Button
+                              className='col-start-3'
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
+                              style={
+                                {
+                                  fontSize: '0.8rem',
+                                }}
+                            >
+                              Ver detalhes
+                            </Button>
+                          </div>
+                        )}
                       <hr className="border-t border-gray-300 mt-5" />
                     </CardContent>
                     <CardFooter className="flex justify-end space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm"
-                            onClick={() => { handlerEditLocacao(locacao) }}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar
-                          </Button>
+                          {(isAdmin ||
+                            user?.permissions.includes("ALL") ||
+                            user?.permissions.includes("UPDATE_LOCACAO")
+                          ) && (
+                              <Button variant="outline" size="sm"
+                                onClick={() => { handlerEditLocacao(locacao) }}
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </Button>
+                            )}
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
@@ -1347,14 +1398,15 @@ export default function DetalhesCliente() {
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                      {/* <Button variant="outline" size="sm">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Editar
-                </Button> */}
+                      {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("DELETE_LOCACAO")
+                      ) && (
                       <Button variant="destructive" size="sm">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
                       </Button>
+                      )}
                     </CardFooter>
                   </Card>
                 )

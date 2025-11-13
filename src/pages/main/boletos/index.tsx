@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils'
 import { BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
+import { useAuth } from '@/hooks/auth/use-auth'
+import { Loader } from '@/components/ui/loader'
 
 // Types
 interface GetBoletosParams {
@@ -90,6 +92,8 @@ export default function ListarBoletos({
   exclude: string
   //onSelectBoleto: ((pagamento: Boleto) => void) | undefined
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -108,7 +112,7 @@ export default function ListarBoletos({
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
   const [dataInicial, setdataInicial] = useState(moment(new Date()).format("YYYY-MM-DD"));
-  const [dataFinal, setdataFinal] = useState(moment(new Date()).format("bole-DD"));
+  const [dataFinal, setdataFinal] = useState(moment(new Date()).format("YYYY-MM-DD"));
 
   const { data, isLoading } = useQuery(
     useGetBoletosQueryOptions({
@@ -216,7 +220,7 @@ export default function ListarBoletos({
   const handleConfirmarBoleto = async (boleto: Boleto) => {
     try {
       boleto.status = BoletoStatus.CONFIRMADO;
-      confirmarBoleto.mutateAsync(boleto);      
+      confirmarBoleto.mutateAsync(boleto);
     } catch (error) {
       toast({ title: 'Erro ao gerar boletos.', variant: 'destructive' });
     }
@@ -224,7 +228,7 @@ export default function ListarBoletos({
 
   const handleExcluirBoleto = async (boletoId: number) => {
     try {
-      deleteBoleto.mutateAsync(boletoId);      
+      deleteBoleto.mutateAsync(boletoId);
     } catch (error) {
       toast({ title: 'Erro ao excluir boleto.', variant: 'destructive' });
     }
@@ -322,111 +326,126 @@ export default function ListarBoletos({
             </p>
           </div>
         )}
-        {boletos.map((boleto) => (
-          <Card key={boleto.id} className="">
-            <CardHeader className="flex flex-row justify-between">
+        {isLoading ?
+          (
+            <div className="bg-transparent flex justify-center items-center col-span-full">
+              <Loader />
+            </div>
+          ) :
+          (boletos.map((boleto) => (
+            <Card key={boleto.id} className="">
+              <CardHeader className="flex flex-row justify-between">
 
-              <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                  <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                    onClick={() => { handlerClickMaps(boleto.locacao?.imovel?.endereco) }}
-                    color='green'
-                  />
-                  {getEnderecoFormatado(boleto.locacao?.imovel?.endereco)}
-                </p>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Label className="font-bold flex justify-end">
-                Aluguel R$ {boleto.locacao?.valorAluguel?.toLocaleString('pt-BR')}
-              </Label>
-              {(boleto.lancamentos && boleto.lancamentos?.length > 0) ? (
-                <>
-                  <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
-                  <div className='rounded-md border'>
-                    <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
-                      <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
-                      {!isMobile ? (
-                        <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
-                        : (<></>)
-                      }
-                      <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
-                      <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
-                    </div>
-
-                    <div className='grid grid-cols-5 m-2 gap-1' >
-                      {boleto.lancamentos?.map((lancamento) => (
-                        <>
-                          <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
-                          {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
-                            : (<></>)
-                          }
-                          <Label className={boleto.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                          <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
-                        </>
-                      ))}
-                    </div>
-                  </div>
-                  <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
-                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                      {usdFormatter.format((boleto.locacao ? boleto.locacao.valorAluguel : 0) +
-                        boleto.lancamentos.reduce((total, lancamento) => {
-                          return total + lancamento.valorLancamento;
-                        }, 0))}
-                    </Label>
-                  </div>
-                  <div className='flex justify-end'>
-                    <Badge
-                      variant="secondary"
-                      className={cn('mt-2 text-xs', {
-                        'bg-green-50 text-green-800': boleto.status === BoletoStatus.PENDENTE,
-                        'bg-red-50 text-red-800': boleto.status === BoletoStatus.ATRASADO,
-                        'bg-blue-50 text-blue-800': boleto.status === BoletoStatus.PAGO
-                      })}
-                    >
-                      {boleto.status}
-                    </Badge>
-                  </div>
-
-                </>
-              )
-                : (<p className="text-center text-muted-foreground mt-5">
-                  Não há lançamentos para esse boleto
-                </p>
-                )
-              }
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className=
-              {cn('grid gap-10', {
-                                    'grid-cols-3': boleto.status === BoletoStatus.PENDENTE,
-                                    'grid-cols-2': boleto.status === BoletoStatus.ATRASADO || boleto.status === BoletoStatus.PAGO,
-                                  })}
-              >
-                <Button variant="secondary"
-                  onClick={() => handleClickVerDetalhes(boleto.id ? boleto.id : 0)}
-                  size={"sm"}>
-                  Detalhes
-                </Button>
-                {(boleto.status === BoletoStatus.PENDENTE) && (
+                <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
+                  <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                    <MapPin className="inline-block h-4 w-4 cursor-pointer"
+                      onClick={() => { handlerClickMaps(boleto.locacao?.imovel?.endereco) }}
+                      color='green'
+                    />
+                    {getEnderecoFormatado(boleto.locacao?.imovel?.endereco)}
+                  </p>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label className="font-bold flex justify-end">
+                  Aluguel R$ {boleto.locacao?.valorAluguel?.toLocaleString('pt-BR')}
+                </Label>
+                {(boleto.lancamentos && boleto.lancamentos?.length > 0) ? (
                   <>
-                    <Button variant="destructive"
-                      onClick={() => handleExcluirBoleto(boleto.id)}
-                      size={"sm"}>
-                      <Trash className="h-4 w-4" />Excluir
-                    </Button>
-                    <Button variant="secondary"
-                      onClick={() => handleConfirmarBoleto(boleto)}
-                      size={"sm"}>
-                      <Receipt className="h-4 w-4" />Emitir Boleto
-                    </Button>
+                    <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
+                    <div className='rounded-md border'>
+                      <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                        <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                        {!isMobile ? (
+                          <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
+                          : (<></>)
+                        }
+                        <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                        <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                      </div>
+
+                      <div className='grid grid-cols-5 m-2 gap-1' >
+                        {boleto.lancamentos?.map((lancamento) => (
+                          <>
+                            <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                            {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                              : (<></>)
+                            }
+                            <Label className={boleto.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                            <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                          </>
+                        ))}
+                      </div>
+                    </div>
+                    <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
+                      <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
+                      <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                        {usdFormatter.format((boleto.locacao ? boleto.locacao.valorAluguel : 0) +
+                          boleto.lancamentos.reduce((total, lancamento) => {
+                            return total + lancamento.valorLancamento;
+                          }, 0))}
+                      </Label>
+                    </div>
+                    <div className='flex justify-end'>
+                      <Badge
+                        variant="secondary"
+                        className={cn('mt-2 text-xs', {
+                          'bg-green-50 text-green-800': boleto.status === BoletoStatus.PENDENTE,
+                          'bg-red-50 text-red-800': boleto.status === BoletoStatus.ATRASADO,
+                          'bg-blue-50 text-blue-800': boleto.status === BoletoStatus.PAGO
+                        })}
+                      >
+                        {boleto.status}
+                      </Badge>
+                    </div>
+
                   </>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                )
+                  : (<p className="text-center text-muted-foreground mt-5">
+                    Não há lançamentos para esse boleto
+                  </p>
+                  )
+                }
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <div className=
+                  {cn('grid gap-10', {
+                    'grid-cols-3': boleto.status === BoletoStatus.PENDENTE,
+                    'grid-cols-2': boleto.status === BoletoStatus.ATRASADO || boleto.status === BoletoStatus.PAGO,
+                  })}
+                >
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("UPDATE_PAGAMENTO")
+                  ) && (
+
+                      <Button variant="secondary"
+                        onClick={() => handleClickVerDetalhes(boleto.id ? boleto.id : 0)}
+                        size={"sm"}>
+                        Detalhes
+                      </Button>
+                    )}
+                  {((isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("DELETE_PAGAMENTO")
+                  ) && (boleto.status === BoletoStatus.PENDENTE)) && (
+                      <>
+                        <Button variant="destructive"
+                          onClick={() => handleExcluirBoleto(boleto.id)}
+                          size={"sm"}>
+                          <Trash className="h-4 w-4" />Excluir
+                        </Button>
+                        <Button variant="secondary"
+                          onClick={() => handleConfirmarBoleto(boleto)}
+                          size={"sm"}>
+                          <Receipt className="h-4 w-4" />Emitir Boleto
+                        </Button>
+                      </>
+                    )}
+                </div>
+              </CardFooter>
+            </Card>
+          )))}
       </div>
 
       {/* Pagination */}

@@ -97,13 +97,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.url === ROUTE.LOCACOES && user?.permissions.includes('VIEW_LOCACOES')) {
         return true
       }
+      if (item.url === ROUTE.LANCAMENTOS && user?.permissions.includes('VIEW_LANCAMENTOS')) {
+        return true
+      }
+      if (item.url === ROUTE.PAGAMENTOS && user?.permissions.includes('VIEW_PAGAMENTOS')) {
+        return true
+      }
       if (item.url === ROUTE.PROPRIETARIOS && user?.permissions.includes('VIEW_PROPRIETARIOS')) {
         return true
       }
       if (item.url === ROUTE.LOCATARIOS && user?.permissions.includes('VIEW_LOCATARIOS')) {
         return true
       }
-      if (item.url === ROUTE.CLIENTES && user?.permissions.includes('VIEW_CLIENTES')) {
+      if (item.url === ROUTE.CLIENTES && user?.permissions.includes('VIEW_PESSOAS')) {
         return true
       }
       if (item.url === ROUTE.TIPOIMOVEL && user?.permissions.includes('VIEW_TIPOS')) {

@@ -304,7 +304,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.CLIENTES}
             element={
-              <ProtectedRoute permission="VIEW_CLIENTES">
+              <ProtectedRoute permission="VIEW_PESSOAS">
                 <ListarClientes exclude='' limitView={3} txtVinc='' onSelectCliente={undefined} />
               </ProtectedRoute>
             }
@@ -313,7 +313,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.CLIENTES_DETALHES}
             element={
-              <ProtectedRoute permission="VIEW_CLIENTES">
+              <ProtectedRoute permission="VIEW_PESSOAS">
                 <DetalhesCliente/>
               </ProtectedRoute>
             }
@@ -321,7 +321,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.CLIENTES_CRIAR}
             element={
-              <ProtectedRoute permission="CREATE_CLIENTE">
+              <ProtectedRoute permission="CREATE_PESSOA">
                 <CriarCliente />
               </ProtectedRoute>
             }

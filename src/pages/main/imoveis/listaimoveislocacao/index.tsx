@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { Input } from '@/components/ui/input'
+import { Loader } from '@/components/ui/loader'
 import {
     Pagination,
     PaginationContent,
@@ -236,51 +237,60 @@ export default function ListarImoveisLocacao({
                     <p className="text-center text-muted-foreground">Nenhum imóvel</p>
                 )}
 
-                {imoveis?.map((imovel) => (
-                    <Card key={imovel.id} className="">
-                        <CardHeader className="flex flex-row justify-between">
-                            <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
-                            <Badge
-                                variant="secondary"
-                                className={cn('mt-2', {
-                                    'bg-blue-50 text-blue-800': imovel?.tipo.name === ImovelTipo.APARTAMENTO,
-                                    'bg-yellow-50 text-yellow-800': imovel?.tipo.name === ImovelTipo.TERRENO,
-                                    'bg-green-50 text-green-800': imovel?.tipo.name === ImovelTipo.CASA
-                                })}
-                            >
-                                {imovel?.tipo.name}
-                            </Badge>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                                {getEnderecoFormatado(imovel?.endereco)}
-                            </p>
-                            <span className="text-lg font-bold">
-                                Aluguel R$ {imovel?.valorAluguel?.toLocaleString('pt-BR')}
-                            </span>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <div className='grid grid-cols-2 gap-10'>
-                                {onSelectImovel && (
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => {
-                                            onSelectImovel(imovel);
-                                        }}
-                                        style={{
-                                            fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                                            textWrap: 'inherit'
-                                        }}
+                {isLoading ?
+                    (
+                        <div className="bg-transparent flex justify-center items-center col-span-full">
+                            <Loader />
+                        </div>
+                    ) :
+                    (imoveis?.map((imovel) => (
+                        <Card key={imovel.id} className="">
+                            <CardHeader className="flex flex-row justify-between">
+                                <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
+                                <Badge
+                                    variant="secondary"
+                                    className={cn('mt-2', {
+                                        'bg-blue-50 text-blue-800': imovel?.tipo.name === ImovelTipo.APARTAMENTO,
+                                        'bg-yellow-50 text-yellow-800': imovel?.tipo.name === ImovelTipo.TERRENO,
+                                        'bg-green-50 text-green-800': imovel?.tipo.name === ImovelTipo.CASA
+                                    })}
+                                >
+                                    {imovel?.tipo.name}
+                                </Badge>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                                    {getEnderecoFormatado(imovel?.endereco)}
+                                </p>
+                                <span className="text-lg font-bold">
+                                    Aluguel R$ {imovel?.valorAluguel?.toLocaleString('pt-BR')}
+                                </span>
+                            </CardContent>
+                            <CardFooter className="flex justify-between">
+                                <div className='grid grid-cols-2 gap-10'>
+                                    {onSelectImovel && (
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => {
+                                                onSelectImovel(imovel);
+                                            }}
+                                            style={{
+                                                fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                                                textWrap: 'inherit'
+                                            }}
 
-                                    >
-                                        Selecionar
-                                    </Button>
-                                )}
-                            </div>
-                        </CardFooter>
-                    </Card>
-                ))}
+                                        >
+                                            Selecionar
+                                        </Button>
+                                    )}
+                                </div>
+                            </CardFooter>
+                        </Card>
+                    )
+                    )
+                    )
+                }
             </div>
 
             {/* Pagination */}

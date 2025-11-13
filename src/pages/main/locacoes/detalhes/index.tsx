@@ -34,6 +34,7 @@ import { Locacao } from '@/interfaces/locacao'
 import { LocacaoFormContent, LocacaoFormRoot } from '../components/locacao-form';
 import { useMediaQuery } from 'react-responsive';
 import moment from 'moment';
+import { useAuth } from '@/hooks/auth/use-auth'
 
 
 const fetchDocumentFiles = async (documents: Locacao['documentos']) => {
@@ -65,10 +66,10 @@ const fetchDocumentFiles = async (documents: Locacao['documentos']) => {
   return resolvedFiles.filter(Boolean)
 }
 
-const updateLocacao = async (id:string, data: FormData): Promise<Locacao | any> => {
-      return await api.put<Locacao>(`/locacoes/${id}`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+const updateLocacao = async (id: string, data: FormData): Promise<Locacao | any> => {
+  return await api.put<Locacao>(`/locacoes/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
 }
 
 
@@ -80,6 +81,9 @@ export const DetalhesLocacaoForm = ({
   disabled?: boolean
   desvincularlocacaoImovel?: () => void
 }) => {
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
 
@@ -153,7 +157,7 @@ export const DetalhesLocacaoForm = ({
     formData.append('numeroApolice', (data.seguroIncendio?.numeroApolice ? data.seguroIncendio?.numeroApolice.toString() : '0'));
     formData.append('vigenciaInicio', (data.seguroIncendio?.vigenciaInicio ? moment(data.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD') : ''));
     formData.append('vigenciaFim', (data.seguroIncendio?.vigenciaFim ? moment(data.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') : ''));
-    
+
     const newDocuments = data?.documentos?.filter((doc) => !doc.id)
     newDocuments?.forEach((doc) => {
       formData.append('documentos', doc.file)
@@ -194,8 +198,8 @@ export const DetalhesLocacaoForm = ({
       imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
       tituloCap: (locacao?.garantiaTituloCapitalizacao ? { numeroTitulo: locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
       seguroFianca: locacao?.garantiaSeguroFianca ? { numeroSeguro: locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
-      depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito, localDeposito : locacao?.garantiaDepositoCalcao.localDeposito } : undefined,
-      seguroIncendio: locacao?.seguroIncendio ? { numeroApolice: locacao?.seguroIncendio?.numeroApolice, vigenciaInicio : moment(locacao?.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD'), vigenciaFim : moment(locacao?.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') } : undefined,
+      depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito, localDeposito: locacao?.garantiaDepositoCalcao.localDeposito } : undefined,
+      seguroIncendio: locacao?.seguroIncendio ? { numeroApolice: locacao?.seguroIncendio?.numeroApolice, vigenciaInicio: moment(locacao?.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD'), vigenciaFim: moment(locacao?.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') } : undefined,
     }),
     [locacao, documentFiles]
   )
@@ -216,8 +220,8 @@ export const DetalhesLocacaoForm = ({
   }, [id, locacao, documentFiles])
 
 
-    const result = locacaoSchema.safeParse(defaultValues)
-    console.log(result)
+  const result = locacaoSchema.safeParse(defaultValues)
+  console.log(result)
   const hasLocatario = !!locacao?.locatarios?.length;
 
   return (
@@ -233,14 +237,19 @@ export const DetalhesLocacaoForm = ({
               </Button>
             )}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
-          </Button>
+          {(isAdmin ||
+            user?.permissions.includes("ALL") ||
+            user?.permissions.includes("UPDATE_LOCACAO")
+          ) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
+              </Button>
+            )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -270,6 +279,12 @@ export const DetalhesLocacaoForm = ({
 }
 
 export default function DetalhesLocacao() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
+  const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
+  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
+
   const navigate = useNavigate()
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
@@ -367,10 +382,16 @@ export default function DetalhesLocacao() {
         <h1 className="text-3xl font-bold">{locacao?.imovel?.endereco.logradouro}</h1>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" className=''>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir Locação
-            </Button>
+            {(isAdmin ||
+              user?.permissions.includes("ALL") ||
+              user?.permissions.includes("DELETE_LOCACAO")
+            ) && (
+
+                <Button variant="destructive" className='' size={"sm"}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir Locação
+                </Button>
+              )}
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -406,47 +427,54 @@ export default function DetalhesLocacao() {
             <h2 className="text-2xl font-bold">Locatários</h2>
           </div>
 
-          {locacao?.locatarios?.map((locatario) => (
-            <Card key={locatario.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{locatario.pessoa?.nome}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Label className="font-semibold">Dados do Locatário</Label>
-                <div className='grid grid-cols-10 flex justify-items-start'>
-                  <div className=''>
-                    <Mail className='text-gray-500' />
+          <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+            {locacao?.locatarios?.map((locatario) => (
+              <Card key={locatario.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{locatario.pessoa?.nome}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Label className="font-semibold">Dados do Locatário</Label>
+                  <div className='grid grid-cols-10 flex justify-items-start'>
+                    <div className=''>
+                      <Mail className='text-gray-500' />
+                    </div>
+                    <div className='text-gray-500'>
+                      {locatario.pessoa?.email?.toString()}
+                    </div>
                   </div>
-                  <div className='text-gray-500'>
-                    {locatario.pessoa?.email?.toString()}
-                  </div>
-                </div>
-                <div className='grid grid-cols-10 flex justify-items-start'>
-                  <Phone className='text-gray-500' />
-                  <div className='text-gray-500'>
-                    {locatario.pessoa?.telefone?.toString()}
-                  </div>
+                  <div className='grid grid-cols-10 flex justify-items-start'>
+                    <Phone className='text-gray-500' />
+                    <div className='text-gray-500'>
+                      {locatario.pessoa?.telefone?.toString()}
+                    </div>
 
-                </div>
-                <div className="grid grid-cols-2 gap-3 flex items-end mt-2">
-                  <Button
-                    className='col-start-3'
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => { handlerDetailLocatario(locatario.pessoa?.id ? locatario.pessoa?.id : 0) }}
-                    style={
-                      {
-                        fontSize: '0.8rem',
-                      }}
-                  >
-                    Ver detalhes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  </div>
+            {(isAdmin ||
+              user?.permissions.includes("ALL") ||
+              user?.permissions.includes("VIEW_PESSOAS")
+            ) && (
+                  <div className="grid grid-cols-2 gap-3 flex items-end mt-2">
+                    <Button
+                      className='col-start-3'
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => { handlerDetailLocatario(locatario.pessoa?.id ? locatario.pessoa?.id : 0) }}
+                      style={
+                        {
+                          fontSize: '0.8rem',
+                        }}
+                    >
+                      Ver detalhes
+                    </Button>
+                  </div>
+            )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
         {/* Fiadores */}

@@ -30,6 +30,8 @@ import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { Locacao } from '@/interfaces/locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { LocacaoStatus } from '@/enums/locacao/enums-locacao'
+import { useAuth } from '@/hooks/auth/use-auth'
+import { Loader } from '@/components/ui/loader'
 
 // Types
 interface GetLocacoesParams {
@@ -88,6 +90,9 @@ export default function ListarLocacoes({
   exclude: string
   onSelectLocacao: ((locacao: Locacao) => void) | undefined
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -192,11 +197,14 @@ export default function ListarLocacoes({
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
-        {/* <div className={(isPortrait ? 'grid grid-cols-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isTablet ? 'grid grid-cols-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : isMobile ? 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center' : 'grid grid-cols-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center')}> */}
-        {/* <h1 className="text-2xl font-bold">Locações</h1> */}
-        <Button onClick={handleClickCreateLocacao} size={"sm"}>
-          <Plus className="h-4 w-4" />Criar Locação
-        </Button>
+        {(isAdmin ||
+          user?.permissions.includes("ALL") ||
+          user?.permissions.includes("CREATE_LOCACAO")
+        ) && (
+            <Button onClick={handleClickCreateLocacao} size={"sm"}>
+              <Plus className="h-4 w-4" />Criar Locação
+            </Button>
+          )}
       </div>
 
       <div className={isTablet ? 'grid grid-cols-6 gap-4' : 'grid grid-cols-1 gap-4'}>
@@ -237,72 +245,81 @@ export default function ListarLocacoes({
         )}
 
         {/* locações Cards */}
-        {locacoes?.map((locacao) => (
-          <Card key={locacao.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="truncate"
-                  style={
-                    {
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
-                    }}
+        {isLoading ?
+          (
+            <div className="bg-transparent flex justify-center items-center col-span-full">
+              <Loader />
+            </div>
+          ) :
+          (locacoes?.map((locacao) => (
+            <Card key={locacao.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="truncate"
+                    style={
+                      {
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
+                      }}
 
-                >{locacao?.imovel?.endereco?.logradouro}</span>
-                <Badge variant="secondary">
-                  {locacao?.locatarios?.length}
-                  {locacao?.locatarios?.length && locacao?.locatarios?.length > 1
-                    ? ' locatários'
-                    : ' locatário'}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <dl className="grid grid-cols-2 gap-1 text-sm">
-                <dt className="font-semibold">Valor do Aluguel:</dt>
-                <dd className="truncate">{locacao?.valorAluguel}</dd>
-                <dt className="font-semibold">Dia de vencimento:</dt>
-                <dd className="truncate">{locacao?.diaVencimento || 'N/A'}</dd>
-                <dt className="font-semibold">Situacao:</dt>
-                <dd style={{
-                  fontSize: (isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                }}>{locacao?.status || 'N/A'}</dd>
-              </dl>
-            </CardContent>
-            <CardFooter>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleClickVerDetalhes(locacao.id)}
-                  style={
-                    {
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                    }}
-                >
-                  Ver detalhes
-                </Button>
-                {onSelectLocacao !== undefined && (
+                  >{locacao?.imovel?.endereco?.logradouro}</span>
+                  <Badge variant="secondary">
+                    {locacao?.locatarios?.length}
+                    {locacao?.locatarios?.length && locacao?.locatarios?.length > 1
+                      ? ' locatários'
+                      : ' locatário'}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <dl className="grid grid-cols-2 gap-1 text-sm">
+                  <dt className="font-semibold">Valor do Aluguel:</dt>
+                  <dd className="truncate">{locacao?.valorAluguel}</dd>
+                  <dt className="font-semibold">Dia de vencimento:</dt>
+                  <dd className="truncate">{locacao?.diaVencimento || 'N/A'}</dd>
+                  <dt className="font-semibold">Situacao:</dt>
+                  <dd style={{
+                    fontSize: (isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                  }}>{locacao?.status || 'N/A'}</dd>
+                </dl>
+              </CardContent>
+              <CardFooter>
+                <div className="grid grid-cols-2 gap-4">
                   <Button
                     variant="secondary"
                     size="sm"
                     className="w-full"
-                    onClick={() => {
-                      onSelectLocacao(locacao);
-                    }}
-                    style={{
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                      textWrap: 'inherit'
-                    }}
-
+                    onClick={handleClickVerDetalhes(locacao.id)}
+                    style={
+                      {
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                      }}
                   >
-                    {txtVinc !== '' ? txtVinc : 'Vincular Imóvel'}
+                    Ver detalhes
                   </Button>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                  {onSelectLocacao !== undefined && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        onSelectLocacao(locacao);
+                      }}
+                      style={{
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                        textWrap: 'inherit'
+                      }}
+
+                    >
+                      {txtVinc !== '' ? txtVinc : 'Vincular Imóvel'}
+                    </Button>
+                  )}
+                </div>
+              </CardFooter>
+            </Card>
+          )
+          )
+          )
+        }
       </div>
 
       {/* Pagination */}

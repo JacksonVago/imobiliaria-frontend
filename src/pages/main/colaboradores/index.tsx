@@ -80,26 +80,26 @@ const imoveisPermissions: { value: Permission; label: string }[] = [
   { value: 'VIEW_IMOVELS', label: 'Visualizar Imóveis' }
 ]
 
-/*const proprietariosPermissions: { value: Permission; label: string }[] = [
+const proprietariosPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_PROPRIETARIO', label: 'Criar Proprietário' },
   { value: 'UPDATE_PROPRIETARIO', label: 'Atualizar Proprietário' },
   { value: 'DELETE_PROPRIETARIO', label: 'Excluir Proprietário' },
   { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' }
-]*/
+]
 
-/*const pessoasPermissions: { value: Permission; label: string }[] = [
-  { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
-  { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
-  { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
-  { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' }
-]*/
+const pessoasPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_PESSOA', label: 'Criar Cliente' },
+  { value: 'UPDATE_PESSOA', label: 'Atualizar Cliente' },
+  { value: 'DELETE_PESSOA', label: 'Excluir Cliente' },
+  { value: 'VIEW_PESSOAS', label: 'Ver Clientes' }
+]
 
-const clientesPermissions: { value: Permission; label: string }[] = [
+/*const clientesPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_CLIENTE', label: 'Criar Cliente' },
   { value: 'UPDATE_CLIENTE', label: 'Atualizar Cliente' },
   { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
   { value: 'VIEW_CLIENTES', label: 'Ver Clientes' }
-]
+]*/
 
 const lancamentoPermissions: { value: Permission; label: string }[] = [
   { value: 'CREATE_LANCAMENTO', label: 'Criar Lançamento' },
@@ -174,6 +174,7 @@ export const putUpdateUser = (userData: {
   permissions: Permission[]
 }) => {
 
+  console.log('userData', userData);
   return api.put(`/users/${userData.id}`, userData)
 }
 
@@ -408,6 +409,86 @@ console.log('usersData', usersData);
         })
       }
     }
+
+    if (permission?.includes('PESSOA')) {
+      if (permission !== 'VIEW_PESSOAS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_PESSOAS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('PESSOA'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('LANCAMENTO')) {
+      if (permission !== 'VIEW_LANCAMENTOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_LANCAMENTOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('LANCAMENTO'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('LOCAC')) {
+      if (permission !== 'VIEW_LOCACOES') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_LOCACOES']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('LOCAC'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('PAGAMENTO')) {
+      if (permission !== 'VIEW_PAGAMENTOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_PAGAMENTOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('PAGAMENTO'))
+          }
+        })
+      }
+    }
   }
 
   const handleSavePermissions = () => {
@@ -481,7 +562,7 @@ console.log('usersData', usersData);
           }}
         >
           <DialogTrigger asChild>
-            <Button>
+            <Button size={"sm"}>
               <Plus className="mr-2 h-4 w-4" /> Criar colaborador
             </Button>
           </DialogTrigger>
@@ -660,7 +741,28 @@ console.log('usersData', usersData);
                   </div>
                   <div className='grid grid-cols-1 gap-1 mt-2'>
                     <h3 className="text-lg font-semibold">Clientes</h3>
-                    {clientesPermissions.map((permission) => (
+                    {pessoasPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Proprietários</h3>
+                    {proprietariosPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
                           id={permission.value}
@@ -723,7 +825,7 @@ console.log('usersData', usersData);
                   </div>
                 </div>
               </ScrollArea>
-              <Button onClick={handleSavePermissions}>Salvar permissões</Button>
+              <Button size={"sm"} onClick={handleSavePermissions}>Salvar permissões</Button>
             </>
           )}
 

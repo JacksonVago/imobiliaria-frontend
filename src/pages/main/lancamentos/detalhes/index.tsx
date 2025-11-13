@@ -50,13 +50,18 @@ import { lancamentoSchema, LancamentoSchema } from '@/schemas/lancamentos.schema
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { useAuth } from '@/hooks/auth/use-auth'
+import { PageLoader } from '@/pages/assistant/page-loader'
+import { Loader } from '@/components/ui/loader'
 
 export const getTipos = async () => {
   return await api.get<TipoLancamento[]>('tipolancamento')
 }
 
 export const DetalhesLancamento = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isPortrait = useMediaQuery({ query: '(max-width: 1224px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
 
@@ -66,21 +71,24 @@ export const DetalhesLancamento = () => {
   const [titulo, setTitulo] = React.useState("Criar novo lançamento")
   const disabled = isEditing
 
+  const [searchParams, setSearchTerm] = useSearchParams();
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
+  const dataInicial = searchParams.get('dataInicial') || '';
+  const dataFinal = searchParams.get('dataFinal') || '';
+
 
   //Globals
   const glb_params = useGlobalParams();
 
-  const { data: locacao } = useQuery({
+  const { data: locacao, isLoading } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
-      const { data } = await api.get<Locacao>(`/locacoes/${id}`)
+      const { data } = await api.get<Locacao>(`/locacoes/lancamentos/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
       return data
     },
     enabled: !!id
   })
-
 
   const createLancamento = useMutation({
     mutationFn: async (data: FormData) => {
@@ -249,7 +257,7 @@ export const DetalhesLancamento = () => {
   )
 
   React.useEffect(() => {
-    glb_params.updTitle_form('Lancamentos');
+    glb_params.updTitle_form(`Lancamentos - ${moment(dataInicial).format('DD/MM/YYYY')} à ${moment(dataFinal).format('DD/MM/YYYY')}`);
     if (localStorage) lancamentoMethods.reset(defaultValues)
   }, [defaultValues])
 
@@ -298,6 +306,9 @@ export const DetalhesLancamento = () => {
     lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
   }
 
+  //if (isLoading) return <PageLoader />
+  if (isLoading) return <Loader />
+
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mx-auto w-full rounded-md">
@@ -316,9 +327,15 @@ export const DetalhesLancamento = () => {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button size={'sm'}>
-                    <Plus className="mr-2 h-4 w-4" /> Lançamento
-                  </Button>
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("CREATE_LANCAMENTO")
+                  ) && (
+
+                      <Button size={'sm'}>
+                        <Plus className="mr-2 h-4 w-4" /> Lançamento
+                      </Button>
+                    )}
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -451,49 +468,52 @@ export const DetalhesLancamento = () => {
                         <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
                         <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{lancamento.valorLancamento}</Label>
                         <div className='flex justify-center'>
-                          {lancamento.status === LancamentoStatus.ABERTO && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleEditLancamento(lancamento);
-                                  //setSelectedTipo(tipo)
-                                  //setIsEditDialogOpen(true)
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={(e) => {
+                          {((isAdmin ||
+                            user?.permissions.includes("ALL") ||
+                            user?.permissions.includes("UPDATE_LANCAMENTO")
+                          ) && lancamento.status === LancamentoStatus.ABERTO) && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => {
                                     e.stopPropagation()
+                                    handleEditLancamento(lancamento);
                                     //setSelectedTipo(tipo)
-                                  }
-                                  } title='Excluir Lançamento'>
-                                    <Trash2 className="h-4 w-4" />
+                                    //setIsEditDialogOpen(true)
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
 
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Isso excluir o lançamento da locação
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => { handleDeleteLancamento(lancamento.id) }}>
-                                      Sim, excluir o lançamento.
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </>
-                          )}
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={(e) => {
+                                      e.stopPropagation()
+                                      //setSelectedTipo(tipo)
+                                    }
+                                    } title='Excluir Lançamento'>
+                                      <Trash2 className="h-4 w-4" />
+
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Isso excluir o lançamento da locação
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => { handleDeleteLancamento(lancamento.id) }}>
+                                        Sim, excluir o lançamento.
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </>
+                            )}
                         </div>
                       </>
                     ))}

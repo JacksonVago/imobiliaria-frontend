@@ -20,6 +20,8 @@ import { Pessoa } from '@/interfaces/pessoa'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
+import { useAuth } from '@/hooks/auth/use-auth'
+import { Loader } from '@/components/ui/loader'
 
 // Types
 interface GetClientesParams {
@@ -74,6 +76,9 @@ export default function ListarClientes({
   exclude: string
   onSelectCliente: ((cliente: Pessoa) => void) | undefined
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -109,7 +114,7 @@ export default function ListarClientes({
   //always that we go to out of the total pages, we will go to the first page
 
   useEffect(() => {
-    if (!onSelectCliente){
+    if (!onSelectCliente) {
       glb_params.updTitle_form('Clientes');
     }
     if (totalPages && page > totalPages) {
@@ -148,6 +153,7 @@ export default function ListarClientes({
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && clientes?.length === 0)
   console.log(data);
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
@@ -156,9 +162,14 @@ export default function ListarClientes({
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Clientes</h1>
         )}
-        <Button onClick={handleClickCreateCliente} size={"sm"}>
-          <Plus className="h-4 w-4" />Criar Cliente
-        </Button>
+        {(isAdmin ||
+          user?.permissions.includes("ALL") ||
+          user?.permissions.includes("CREATE_PESSOA")
+        ) && (
+            <Button onClick={handleClickCreateCliente} size={"sm"}>
+              <Plus className="h-4 w-4" />Criar Cliente
+            </Button>
+          )}
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -183,76 +194,82 @@ export default function ListarClientes({
         )}
 
         {/* Clientes Cards */}
-        {clientes?.map((cliente) => (
-          <Card key={cliente.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="truncate"
-                  style={
-                    {
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
-                    }}
+        {isLoading ? (
+          <div className="bg-transparent flex justify-center items-center col-span-full">
+            <Loader />
+          </div>
+        ) : (
+          clientes?.map((cliente) => (
+            <Card key={cliente.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="truncate"
+                    style={
+                      {
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
+                      }}
 
-                >{cliente?.nome}</span>
-                <Badge variant="secondary">                  
-                  {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
-                    ? 'Locatário'
-                    : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
-                    ? 'Proprietário'
-                    : (cliente?.fiador
-                    ? 'Fiador'
-                    : 'Cliente')))}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <dl className="grid grid-cols-2 gap-1 text-sm">
-                <dt className="font-semibold">CPF/CNPJ:</dt>
-                <dd className="truncate">{cliente?.documento}</dd>
-                <dt className="font-semibold">Profissão:</dt>
-                <dd className="truncate">{cliente?.profissao || 'N/A'}</dd>
-                <dt className="font-semibold">Estado Civil:</dt>
-                <dd>{cliente?.estadoCivil || 'N/A'}</dd>
-                <dt className="font-semibold">Email:</dt>
-                <dd className="truncate">{cliente?.email || 'N/A'}</dd>
-                <dt className="font-semibold">Telefone:</dt>
-                <dd>{cliente?.telefone || 'N/A'}</dd>
-              </dl>
-            </CardContent>
-            <CardFooter>
-              <div className="grid grid-cols-2 gap-10">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleClickVerDetalhes(cliente.id)}
-                  style={
-                    {
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                    }}
-                >
-                  Ver detalhes
-                </Button>
-                {(txtVinc !== '' && onSelectCliente) && (
+                  >{cliente?.nome}</span>
+                  <Badge variant="secondary">
+                    {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
+                      ? 'Locatário'
+                      : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
+                        ? 'Proprietário'
+                        : (cliente?.fiador
+                          ? 'Fiador'
+                          : 'Cliente')))}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <dl className="grid grid-cols-2 gap-1 text-sm">
+                  <dt className="font-semibold">CPF/CNPJ:</dt>
+                  <dd className="truncate">{cliente?.documento}</dd>
+                  <dt className="font-semibold">Profissão:</dt>
+                  <dd className="truncate">{cliente?.profissao || 'N/A'}</dd>
+                  <dt className="font-semibold">Estado Civil:</dt>
+                  <dd>{cliente?.estadoCivil || 'N/A'}</dd>
+                  <dt className="font-semibold">Email:</dt>
+                  <dd className="truncate">{cliente?.email || 'N/A'}</dd>
+                  <dt className="font-semibold">Telefone:</dt>
+                  <dd>{cliente?.telefone || 'N/A'}</dd>
+                </dl>
+              </CardContent>
+              <CardFooter>
+                <div className="grid grid-cols-2 gap-10">
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => {
-                      onSelectCliente(cliente);
-                    }}
-                    style={{
-                      fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                      textWrap: 'inherit'
-                    }}
-
+                    className="w-full"
+                    onClick={handleClickVerDetalhes(cliente.id)}
+                    style={
+                      {
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                      }}
                   >
-                    {txtVinc}
+                    Ver detalhes
                   </Button>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                  {(txtVinc !== '' && onSelectCliente) && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        onSelectCliente(cliente);
+                      }}
+                      style={{
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                        textWrap: 'inherit'
+                      }}
+
+                    >
+                      {txtVinc}
+                    </Button>
+                  )}
+                </div>
+              </CardFooter>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Pagination */}

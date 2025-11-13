@@ -11,7 +11,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { MapPin, Plus, Receipt, Search } from 'lucide-react'
+import { MapPin, Pencil, Plus, Receipt, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -28,6 +28,8 @@ import moment from 'moment'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/services/react-query/query-client'
 import { usdFormatter } from '@/utils/format-money'
+import { useAuth } from '@/hooks/auth/use-auth'
+import { Loader } from '@/components/ui/loader'
 
 // Types
 interface GetLancamentosParams {
@@ -88,6 +90,9 @@ export default function ListarLancamentos({
   exclude: string
   onSelectLancamento: ((lancamento: Lancamento) => void) | undefined
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -149,7 +154,7 @@ export default function ListarLancamentos({
 
   useEffect(() => {
     if (!onSelectLancamento) {
-      glb_params.updTitle_form('Lançamentos');
+      glb_params.updTitle_form('Lançamentos de Locações');
     }
     if (totalPages && page > totalPages) {
       navigate({
@@ -179,7 +184,7 @@ export default function ListarLancamentos({
   }
 
   const handleClickVerDetalhes = (id: number) => {
-    navigate(`${ROUTE.LANCAMENTOS}/${id}`)
+    navigate(`${ROUTE.LANCAMENTOS}/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
   }
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && locacoes?.length === 0)
@@ -206,7 +211,7 @@ export default function ListarLancamentos({
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
-          <h1 className="text-2xl font-bold">Lançamentos</h1>
+          <h1 className="text-2xl font-bold">Lançamentos de Locações</h1>
         )}
       </div>
 
@@ -266,86 +271,105 @@ export default function ListarLancamentos({
         )}
 
         {/*Card das locações/lançamentos */}
-        {locacoes.map((locacao) => (
-          <Card key={locacao.id} className="">
-            <CardHeader className="flex flex-row justify-between">
-              <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                  <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                    onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
-                    color='green'
-                  />
-                  {getEnderecoFormatado(locacao.imovel?.endereco)}
-                </p>
 
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Label className="font-bold flex justify-end">
-                Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
-              </Label>
-              {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
-                <>
-                  <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
-                  <div className='rounded-md border'>
-                    <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
-                      <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
-                      {!isMobile ? (
-                        <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
-                        : (<></>)
-                      }
-                      <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
-                      <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
-                    </div>
+        {isLoading ? (
+          <div className="bg-transparent flex justify-center items-center col-span-full">
+            <Loader />
+          </div>
+        ) :
+          (
+            locacoes.map((locacao) => (
+              <Card key={locacao.id} className="">
+                <CardHeader className="flex flex-row justify-between">
+                  <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
+                    <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                      <MapPin className="inline-block h-4 w-4 cursor-pointer"
+                        onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
+                        color='green'
+                      />
+                      {getEnderecoFormatado(locacao.imovel?.endereco)}
+                    </p>
 
-                    <div className='grid grid-cols-5 m-2 gap-1' >
-                      {locacao.lancamentos?.map((lancamento) => (
-                        <>
-                          <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600'  : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
-                          {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Label className="font-bold flex justify-end">
+                    Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
+                  </Label>
+                  {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
+                    <>
+                      <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
+                      <div className='rounded-md border'>
+                        <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                          <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                          {!isMobile ? (
+                            <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
                             : (<></>)
                           }
-                          <Label className={lancamento.status === LancamentoStatus.ABERTO ? (!isMobile ? 'text-red-600' : 'text-red-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                          <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
-                        </>
-                      ))}
-                    </div>
+                          <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                          <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                        </div>
+
+                        <div className='grid grid-cols-5 m-2 gap-1' >
+                          {locacao.lancamentos?.map((lancamento) => (
+                            <>
+                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                              {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                                : (<></>)
+                              }
+                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? (!isMobile ? 'text-red-600' : 'text-red-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                            </>
+                          ))}
+                        </div>
+                      </div>
+                      <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
+                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
+                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                          {usdFormatter.format(locacao.valorAluguel +
+                            locacao.lancamentos.reduce((total, lancamento) => {
+                              return total + lancamento.valorLancamento;
+                            }, 0))}
+                        </Label>
+                      </div>
+                    </>
+                  )
+                    : (<p className="text-center text-muted-foreground mt-5">
+                      Não há lançamentos para essa locação
+                    </p>
+                    )
+                  }
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <div className='grid grid-cols-2 gap-10'>
+                    {((isAdmin ||
+                      user?.permissions.includes("ALL") ||
+                      user?.permissions.includes("UPDATE_LANCAMENTO")) &&
+                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
+
+                        <Button variant="secondary"
+                          onClick={() => handleClickVerDetalhes(locacao?.id)}
+                          size={"sm"}>
+                          <Pencil className='h4 w4' /> Lançamentos
+                        </Button>
+                      )}
+                    {((isAdmin ||
+                      user?.permissions.includes("ALL") ||
+                      user?.permissions.includes("CREATE_PAGAMENTO")) &&
+                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
+                        <Button variant="secondary"
+                          onClick={() => handleGerarBoleto(locacao)}
+                          size={"sm"}>
+                          <Receipt className="h-4 w-4" />Gerar Boleto
+                        </Button>
+                      )}
                   </div>
-                  <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                    <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
-                    <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                      {usdFormatter.format(locacao.valorAluguel +
-                        locacao.lancamentos.reduce((total, lancamento) => {
-                          return total + lancamento.valorLancamento;
-                        }, 0))}
-                    </Label>
-                  </div>
-                </>
-              )
-                : (<p className="text-center text-muted-foreground mt-5">
-                  Não há lançamentos para essa locação
-                </p>
-                )
-              }
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className='grid grid-cols-2 gap-10'>
-                <Button variant="secondary"
-                  onClick={() => handleClickVerDetalhes(locacao?.id)}
-                  size={"sm"}>
-                  <Plus className="h-4 w-4" />Lançamento
-                </Button>
-                {(locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO) && (
-                  <Button variant="secondary"
-                    onClick={() => handleGerarBoleto(locacao)}
-                    size={"sm"}>
-                    <Receipt className="h-4 w-4" />Gerar Boleto
-                  </Button>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                </CardFooter>
+              </Card>
+            )
+            )
+          )
+        }
       </div>
 
       {/* Pagination */}

@@ -59,6 +59,7 @@ import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
+import { usdFormatter } from '@/utils/format-money'
 
 //REFACTOR: move to another directory
 //const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
@@ -1070,14 +1071,20 @@ export const DetalhesImovel = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
                 <span>Informações do Imóvel</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
-                </Button>
+                {(isAdmin ||
+                  user?.permissions.includes("ALL") ||
+                  user?.permissions.includes("DELETE_IMOVEL")
+                ) && (
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
+                    </Button>
+                  )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1110,10 +1117,16 @@ export const DetalhesImovel = () => {
         <TabsContent value="proprietarios" className="space-y-4 font-[Poppins-regular]">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Proprietários</h2>
-            <Button onClick={handlerNewProp}>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Proprietrário
-            </Button>
+            {(isAdmin ||
+              user?.permissions.includes("ALL") ||
+              user?.permissions.includes("DELETE_IMOVEL")
+            ) && (
+
+                <Button onClick={handlerNewProp} size={"sm"}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Novo Proprietrário
+                </Button>
+              )}
             <Dialog open={openCli} onOpenChange={setOpenCli}>
               <DialogContent>
                 <DialogHeader>
@@ -1191,148 +1204,169 @@ export const DetalhesImovel = () => {
             </Dialog>
           </div>
 
-          {imovel?.proprietarios?.map((proprietario) => (
-            <Card key={proprietario.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{proprietario.pessoa?.nome}</span>
-                  <Badge variant="default">{proprietario.cotaImovel}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <Label className="font-semibold">Cota do imóvel</Label>
-                  <p>
-                    % {proprietario.cotaImovel.toLocaleString('pt-BR')}
-                  </p>
-                </div>
-
-                <Label className="font-semibold">Dados do Proprietário</Label>
-                <div className='grid grid-cols-10 flex justify-items-start'>
-                  <div className=''>
-                    <Mail className='text-gray-500' />
-                  </div>
-                  <div className='text-gray-500 col-span-9'>
-                    {proprietario.pessoa?.email?.toString()}
-                  </div>
-                </div>
-                <div className='grid grid-cols-10 flex justify-items-start'>
-                  <Phone className='text-gray-500' />
-                  <div className='text-gray-500 col-span-9'>
-                    {proprietario.pessoa?.telefone?.toString()}
+          <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+            {imovel?.proprietarios?.map((proprietario) => (
+              <Card key={proprietario.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{proprietario.pessoa?.nome}</span>
+                    <Badge variant="default">{proprietario.cotaImovel}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Label className="font-semibold">Cota do imóvel</Label>
+                    <p>
+                      % {proprietario.cotaImovel.toLocaleString('pt-BR')}
+                    </p>
                   </div>
 
-                </div>
-                <div className="grid grid-cols-3 gap-4 flex items-end">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    onClick={() => { handlerDetailProp(proprietario.pessoaId) }}
-                    style={
-                      {
-                        fontSize: '0.8rem',
-                      }}
-                  >
-                    Ver detalhes
-                  </Button>
-                </div>
-                <hr className="border-t border-gray-300 mt-5" />
-              </CardContent>
-              <CardFooter className="flex justify-end space-x-2">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm"
-                      onClick={() => { handlerEditProprietario(proprietario) }}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className='font-[Poppins-regular]'>
-                    <DialogHeader>
-                      <DialogTitle>Alterar Proprietário</DialogTitle>
-                      <DialogDescription>
-                        Preencha os detalhes do proprietário para este imóvel.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form className="space-y-4" onSubmit={imovelPropAlt.handleSubmit(handlerUpdateProprietario)}>
-                      <div>
-                        {!selPessoa && (
-                          <div className="grid grid-cols-1 gap-4 flex items-center">
-                            <Button onClick={() => { handlerSelProp('proprietarios') }}>
-                              <Search className="mr-2 h-4 w-4" />
-                              Proprietrários
-                            </Button>
+                  <Label className="font-semibold">Dados do Proprietário</Label>
+                  <div className='grid grid-cols-10 flex justify-items-start'>
+                    <div className=''>
+                      <Mail className='text-gray-500' />
+                    </div>
+                    <div className='text-gray-500 col-span-9'>
+                      {proprietario.pessoa?.email?.toString()}
+                    </div>
+                  </div>
+                  <div className='grid grid-cols-10 flex justify-items-start'>
+                    <Phone className='text-gray-500' />
+                    <div className='text-gray-500 col-span-9'>
+                      {proprietario.pessoa?.telefone?.toString()}
+                    </div>
 
-                            {(imovelPropers.fields.length > 0) && (
-                              <div className="grid grid-cols-1 gap-4 flex items-center">
-                                {imovelPropers.fields.map((field, index) => (
-                                  <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                                    <Label >{field.nome}</Label>
-                                    <button
-                                      className='border bg-zinc-200 hover:bg-zinc-400'
-                                      type="button"
-                                      onClick={() => {
-                                        imovelPropAlt.setValue('pessoaId', 0);
-                                        imovelPropers.remove(index);
-                                      }}
-                                    >
-                                      <X className='px-1'></X>
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {!!imovelPropAlt?.formState?.errors?.pessoaId?.message && (
-                              <span>{imovelPropAlt?.formState?.errors?.pessoaId?.message}</span>
-                            )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 flex items-end">
+                    {(isAdmin ||
+                      user?.permissions.includes("ALL") ||
+                      user?.permissions.includes("VIEW_PROPRIETARIOS")
+                    ) && (
 
-                          </div>
-                        )}
-                        {selPessoa && (
-                          <div>
-                            <Card id='teste' className='h-full'>
-                              <div className="flex  justify-end">
-                                <Button onClick={() => { handleSelectProp(undefined) }}
-                                  className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
-                              </div>
-                              <CardHeader>
-                                <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
-                              </CardHeader>
-                              <CardContent className='mt-2 h-120'>
-                                <ListarClientes limitView={1} txtVinc='Vincular Propriedade' exclude={imovel && imovel?.proprietarios ? imovel?.proprietarios?.map((porp) => { return porp.id }).toString() : ''} onSelectCliente={handleSelectProp} />
-                              </CardContent>
-                            </Card>
-                          </div>
-                        )}
-                      </div>
-                      {!selPessoa && (
-                        <>
-                          <div>
-                            <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
-                            <Input id="cotaImovel" type="number" placeholder="0.00"
-                              {...imovelPropAlt.register('cotaImovel')}
-                              helperText={imovelPropAlt.formState?.errors?.cotaImovel?.message}
-                            />
-                          </div>
-                        </>
+                        <Button
+                          className='mt-2'
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { handlerDetailProp(proprietario.pessoaId) }}
+                          style={
+                            {
+                              fontSize: '0.8rem',
+                            }}
+                        >
+                          Ver detalhes
+                        </Button>
                       )}
-                      <DialogFooter>
-                        <Button type="submit"
-                        >Salvar Alterações</Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-                <Button variant="destructive" size="sm"
-                  onClick={() => { handleDeleteProprietario(proprietario) }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                  </div>
+                  <hr className="border-t border-gray-300 mt-5" />
+                </CardContent>
+                <CardFooter className="flex justify-end space-x-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("UPDATE_PROPRIETARIO")
+                      ) && (
+
+                          <Button variant="outline" size="sm"
+                            onClick={() => { handlerEditProprietario(proprietario) }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Button>
+                        )}
+                    </DialogTrigger>
+                    <DialogContent className='font-[Poppins-regular]'>
+                      <DialogHeader>
+                        <DialogTitle>Alterar Proprietário</DialogTitle>
+                        <DialogDescription>
+                          Preencha os detalhes do proprietário para este imóvel.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form className="space-y-4" onSubmit={imovelPropAlt.handleSubmit(handlerUpdateProprietario)}>
+                        <div>
+                          {!selPessoa && (
+                            <div className="grid grid-cols-1 gap-4 flex items-center">
+                              <Button onClick={() => { handlerSelProp('proprietarios') }}>
+                                <Search className="mr-2 h-4 w-4" />
+                                Proprietrários
+                              </Button>
+
+                              {(imovelPropers.fields.length > 0) && (
+                                <div className="grid grid-cols-1 gap-4 flex items-center">
+                                  {imovelPropers.fields.map((field, index) => (
+                                    <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                                      <Label >{field.nome}</Label>
+                                      <button
+                                        className='border bg-zinc-200 hover:bg-zinc-400'
+                                        type="button"
+                                        onClick={() => {
+                                          imovelPropAlt.setValue('pessoaId', 0);
+                                          imovelPropers.remove(index);
+                                        }}
+                                      >
+                                        <X className='px-1'></X>
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {!!imovelPropAlt?.formState?.errors?.pessoaId?.message && (
+                                <span>{imovelPropAlt?.formState?.errors?.pessoaId?.message}</span>
+                              )}
+
+                            </div>
+                          )}
+                          {selPessoa && (
+                            <div>
+                              <Card id='teste' className='h-full'>
+                                <div className="flex  justify-end">
+                                  <Button onClick={() => { handleSelectProp(undefined) }}
+                                    className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                                </div>
+                                <CardHeader>
+                                  <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
+                                </CardHeader>
+                                <CardContent className='mt-2 h-120'>
+                                  <ListarClientes limitView={1} txtVinc='Vincular Propriedade' exclude={imovel && imovel?.proprietarios ? imovel?.proprietarios?.map((porp) => { return porp.id }).toString() : ''} onSelectCliente={handleSelectProp} />
+                                </CardContent>
+                              </Card>
+                            </div>
+                          )}
+                        </div>
+                        {!selPessoa && (
+                          <>
+                            <div>
+                              <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
+                              <Input id="cotaImovel" type="number" placeholder="0.00"
+                                {...imovelPropAlt.register('cotaImovel')}
+                                helperText={imovelPropAlt.formState?.errors?.cotaImovel?.message}
+                              />
+                            </div>
+                          </>
+                        )}
+                        <DialogFooter>
+                          <Button type="submit"
+                          >Salvar Alterações</Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("DELETE_PROPRIETARIO")
+                  ) && (
+
+                      <Button variant="destructive" size="sm"
+                        onClick={() => { handleDeleteProprietario(proprietario) }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </Button>
+                    )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
         {/* Locações */}
@@ -1581,391 +1615,410 @@ export const DetalhesImovel = () => {
           </div>
 
           {/*Lista de locações */}
-          {imovel?.locacoes?.map((locacao) => (
-            <Card key={locacao.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{locacao.id}</span>
-                  <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive" : "default"} >{locacao.status}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 flex items-center mt-2">
-                  <Label>Valor do Aluguel</Label>
-                  <p className="font-semibold">
-                    R$ {locacao.valorAluguel.toLocaleString('pt-BR')}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 items-center mt-4">
-                  <Label>Período</Label>
-                  <p className="flex items-center text-[0.7rem] font-semibold">
+          <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+            {imovel?.locacoes?.map((locacao) => (
+              <Card key={locacao.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{locacao.id}</span>
+                    <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive" : "default"} >{locacao.status}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 flex items-center mt-2">
+                    <Label>Valor do Aluguel</Label>
+                    <p className="font-semibold">
+                      {usdFormatter.format(locacao.valorAluguel)}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 items-center mt-4">
+                    <Label>Período</Label>
+                    <p className="flex items-center text-[0.7rem] font-semibold">
 
-                    {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
-                    {locacao.dataFim
-                      ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
-                      : 'Atual'}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 items-center mt-4">
-                  <Label>Locatários</Label>
-                  {locacao.locatarios?.map((locatario) => (
-                    <div className='flex justify-start'>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
-                        style={
-                          {
-                            fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
-                            fontWeight: 'Bold'
-                          }}
-                      >
-                        {locatario.pessoa?.nome}
-                      </Button>
-                    </div>
-                  ))}
+                      {new Date(locacao.dataInicio).toLocaleDateString('pt-BR')} -
+                      {locacao.dataFim
+                        ? new Date(locacao.dataFim).toLocaleDateString('pt-BR')
+                        : 'Atual'}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 items-center mt-4">
+                    <Label>Locatários</Label>
+                    {locacao.locatarios?.map((locatario) => (
+                      <div className='flex justify-start'>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
+                          style={
+                            {
+                              fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
+                              fontWeight: 'Bold'
+                            }}
+                        >
+                          {locatario.pessoa?.nome}
+                        </Button>
+                      </div>
+                    ))}
 
-                </div>
-                <div className="grid grid-cols-2 gap-4 items-center mt-4">
-                  {locacao.garantiaLocacaoTipo === GarantiaLocacao.FIADOR && (
-                    <>
-                      <Label>Fiadores</Label>
-                      {locacao.fiadores?.map((fiador) => (
-                        <div className='flex justify-start'>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => { handlerDetailPessoa(parseFloat(fiador.pessoaId.toString())) }}
-                            style={
-                              {
-                                fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
-                                fontWeight: 'Bold'
-                              }}
-                          >
-                            {fiador.pessoa?.nome}
-                          </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 items-center mt-4">
+                    {locacao.garantiaLocacaoTipo === GarantiaLocacao.FIADOR && (
+                      <>
+                        <Label>Fiadores</Label>
+                        {locacao.fiadores?.map((fiador) => (
+                          <div className='flex justify-start'>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => { handlerDetailPessoa(parseFloat(fiador.pessoaId.toString())) }}
+                              style={
+                                {
+                                  fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
+                                  fontWeight: 'Bold'
+                                }}
+                            >
+                              {fiador.pessoa?.nome}
+                            </Button>
+                          </div>
+                        ))}
+                      </>
+                    )}
+
+                    {locacao.garantiaLocacaoTipo === GarantiaLocacao.SEGURO_FIANCA && (
+                      <>
+                        <Label>Seguro Fiança</Label>
+                        <div className='flex justify-start font-semibold'>
+                          <p>{locacao.garantiaSeguroFianca?.numeroSeguro}</p>
                         </div>
-                      ))}
-                    </>
-                  )}
+                      </>
+                    )}
+                    {locacao.garantiaLocacaoTipo === GarantiaLocacao.DEPOSITO_CALCAO && (
+                      <>
+                        <Label>Depósito Calção</Label>
+                        <p>{usdFormatter.format(locacao.garantiaDepositoCalcao?.valorDeposito ? locacao.garantiaDepositoCalcao?.valorDeposito : 0)}</p>
+                      </>
+                    )}
+                    {locacao.garantiaLocacaoTipo === GarantiaLocacao.TITULO_CAPITALIZACAO && (
+                      <>
+                        <Label>Título de Capitalização</Label>
+                        <div className='flex justify-start font-semibold'>
+                          <p>{locacao.garantiaTituloCapitalizacao?.numeroTitulo}</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-                  {locacao.garantiaLocacaoTipo === GarantiaLocacao.SEGURO_FIANCA && (
-                    <>
-                      <Label>Seguro Fiança</Label>
-                      <div className='flex justify-start font-semibold'>
-                        <p>{locacao.garantiaSeguroFianca?.numeroSeguro}</p>
+                  {(isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("VIEW_PAGAMENTOS")
+                  ) && (
+
+                      <div className="grid grid-cols-2 gap-4 flex items-end mt-2">
+                        <Button size={"sm"} className='col-start-2' variant="secondary" onClick={() => { handlerSelProp('locacoes') }}>
+                          <CircleDollarSign className="mr-2 h-4 w-4" />
+                          Pagamentos
+                        </Button>
                       </div>
-                    </>
-                  )}
-                  {locacao.garantiaLocacaoTipo === GarantiaLocacao.DEPOSITO_CALCAO && (
-                    <>
-                      <Label>Depósito Calção</Label>
-                      <div className='flex justify-end'>
-                        <p>{locacao.garantiaDepositoCalcao?.valorDeposito}</p>
-                      </div>
-                    </>
-                  )}
-                  {locacao.garantiaLocacaoTipo === GarantiaLocacao.TITULO_CAPITALIZACAO && (
-                    <>
-                      <Label>Título de Capitalização</Label>
-                      <div className='flex justify-start font-semibold'>
-                        <p>{locacao.garantiaTituloCapitalizacao?.numeroTitulo}</p>
-                      </div>
-                    </>
-                  )}
-                </div>
+                    )}
+
+                  <hr className="border-t border-gray-300 mt-3" />
+                </CardContent>
+                <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("UPDATE_LOCACAO")
+                      ) && (
 
 
-                <div className="grid grid-cols-2 gap-4 flex items-end mt-2">
-                  <Button className='col-start-2' variant="secondary" onClick={() => { handlerSelProp('locacoes') }}>
-                    <CircleDollarSign className="mr-2 h-4 w-4" />
-                    Pagamentos
-                  </Button>
-                </div>
+                          <Button variant="outline" size="sm"
+                            onClick={() => { handlerEditLocacao(locacao) }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Button>
+                        )}
+                    </DialogTrigger>
+                    <DialogContent className='font-[Poppins-regular]'>
+                      <DialogHeader>
+                        <DialogTitle>Alterar Locação</DialogTitle>
+                        <DialogDescription>
+                          Preencha os detalhes da nova locação para este cliente.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form className="space-y-4 font-[Poppins-regular]" onSubmit={locacaoMethodsAlt.handleSubmit(handlerUpdateLocacao)}>
+                        <div style={{ display: (!selFiador ? 'block' : 'none') }}>
+                          <div>
+                            {!selPessoa && (
+                              <div className="grid grid-cols-1 gap-4 flex items-center">
+                                <Button onClick={() => { handlerSelProp('locacoes') }}>
+                                  <Search className="mr-2 h-4 w-4" />
+                                  Locatários
+                                </Button>
 
-                <hr className="border-t border-gray-300 mt-3" />
-              </CardContent>
-              <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm"
-                      onClick={() => { handlerEditLocacao(locacao) }}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Editar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className='font-[Poppins-regular]'>
-                    <DialogHeader>
-                      <DialogTitle>Alterar Locação</DialogTitle>
-                      <DialogDescription>
-                        Preencha os detalhes da nova locação para este cliente.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form className="space-y-4 font-[Poppins-regular]" onSubmit={locacaoMethodsAlt.handleSubmit(handlerUpdateLocacao)}>
-                      <div style={{ display: (!selFiador ? 'block' : 'none') }}>
-                        <div>
+                                {(imovelLocatarios.fields.length > 0) && (
+                                  <div className="grid grid-cols-1 gap-4 flex items-center">
+                                    {imovelLocatarios.fields.map((field, index) => (
+                                      <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                                        <Label >{field.nome}</Label>
+                                        <button
+                                          className='border bg-zinc-200 hover:bg-zinc-400'
+                                          type="button"
+                                          onClick={() => {
+                                            //locacaoMethodsAlt.setValue('pessoaId', 0);
+                                            imovelLocatarios.remove(index);
+                                          }}
+                                        >
+                                          <X className='px-1'></X>
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {!!locacaoMethodsAlt?.formState?.errors?.locatarios?.message && (
+                                  <span>{locacaoMethodsAlt?.formState?.errors?.locatarios?.message}</span>
+                                )}
+
+                              </div>
+                            )}
+                            {selPessoa && (
+                              <div>
+                                <Card id='teste' className='h-full'>
+                                  <div className="flex  justify-end">
+                                    <Button onClick={() => { handleSelectProp(undefined) }}
+                                      className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                                  </div>
+                                  <CardHeader>
+                                    <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
+                                  </CardHeader>
+                                  <CardContent className='mt-2 h-120'>
+                                    <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ?
+                                      imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString()
+                                      : ''} onSelectCliente={handleSelectProp} />
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            )}
+                          </div>
+
                           {!selPessoa && (
-                            <div className="grid grid-cols-1 gap-4 flex items-center">
-                              <Button onClick={() => { handlerSelProp('locacoes') }}>
-                                <Search className="mr-2 h-4 w-4" />
-                                Locatários
-                              </Button>
-
-                              {(imovelLocatarios.fields.length > 0) && (
-                                <div className="grid grid-cols-1 gap-4 flex items-center">
-                                  {imovelLocatarios.fields.map((field, index) => (
-                                    <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                                      <Label >{field.nome}</Label>
-                                      <button
-                                        className='border bg-zinc-200 hover:bg-zinc-400'
-                                        type="button"
-                                        onClick={() => {
-                                          //locacaoMethodsAlt.setValue('pessoaId', 0);
-                                          imovelLocatarios.remove(index);
-                                        }}
-                                      >
-                                        <X className='px-1'></X>
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              {!!locacaoMethodsAlt?.formState?.errors?.locatarios?.message && (
-                                <span>{locacaoMethodsAlt?.formState?.errors?.locatarios?.message}</span>
-                              )}
-
-                            </div>
-                          )}
-                          {selPessoa && (
                             <div>
-                              <Card id='teste' className='h-full'>
-                                <div className="flex  justify-end">
-                                  <Button onClick={() => { handleSelectProp(undefined) }}
-                                    className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
-                                </div>
-                                <CardHeader>
-                                  <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
-                                </CardHeader>
-                                <CardContent className='mt-2 h-120'>
-                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' exclude={imovel && imovel?.locacoes ?
-                                    imovel?.locacoes?.map((locacao) => { return locacao.locatarios?.map((locatario) => { return locatario.id }) }).toString()
-                                    : ''} onSelectCliente={handleSelectProp} />
-                                </CardContent>
-                              </Card>
+                              <div className='mt-2'>
+                                <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
+                                <Input type="number" placeholder="0.00"
+                                  {...locacaoMethodsAlt.register('valorAluguel')}
+                                  helperText={locacaoMethodsAlt.formState?.errors?.valorAluguel?.message}
+                                />
+                              </div>
+                              <div className='mt-2'>
+                                <Label htmlFor="dataInicio">Data de Início</Label>
+                                <Input type="date"
+                                  {...locacaoMethodsAlt.register('dataInicio')}
+                                  helperText={locacaoMethodsAlt.formState?.errors?.dataInicio?.message}
+                                />
+                              </div>
+                              <div className='mt-2'>
+                                <Label htmlFor="dataFim">Data de Fim (opcional)</Label>
+                                <Input type="date"
+                                  {...locacaoMethodsAlt.register('dataFim')}
+                                  helperText={locacaoMethodsAlt.formState?.errors?.dataFim?.message}
+                                />
+                              </div>
+                              <div className='mt-2'>
+                                <Label htmlFor="diaVencto">Dia de Vencimento</Label>
+                                <Input type="number"
+                                  {...locacaoMethodsAlt.register('diaVencimento')} placeholder='0'
+                                  helperText={locacaoMethodsAlt.formState?.errors?.diaVencimento?.message}
+                                />
+                              </div>
+                              <div className='mt-2'>
+                                <Label htmlFor="observacoes">Observações</Label>
+                                <Textarea id="observacoes" placeholder="Detalhes adicionais sobre a locação" />
+                              </div>
+                              <div className='mt-2'>
+                                <Label>
+                                  Tipo de Garantia
+                                  <div className="mt-2">
+                                    <Controller
+                                      name="garantiaLocacaoTipo"
+                                      control={locacaoMethodsAlt.control}
+                                      render={({ field }) => (
+                                        <Select
+                                          onValueChange={(value) => {
+                                            field.onChange(value)
+                                            locacaoMethodsAlt.setValue('garantiaLocacaoTipo', value);
+
+                                          }}
+                                          value={field.value?.toString()}
+                                        >
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="Selecione a garantia" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {GARANTIA_LOCACAO_OPTIONS.map((garantia) => (
+                                              <SelectItem value={garantia.value}>{garantia.label}</SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      )}
+                                    />
+                                    {!!locacaoMethodsAlt?.formState?.errors?.garantiaLocacaoTipo?.message && (
+                                      <span>{locacaoMethodsAlt?.formState?.errors?.garantiaLocacaoTipo?.message}</span>
+                                    )}
+                                  </div>
+                                </Label>
+                              </div>
                             </div>
                           )}
                         </div>
 
                         {!selPessoa && (
                           <div>
-                            <div className='mt-2'>
-                              <Label htmlFor="valorAluguel">Valor do Aluguel</Label>
-                              <Input type="number" placeholder="0.00"
-                                {...locacaoMethodsAlt.register('valorAluguel')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.valorAluguel?.message}
-                              />
-                            </div>
-                            <div className='mt-2'>
-                              <Label htmlFor="dataInicio">Data de Início</Label>
-                              <Input type="date"
-                                {...locacaoMethodsAlt.register('dataInicio')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.dataInicio?.message}
-                              />
-                            </div>
-                            <div className='mt-2'>
-                              <Label htmlFor="dataFim">Data de Fim (opcional)</Label>
-                              <Input type="date"
-                                {...locacaoMethodsAlt.register('dataFim')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.dataFim?.message}
-                              />
-                            </div>
-                            <div className='mt-2'>
-                              <Label htmlFor="diaVencto">Dia de Vencimento</Label>
-                              <Input type="number"
-                                {...locacaoMethodsAlt.register('diaVencimento')} placeholder='0'
-                                helperText={locacaoMethodsAlt.formState?.errors?.diaVencimento?.message}
-                              />
-                            </div>
-                            <div className='mt-2'>
-                              <Label htmlFor="observacoes">Observações</Label>
-                              <Textarea id="observacoes" placeholder="Detalhes adicionais sobre a locação" />
-                            </div>
+                            {(selGarantia === GarantiaLocacao.FIADOR && selFiador) && (
+                              <div>
+                                <Card>
+                                  <CardHeader>
+                                    <DialogTitle className='flex items-center'>Selecionar o Fiador</DialogTitle>
+                                  </CardHeader>
+                                  <CardContent className='mt-2 h-120'>
+                                    <ListarClientes limitView={1} txtVinc='Vincular Locação' onSelectCliente={handleSelectFiador} exclude='' />
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            )}
+
+                            {(locacaoFiadores.fields.length > 0) && (
+                              <div>
+                                <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                                  <Label>Fiadores</Label>
+                                  <button
+                                    className='border bg-zinc-200 hover:bg-zinc-400 rounded'
+                                    type="button"
+                                    onClick={() => { setSelFiador(true) }}
+                                  >
+                                    Adicionar
+                                  </button>
+                                </div>
+                                {locacaoFiadores.fields.map((field, index) => (
+                                  <div className='flex items-center gap-2 mt-2'>
+                                    <Label >{field.nome}</Label>
+                                    <button
+                                      className='border bg-zinc-200 hover:bg-zinc-400'
+                                      type="button"
+                                      onClick={() => locacaoFiadores.remove(index)}
+                                    >
+                                      <X className='px-1'></X>
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
+                              <div className='mt-2'>
+                                <Label htmlFor="tituloCap.numeroTitulo">Número do Título</Label>
+                                <Input type="number"
+                                  {...locacaoMethodsAlt.register('tituloCap.numeroTitulo')}
+                                  helperText={locacaoMethodsAlt.formState?.errors?.tituloCap?.numeroTitulo?.message}
+                                  onChange={(e) => { locacaoMethodsAlt.setValue('tituloCap.numeroTitulo', e.target.value) }}
+                                />
+                              </div>
+                            )}
+
+                            {selGarantia === GarantiaLocacao.SEGURO_FIANCA && (
+                              <div className='mt-2'>
+                                <Label htmlFor="seguroFianca.numeroSeguro">Número do Seguro</Label>
+                                <Input type="number"
+                                  {...locacaoMethodsAlt.register('seguroFianca.numeroSeguro')}
+                                  helperText={locacaoMethodsAlt.formState?.errors?.seguroFianca?.numeroSeguro?.message}
+                                  onChange={(e) => { locacaoMethodsAlt.setValue('seguroFianca.numeroSeguro', e.target.value) }}
+                                />
+                              </div>
+                            )}
+
+                            {selGarantia === GarantiaLocacao.DEPOSITO_CALCAO && (
+                              <div>
+                                <div className='mt-2'>
+                                  <Label htmlFor="depCalcao.valorDeposito">Valor do depósito</Label>
+                                  <Input type="number" placeholder='0,00'
+                                    {...locacaoMethodsAlt.register('depCalcao.valorDeposito')}
+                                    helperText={locacaoMethodsAlt.formState?.errors?.depCalcao?.valorDeposito?.message}
+                                    onChange={(e) => { locacaoMethodsAlt.setValue('depCalcao.valorDeposito', parseFloat(e.target.value)) }}
+                                  />
+                                </div>
+                                <div className='mt-2'>
+                                  <Label htmlFor="depCalcao.quantidadeMeses">Quantidade de meses</Label>
+                                  <Input type="number"
+                                    {...locacaoMethodsAlt.register('depCalcao.quantidadeMeses')}
+                                    helperText={locacaoMethodsAlt.formState?.errors?.depCalcao?.quantidadeMeses?.message}
+                                  />
+                                </div>
+                              </div>
+                            )}
+
                             <div className='mt-2'>
                               <Label>
-                                Tipo de Garantia
+                                Situação da Locação
                                 <div className="mt-2">
                                   <Controller
-                                    name="garantiaLocacaoTipo"
+                                    name="status"
                                     control={locacaoMethodsAlt.control}
                                     render={({ field }) => (
                                       <Select
                                         onValueChange={(value) => {
                                           field.onChange(value)
-                                          locacaoMethodsAlt.setValue('garantiaLocacaoTipo', value);
+                                          locacaoMethodsAlt.setValue('status', value);
 
                                         }}
                                         value={field.value?.toString()}
                                       >
                                         <SelectTrigger>
-                                          <SelectValue placeholder="Selecione a garantia" />
+                                          <SelectValue placeholder="Selecione a situação" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          {GARANTIA_LOCACAO_OPTIONS.map((garantia) => (
-                                            <SelectItem value={garantia.value}>{garantia.label}</SelectItem>
+                                          {STATUS_LOCACAO_OPTIONS.map((status) => (
+                                            <SelectItem value={status.value}>{status.label}</SelectItem>
                                           ))}
                                         </SelectContent>
                                       </Select>
                                     )}
                                   />
-                                  {!!locacaoMethodsAlt?.formState?.errors?.garantiaLocacaoTipo?.message && (
-                                    <span>{locacaoMethodsAlt?.formState?.errors?.garantiaLocacaoTipo?.message}</span>
+                                  {!!locacaoMethodsAlt?.formState?.errors?.status?.message && (
+                                    <span>{locacaoMethodsAlt?.formState?.errors?.status?.message}</span>
                                   )}
                                 </div>
                               </Label>
                             </div>
+
+                            <DialogFooter className='mt-5'>
+                              <Button type="submit">Adicionar Locação</Button>
+                            </DialogFooter>
+
                           </div>
                         )}
-                      </div>
-
-                      {!selPessoa && (
-                        <div>
-                          {(selGarantia === GarantiaLocacao.FIADOR && selFiador) && (
-                            <div>
-                              <Card>
-                                <CardHeader>
-                                  <DialogTitle className='flex items-center'>Selecionar o Fiador</DialogTitle>
-                                </CardHeader>
-                                <CardContent className='mt-2 h-120'>
-                                  <ListarClientes limitView={1} txtVinc='Vincular Locação' onSelectCliente={handleSelectFiador} exclude='' />
-                                </CardContent>
-                              </Card>
-                            </div>
-                          )}
-
-                          {(locacaoFiadores.fields.length > 0) && (
-                            <div>
-                              <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                                <Label>Fiadores</Label>
-                                <button
-                                  className='border bg-zinc-200 hover:bg-zinc-400 rounded'
-                                  type="button"
-                                  onClick={() => { setSelFiador(true) }}
-                                >
-                                  Adicionar
-                                </button>
-                              </div>
-                              {locacaoFiadores.fields.map((field, index) => (
-                                <div className='flex items-center gap-2 mt-2'>
-                                  <Label >{field.nome}</Label>
-                                  <button
-                                    className='border bg-zinc-200 hover:bg-zinc-400'
-                                    type="button"
-                                    onClick={() => locacaoFiadores.remove(index)}
-                                  >
-                                    <X className='px-1'></X>
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
-                            <div className='mt-2'>
-                              <Label htmlFor="tituloCap.numeroTitulo">Número do Título</Label>
-                              <Input type="number"
-                                {...locacaoMethodsAlt.register('tituloCap.numeroTitulo')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.tituloCap?.numeroTitulo?.message}
-                                onChange={(e) => { locacaoMethodsAlt.setValue('tituloCap.numeroTitulo', e.target.value) }}
-                              />
-                            </div>
-                          )}
-
-                          {selGarantia === GarantiaLocacao.SEGURO_FIANCA && (
-                            <div className='mt-2'>
-                              <Label htmlFor="seguroFianca.numeroSeguro">Número do Seguro</Label>
-                              <Input type="number"
-                                {...locacaoMethodsAlt.register('seguroFianca.numeroSeguro')}
-                                helperText={locacaoMethodsAlt.formState?.errors?.seguroFianca?.numeroSeguro?.message}
-                                onChange={(e) => { locacaoMethodsAlt.setValue('seguroFianca.numeroSeguro', e.target.value) }}
-                              />
-                            </div>
-                          )}
-
-                          {selGarantia === GarantiaLocacao.DEPOSITO_CALCAO && (
-                            <div>
-                              <div className='mt-2'>
-                                <Label htmlFor="depCalcao.valorDeposito">Valor do depósito</Label>
-                                <Input type="number" placeholder='0,00'
-                                  {...locacaoMethodsAlt.register('depCalcao.valorDeposito')}
-                                  helperText={locacaoMethodsAlt.formState?.errors?.depCalcao?.valorDeposito?.message}
-                                  onChange={(e) => { locacaoMethodsAlt.setValue('depCalcao.valorDeposito', parseFloat(e.target.value)) }}
-                                />
-                              </div>
-                              <div className='mt-2'>
-                                <Label htmlFor="depCalcao.quantidadeMeses">Quantidade de meses</Label>
-                                <Input type="number"
-                                  {...locacaoMethodsAlt.register('depCalcao.quantidadeMeses')}
-                                  helperText={locacaoMethodsAlt.formState?.errors?.depCalcao?.quantidadeMeses?.message}
-                                />
-                              </div>
-                            </div>
-                          )}
-
-                          <div className='mt-2'>
-                            <Label>
-                              Situação da Locação
-                              <div className="mt-2">
-                                <Controller
-                                  name="status"
-                                  control={locacaoMethodsAlt.control}
-                                  render={({ field }) => (
-                                    <Select
-                                      onValueChange={(value) => {
-                                        field.onChange(value)
-                                        locacaoMethodsAlt.setValue('status', value);
-
-                                      }}
-                                      value={field.value?.toString()}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Selecione a situação" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {STATUS_LOCACAO_OPTIONS.map((status) => (
-                                          <SelectItem value={status.value}>{status.label}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  )}
-                                />
-                                {!!locacaoMethodsAlt?.formState?.errors?.status?.message && (
-                                  <span>{locacaoMethodsAlt?.formState?.errors?.status?.message}</span>
-                                )}
-                              </div>
-                            </Label>
-                          </div>
-
-                          <DialogFooter className='mt-5'>
-                            <Button type="submit">Adicionar Locação</Button>
-                          </DialogFooter>
-
-                        </div>
-                      )}
-                    </form>
-                  </DialogContent>
-                </Dialog>
-                {!locacao.status || locacao.status !== LocacaoStatus.ENCERRADA && (
-                  <Button variant="destructive" size="sm"
-                    onClick={() => { handleDeleteLocacao(locacao) }}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                  {(
+                    (isAdmin ||
+                      user?.permissions.includes("ALL") ||
+                      user?.permissions.includes("DELETE_LOCACAO")
+                    ) &&
+                    (!locacao.status || locacao.status !== LocacaoStatus.ENCERRADA)
+                  )
+                    && (
+                      <Button variant="destructive" size="sm"
+                        onClick={() => { handleDeleteLocacao(locacao) }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </Button>
+                    )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div >
