@@ -51,8 +51,8 @@ export interface BasePaginationData<T> {
     currentPosition: number
 }
 
-export const getTipos = async () => {
-    return await api.get<TipoImovel[]>('tipoimovel')
+export const getTipos = async (empresaId:number) => {
+  return await api.get<TipoImovel[]>(`tipoimovel/${empresaId}`)
 }
 
 
@@ -138,7 +138,7 @@ export default function ListarImoveisLocacao({
         data: imovelTipo
     } = useQuery({
         queryKey: ['imovelTipo'],
-        queryFn: () => getTipos()
+        queryFn: () => getTipos(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0)
     });
 
     const { data, isLoading } = useQuery(

@@ -57,6 +57,7 @@ import {
 import { DocumentUpload } from './components/document-upload'
 import { ImovelForm } from './components/imovel-form'
 import { ProprietarioSearch } from './components/owner-search'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
 export interface CriarLocatarioData extends LocatarioSchema {
   imovelId?: string
@@ -115,6 +116,8 @@ const IMOVEL_KNOWN_ERRORS = ['Imóvel já cadastrado']
 //TODO: create a interface for created imovel
 
 export const CriarImovel = () => {
+  const glb_params = useGlobalParams();
+
   const navigate = useNavigate()
   const { toast } = useToast()
   const [currentStep, setCurrentStep] = React.useState<Step['id']>('imovel')
@@ -137,9 +140,11 @@ export const CriarImovel = () => {
   const createImovelMethods = useForm<ImovelSchema>({
     resolver: zodResolver(imovelSchema),
     defaultValues: {
+      numero: 0,
       finalidade: ImovelFinalidade.ALUGUEL,
       status: ImovelStatus.DISPONIVEL,
-      images: (imovelData?.imovelPhotos ? imovelData?.imovelPhotos : [])
+      images: (imovelData?.imovelPhotos ? imovelData?.imovelPhotos : []),
+      empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
     },
     mode: 'all'
   })
@@ -168,6 +173,21 @@ export const CriarImovel = () => {
       if (data.valorAluguel) {
         form.append('valorAluguel', data.valorAluguel.toString())
       }
+      if (data.metragem) {
+        form.append('metragem', data.metragem.toString())
+      }
+      if (data.quartos) {
+        form.append('quartos', data.quartos.toString())
+      }
+      if (data.banheiros) {
+        form.append('banheiros', data.banheiros.toString())
+      }
+      if (data.vagasEstacionamento) {
+        form.append('vagasEstacionamento', data.vagasEstacionamento.toString())
+      }
+      if (data.andar) {
+        form.append('andar', data.andar.toString())
+      }
       if (data.logradouro) {
         form.append('logradouro', data.logradouro)
       }
@@ -194,6 +214,18 @@ export const CriarImovel = () => {
 
       if (data.estado) {
         form.append('estado', data.estado)
+      }
+
+      if (data.empresaId) {
+        form.append('empresaId', data.empresaId.toString())
+      }
+
+      if (data.condominioId) {
+        form.append('condominioId', data.condominioId.toString())
+      }
+
+      if (data.blocoId) {
+        form.append('blocoId', data.blocoId.toString())
       }
 
       data?.images?.forEach((image: any) => {

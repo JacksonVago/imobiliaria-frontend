@@ -58,7 +58,8 @@ export const clienteSchema = z.object({
       })
     )
     .optional(),
-  documentosToDeleteIds: z.array(z.number()).optional()
+  documentosToDeleteIds: z.array(z.number()).optional(),
+  empresaId: z.number(),
 })
 
 export type GarantiaLocacaoTypes =

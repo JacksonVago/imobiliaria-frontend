@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, CircleDollarSign, Cog, House,  HousePlus, Lock, LogOut, Shapes, Users } from 'lucide-react'
+import { Banknote, Building, Building2, CircleDollarSign, Cog, House,  HousePlus, KeyRound, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 import logo  from '../assets/logo-molina.png';
 
@@ -41,6 +41,16 @@ const data = {
       icon: Shapes
     },
     {
+      title: 'Condomínios',
+      url: ROUTE.CONDOMINIOS,
+      icon: Building2
+    },
+    {
+      title: 'Blocos',
+      url: ROUTE.BLOCOS,
+      icon: Building
+    },
+    {
       title: 'Imoveis',
       url: ROUTE.IMOVEIS,
       icon: House
@@ -48,7 +58,7 @@ const data = {
     {
       title: 'Locações',
       url: ROUTE.LOCACOES,
-      icon: HousePlus
+      icon: KeyRound
     },
     {
       title: 'Lancamentos',
@@ -56,9 +66,19 @@ const data = {
       icon: Banknote
     },
     {
+      title: 'Lancamentos Condomínios',
+      url: ROUTE.LANCAMENTOS_CONDOMINIOS,
+      icon: Banknote
+    },
+    {
       title: 'Boletos',
       url: ROUTE.PAGAMENTOS,
       icon: CircleDollarSign
+    },
+    {
+      title: 'Relatório de Repasse',
+      url: ROUTE.REPASSES,
+      icon: ReceiptText
     },
     /*{
       title: 'Proprietários',
@@ -100,7 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.url === ROUTE.LANCAMENTOS && user?.permissions.includes('VIEW_LANCAMENTOS')) {
         return true
       }
-      if (item.url === ROUTE.PAGAMENTOS && user?.permissions.includes('VIEW_PAGAMENTOS')) {
+      if ((item.url === ROUTE.PAGAMENTOS || item.url === ROUTE.REPASSES) && user?.permissions.includes('VIEW_PAGAMENTOS')) {
         return true
       }
       if (item.url === ROUTE.PROPRIETARIOS && user?.permissions.includes('VIEW_PROPRIETARIOS')) {
@@ -113,6 +133,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return true
       }
       if (item.url === ROUTE.TIPOIMOVEL && user?.permissions.includes('VIEW_TIPOS')) {
+        return true
+      }
+      if (item.url === ROUTE.LANCAMENTOS_CONDOMINIOS && user?.permissions.includes('VIEW_LANCAMENTOS_CONDOMINIOS')) {
         return true
       }
       return false

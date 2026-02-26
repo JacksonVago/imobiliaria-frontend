@@ -266,6 +266,7 @@ export const locacaoSchema = z.object({
       }),
     }
   ),
+  empresaId: z.number().min(1, 'Empresa é obrigatória'),
 });
 
 export type LocacaoSchema = z.infer<typeof locacaoSchema>

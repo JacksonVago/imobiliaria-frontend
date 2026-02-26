@@ -3,6 +3,15 @@ export enum ROUTE {
   LOGIN = '/login',
   REGISTER = '/register',
 
+  //escolha de planos
+  BEMVINDO = '/bemvindo/:email',
+  PLANOS = '/planos/:email',
+  PLANO_ANUAL = '/plano/anual',
+  PLANO_MENSAL = '/plano/mensal',
+  PLANO_SEMESTRAL = '/plano/semestral',
+  PLANO_TIPO = '/planos/tipo/:email/:plano',
+  PLANO_PAGAMENTO = '/planos/pagamento/:email/:plano',
+
   // Main routes
   HOME = '/',
   SOBRE = '/sobre',
@@ -10,6 +19,21 @@ export enum ROUTE {
   // Configurações
   EMPRESA_DETALHES = '/empresas/:id',
   EMPRESA = '/empresas',
+
+  // Condomínios routes
+  CONDOMINIOS = '/condominios',
+  CONDOMINIOS_CRIAR = '/condominios/criar',
+  CONDOMINIOS_DETALHES = '/condominios/:id',
+
+  // Lancamentos Condomínios routes
+  LANCAMENTOS_CONDOMINIOS = '/lancamentosCondominios',
+  LANCAMENTOS_CONDOMINIOS_CRIAR = '/lancamentosCondominios/criar',
+  LANCAMENTOS_CONDOMINIOS_DETALHES = '/lancamentosCondominios/:id',
+
+  // Blocos routes
+  BLOCOS = '/blocos',
+  BLOCOS_CRIAR = '/blocos/criar',
+  BLOCOS_DETALHES = '/blocos/:id',
 
   // Imoveis routes
   IMOVEIS = '/imoveis',
@@ -21,7 +45,7 @@ export enum ROUTE {
   LOCACOES_CRIAR = '/locacoes/criar',
   LOCACOES_DETALHES = '/locacoes/:id',
 
-  // Locações routes
+  // Lancamentos Locações routes
   LANCAMENTOS = '/lancamentos',
   LANCAMENTOS_CRIAR = '/lancamentos/criar',
   LANCAMENTOS_DETALHES = '/lancamentos/:id',
@@ -60,6 +84,9 @@ export enum ROUTE {
   PAGAMENTOS = '/pagamentos',
   PAGAMENTOS_CRIAR = '/pagamentos/criar',
   PAGAMENTOS_DETALHES = '/pagamentos/:id',
+
+  //Repasse routes
+  REPASSES = '/repasses',
 
   // Error routes
   NOT_FOUND = '*',

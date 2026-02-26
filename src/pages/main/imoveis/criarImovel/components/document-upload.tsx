@@ -14,6 +14,7 @@ import { Download, File, FileText, FileUp, Image, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
+import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob';
 
 export function DocumentUpload({
   disabled,
@@ -87,12 +88,12 @@ export function DocumentUpload({
 
     //also for existant docs, set the id to delete
     if (documents[index]?.id) {
-      setValue("documentosToDeleteIds", [...(watch("documentosToDeleteIds") || []), {id: documents[index].id, file: documents[index].name}], {
+      /*setValue("documentosToDeleteIds", [...(watch("documentosToDeleteIds") || []), {id: documents[index].id, file: documents[index].name}], {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true
-      })
-      /*setValue(
+      })*/
+      setValue(
         'documentosToDeleteIds',
         [...(watch('documentosToDeleteIds') || []), documents[index].id],
         {
@@ -100,7 +101,7 @@ export function DocumentUpload({
           shouldDirty: true,
           shouldTouch: true
         }
-      )*/
+      );
     }
   }
 
@@ -123,7 +124,7 @@ export function DocumentUpload({
   
   const downloadDocument = async (index:number) => {
     try {
-      console.log(documents[index]?.url);
+      /*console.log(documents[index]?.url);
       
       const { data, error } = await supabase.storage
         .from('imoveis_photos') // Replace with your bucket name
@@ -140,7 +141,15 @@ export function DocumentUpload({
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);*/
+
+      const blobName = AZURE_BLOB_CONTAINER + documents[index]?.url;
+      const a = document.createElement('a');
+      a.href = blobName;
+      a.download = documents[index]?.name; // Desired filename for download
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading file:', error);
     }

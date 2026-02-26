@@ -16,6 +16,7 @@ import ListarProprietarios from '@/pages/main/proprietarios'
 import { CriarProprietario } from '@/pages/main/proprietarios/criar'
 import DetalhesProprietario from '@/pages/main/proprietarios/detalhes'
 import { Outlet, Route, Routes } from 'react-router-dom'
+import SlideRoutes from 'react-slide-routes';
 import { AuthenticatedRoutesGuard } from './guards/authenticated-routes-guard'
 import { UnauthenticatedRoutesGuard } from './guards/unauthenticated-routes-guard'
 import DetalhesCliente from '@/pages/main/clientes/detalhes'
@@ -26,7 +27,7 @@ import { useEffect, useState } from 'react'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import ListarLocacoes from '@/pages/main/locacoes'
 import DetalhesLocacao from '@/pages/main/locacoes/detalhes'
-import  CriarLocacao  from '@/pages/main/locacoes/criar'
+import CriarLocacao from '@/pages/main/locacoes/criar'
 import ListarTipos from '@/pages/main/tipoImovel'
 import DetalhesEmpresa from '@/pages/main/empresas/detalhes'
 import ListarLancamentos from '@/pages/main/lancamentos'
@@ -34,6 +35,19 @@ import ListarTiposLancamento from '@/pages/main/tipolancamento'
 import { DetalhesLancamento } from '@/pages/main/lancamentos/detalhes'
 import { DetalhesBoleto } from '@/pages/main/boletos/detalhes'
 import ListarBoletos from '@/pages/main/boletos'
+import ListarRepasses from '@/pages/main/relatoriorepasse'
+import { Adesao } from '@/pages/main/adesao'
+import { Planos } from '@/pages/main/adesao/planos'
+import { PlanoTipo } from '@/pages/main/adesao/planos/tipoplano'
+import { MeioPagamento } from '@/pages/main/adesao/planos/meiopagamento'
+import { CriarCondominio } from '@/pages/main/condominios/criarcondominio'
+import ListarCondominios from '@/pages/main/condominios/listarcondominios'
+import { DetalhesCondominio } from '@/pages/main/condominios/detalhes'
+import { CriarBloco } from '@/pages/main/blocos/criarbloco'
+import { DetalhesBloco } from '@/pages/main/blocos/detalhes'
+import ListarBlocos from '@/pages/main/blocos/listarblocos'
+import ListarLancamentosCondominios from '@/pages/main/lancamentoscondominio'
+import { DetalhesLancamentoCondominio } from '@/pages/main/lancamentoscondominio/detalhes'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -46,8 +60,9 @@ export const MainLayout = () => {
 
   const { firstName } = useAuth()
 
-  useEffect(()=>{},[glb_params]);
+  useEffect(() => { }, [glb_params]);
   return (
+
     <SidebarProvider className='font-[Poppins-Regular]'>
       <AppSidebar />
       <SidebarInset>
@@ -57,7 +72,7 @@ export const MainLayout = () => {
             <Label>{glb_params.title_form}</Label>
             <Avatar className={nameUser ? 'w-1/3' : 'w-10'}>
               <AvatarImage src="http://localhost:3000/assets/images/avatar.jpg" />
-              <AvatarFallback className="bg-gray-200" onClick={() => {setNameUser(!nameUser)}}>
+              <AvatarFallback className="bg-gray-200" onClick={() => { setNameUser(!nameUser) }}>
                 {nameUser ? firstName : firstName?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -90,8 +105,18 @@ export const ProtectedRoute = ({ children, permission }: ProtectedRouteProps) =>
 
 export const RoutesComponent = () => {
   const { user } = useAuth()
+  const glb_params = useGlobalParams();
+
+  useEffect(() => { }, [glb_params]);
+
   return (
-    <Routes>
+    <SlideRoutes>
+      {/*Bem vindo */}
+      <Route path={ROUTE.BEMVINDO} element={<Adesao />} />
+      <Route path={ROUTE.PLANOS} element={<Planos />} />
+      <Route path={ROUTE.PLANO_TIPO} element={<PlanoTipo />} />
+      <Route path={ROUTE.PLANO_PAGAMENTO} element={<MeioPagamento />} />
+
       <Route element={<UnauthenticatedRoutesGuard />}>
         <Route path={ROUTE.LOGIN} element={<Login />} />
       </Route>
@@ -104,6 +129,7 @@ export const RoutesComponent = () => {
 
           <Route path={ROUTE.HOME} element={<div>Home</div>} />
 
+          {/* Empresas */}
           <Route
             path={ROUTE.EMPRESA_DETALHES}
             element={
@@ -132,32 +158,61 @@ export const RoutesComponent = () => {
               </ProtectedRoute>
             }
           />
+
+
+          {/* Condomínios */}
           <Route
-            path={ROUTE.IMOVEIS_CRIAR}
+            path={ROUTE.CONDOMINIOS_CRIAR}
             element={
-              <ProtectedRoute permission="CREATE_IMOVEL">
-                <CriarImovel />
+              <ProtectedRoute permission="CREATE_CONDOMINIO">
+                <CriarCondominio />
               </ProtectedRoute>
             }
           />
           <Route
-            path={ROUTE.IMOVEIS_DETALHES}
+            path={ROUTE.CONDOMINIOS_DETALHES}
             element={
-              <ProtectedRoute permission="VIEW_IMOVELS">
-                <DetalhesImovel />
+              <ProtectedRoute permission="VIEW_CONDOMINIOS">
+                <DetalhesCondominio />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.CONDOMINIOS}
+            element={
+              <ProtectedRoute permission="VIEW_CONDOMINIOS">
+                <ListarCondominios limitView={3} exclude='' onSelectCondominio={undefined} />
               </ProtectedRoute>
             }
           />
 
-          {/* Imóveis */}
+          {/* Blocos */}
           <Route
-            path={ROUTE.IMOVEIS}
+            path={ROUTE.BLOCOS_CRIAR}
             element={
-              <ProtectedRoute permission="VIEW_IMOVELS">
-                <ListarImoveis limitView={3} exclude='' onSelectImovel={undefined}/>
+              <ProtectedRoute permission="CREATE_BLOCO">
+                <CriarBloco />
               </ProtectedRoute>
             }
           />
+          <Route
+            path={ROUTE.BLOCOS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_BLOCOS">
+                <DetalhesBloco />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.BLOCOS}
+            element={
+              <ProtectedRoute permission="VIEW_BLOCOS">
+                <ListarBlocos limitView={3} exclude='' onSelectBloco={undefined} />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Imóveis */}
           <Route
             path={ROUTE.IMOVEIS_CRIAR}
             element={
@@ -171,6 +226,14 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_IMOVELS">
                 <DetalhesImovel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.IMOVEIS}
+            element={
+              <ProtectedRoute permission="VIEW_IMOVELS">
+                <ListarImoveis limitView={3} exclude='' onSelectImovel={undefined} />
               </ProtectedRoute>
             }
           />
@@ -188,7 +251,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCACOES_CRIAR}
             element={
               <ProtectedRoute permission="CREATE_LOCACAO">
-                <CriarLocacao/>
+                <CriarLocacao />
               </ProtectedRoute>
             }
           />
@@ -201,20 +264,30 @@ export const RoutesComponent = () => {
             }
           />
 
+          {/* Lançamentos Condomínios */}
+          <Route
+            path={ROUTE.LANCAMENTOS_CONDOMINIOS}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS_CONDOMINIOS">
+                <ListarLancamentosCondominios exclude='' limitView={3} onSelectLancamento={undefined} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.LANCAMENTOS_CONDOMINIOS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS_CONDOMINIOS">
+                <DetalhesLancamentoCondominio />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Lançamentos */}
           <Route
             path={ROUTE.LANCAMENTOS}
             element={
               <ProtectedRoute permission="VIEW_LANCAMENTOS">
                 <ListarLancamentos exclude='' limitView={3} onSelectLancamento={undefined} />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTE.LANCAMENTOS_CRIAR}
-            element={
-              <ProtectedRoute permission="CREATE_LANCAMENTO">
-                <CriarLocacao/>
               </ProtectedRoute>
             }
           />
@@ -232,7 +305,7 @@ export const RoutesComponent = () => {
             path={ROUTE.PAGAMENTOS}
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
-                <ListarBoletos exclude='' limitView={3}/>
+                <ListarBoletos exclude='' limitView={3} />
               </ProtectedRoute>
             }
           />
@@ -241,6 +314,16 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
                 <DetalhesBoleto />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Repasses */}
+          <Route
+            path={ROUTE.REPASSES}
+            element={
+              <ProtectedRoute permission="VIEW_PAGAMENTOS">
+                <ListarRepasses exclude='' limitView={3} />
               </ProtectedRoute>
             }
           />
@@ -278,7 +361,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCATARIOS}
             element={
               <ProtectedRoute permission="VIEW_LOCATARIOS">
-                <ListarLocatarios onSelectLocatario={()=>{}} />
+                <ListarLocatarios onSelectLocatario={() => { }} />
               </ProtectedRoute>
             }
           />
@@ -287,7 +370,7 @@ export const RoutesComponent = () => {
             path={ROUTE.LOCATARIOS_DETALHES}
             element={
               <ProtectedRoute permission="VIEW_LOCATARIOS">
-                <DetalhesLocatario defaultId={{id:""}} />
+                <DetalhesLocatario defaultId={{ id: "" }} />
               </ProtectedRoute>
             }
           />
@@ -314,7 +397,7 @@ export const RoutesComponent = () => {
             path={ROUTE.CLIENTES_DETALHES}
             element={
               <ProtectedRoute permission="VIEW_PESSOAS">
-                <DetalhesCliente/>
+                <DetalhesCliente />
               </ProtectedRoute>
             }
           />
@@ -338,7 +421,7 @@ export const RoutesComponent = () => {
       </Route>
       <Route path={ROUTE.UNAUTHORIZED} element={<UnauthorizedPage />} />
       <Route path="*" element={<div>404</div>} />
-    </Routes>
+    </SlideRoutes>
   )
 }
 export const UnauthorizedPage = () => {

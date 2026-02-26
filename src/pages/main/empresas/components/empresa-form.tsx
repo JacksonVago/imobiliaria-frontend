@@ -19,9 +19,10 @@ import { Switch, Thumb } from "@radix-ui/react-switch"
 import { useState } from 'react'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import { useQuery } from '@tanstack/react-query'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
-export const getTipos = async () => {
-  return await api.get<TipoLancamento[]>('tipolancamento')
+export const getTipos = async (empresaId: number) => {
+  return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
 export const EmpresaFormRoot = ({
@@ -46,13 +47,15 @@ export const EmpresaFormContent = ({
   disabled?: boolean
 }) => {
   const [showBoleto, setShowBoleto] = useState(createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false);
+  //Globals
+  const glb_params = useGlobalParams();
 
   //Consulta Tipo imóvel
   const {
     data: tipoLancamento
   } = useQuery({
     queryKey: ['tipolancamento'],
-    queryFn: () => getTipos()
+    queryFn: () => getTipos(Number(glb_params.id_empresa))
   });
 
   return (

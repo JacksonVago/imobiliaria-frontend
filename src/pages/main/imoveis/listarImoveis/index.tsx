@@ -55,14 +55,14 @@ export interface BasePaginationData<T> {
   currentPosition: number
 }
 
-export const getTipos = async () => {
-  return await api.get<TipoImovel[]>('tipoimovel')
+export const getTipos = async (empresaId:number) => {
+  return await api.get<TipoImovel[]>(`tipoimovel/${empresaId}`)
 }
 
 
 // API & Query Logic
-export const getImoveis = async ({ page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
-  return await api.get<BasePaginationData<Imovel>>('imoveis', {
+export const getImoveis = async (empresaId:number, { page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
+  return await api.get<BasePaginationData<Imovel>>('imoveis/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -76,7 +76,7 @@ export const getImoveis = async ({ page, limit, search, type, rooms, price, tipo
   })
 }
 
-export const useGetImoveisQueryOptions = ({
+export const useGetImoveisQueryOptions = (empresaId:number, {
   search,
   type,
   rooms,
@@ -97,8 +97,8 @@ export const useGetImoveisQueryOptions = ({
   exclude?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['imoveis', { search, type, rooms, price, page, limit, tipo, exclude }, queryKeys],
-    queryFn: () => getImoveis({ search, type, rooms, price, page, limit, tipo, exclude })
+    queryKey: ['imoveis', empresaId, { search, type, rooms, price, page, limit, tipo, exclude }, queryKeys],
+    queryFn: () => getImoveis(empresaId, { search, type, rooms, price, page, limit, tipo, exclude })
   })
 }
 
@@ -147,11 +147,11 @@ export default function ListarImoveis({
     data: imovelTipo
   } = useQuery({
     queryKey: ['imovelTipo'],
-    queryFn: () => getTipos()
+    queryFn: () => getTipos(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0)
   });
 
   const { data, isLoading } = useQuery(
-    useGetImoveisQueryOptions({
+    useGetImoveisQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
       page,
       limit,
       search,
@@ -314,6 +314,7 @@ export default function ListarImoveis({
             <Loader />
           </div>
         ) :
+        
           (
             showcard ?
               (
@@ -406,6 +407,7 @@ export default function ListarImoveis({
                       {imoveis?.map((imovel) => (
                         <tr key={imovel.id} className="hover:bg-gray-100">
                           <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                            {imovel.description} -
                             {getEnderecoFormatado(imovel?.endereco)}
                           </td>
                           <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>

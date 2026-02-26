@@ -94,7 +94,7 @@ export const LocacaoFormContent = ({
   } = useQuery({
     queryKey: ['imovel', createLocacaoMethods.getValues('imovelId')],
     queryFn: async () => {
-      const { data } = await api.get<Imovel>(`imoveis/${createLocacaoMethods.getValues('imovelId')}`)      
+      const { data } = await api.get<Imovel>(`imoveis/findbyid/${createLocacaoMethods.getValues('imovelId')}`)      
       console.log(data);
       if (data){
         //Carrgea array de imóvel

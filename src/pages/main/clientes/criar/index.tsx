@@ -30,7 +30,9 @@ export const CriarCliente = () => {
 
   const clienteMethods = useForm<ClienteSchema>({
     resolver: zodResolver(clienteSchema),
-    defaultValues: {},
+    defaultValues: {
+      empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+    },
     mode: 'all'
   })
 
@@ -126,6 +128,7 @@ export const CriarCliente = () => {
     }
 
     form.append('status', PessoaStatus.ATIVA);
+    form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 
     const newDocuments = data?.documentos?.filter((doc) => !doc.id)
     newDocuments?.forEach((doc) => {
@@ -169,7 +172,14 @@ export const CriarCliente = () => {
       description: 'Não foi possível criar o cliente, tente novamente'
     })
   }*/
+
+    
   }
+
+    console.log('Erro', clienteMethods.formState.errors);
+    console.log('dirty', clienteMethods.formState.isDirty);
+    console.log('valid', clienteMethods.formState.isValid);
+    console.log('valid', clienteMethods.getValues());
   return (
     <div className="mx-auto max-w-screen-xl">
       <Card className='py-10'>

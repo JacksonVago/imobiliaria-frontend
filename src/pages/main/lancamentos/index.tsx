@@ -18,7 +18,6 @@ import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
-import { Lancamento } from '@/interfaces/lancamentos'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
 import { Locacao } from '@/interfaces/locacao'
@@ -30,6 +29,8 @@ import { queryClient } from '@/services/react-query/query-client'
 import { usdFormatter } from '@/utils/format-money'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { LancamentoLocacao } from '@/interfaces/lancamentos'
 
 // Types
 interface GetLancamentosParams {
@@ -43,8 +44,8 @@ interface GetLancamentosParams {
 }
 
 // API & Query Logic
-export const getLancamentos = async ({ page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
-  return await api.get<BasePaginationData<Locacao>>('lancamentos', {
+export const getLancamentos = async (empresaId:number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
+  return await api.get<BasePaginationData<Locacao>>('lancamentos/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -57,7 +58,7 @@ export const getLancamentos = async ({ page, limit, search, status, exclude, dat
   })
 }
 
-export const useGetLancamentosQueryOptions = ({
+export const useGetLancamentosQueryOptions = (empresaId:number, {
   search,
   page,
   limit,
@@ -76,8 +77,8 @@ export const useGetLancamentosQueryOptions = ({
   dataFinal?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['lancamentos', { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
-    queryFn: () => getLancamentos({ search, page, limit, status, exclude, dataInicial, dataFinal })
+    queryKey: ['lancamentos', empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
+    queryFn: () => getLancamentos(empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal })
   })
 }
 //lancamentos
@@ -88,7 +89,7 @@ export default function ListarLancamentos({
 }: {
   limitView: number
   exclude: string
-  onSelectLancamento: ((lancamento: Lancamento) => void) | undefined
+  onSelectLancamento: ((lancamento: LancamentoLocacao) => void) | undefined
 }) {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -114,7 +115,7 @@ export default function ListarLancamentos({
   const [dataFinal, setdataFinal] = useState(moment(new Date()).format("YYYY-MM-DD"));
 
   const { data, isLoading } = useQuery(
-    useGetLancamentosQueryOptions({
+    useGetLancamentosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
       page,
       limit,
       search,
@@ -144,7 +145,7 @@ export default function ListarLancamentos({
         description: `Boleto gerado com sucesso`
       })
     }
-  })
+  });
 
 
   // const hasTotalPages = !!totalPages
@@ -344,8 +345,7 @@ export default function ListarLancamentos({
                   <div className='grid grid-cols-2 gap-10'>
                     {((isAdmin ||
                       user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("UPDATE_LANCAMENTO")) &&
-                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
+                      user?.permissions.includes("UPDATE_LANCAMENTO"))) && (
 
                         <Button variant="secondary"
                           onClick={() => handleClickVerDetalhes(locacao?.id)}
@@ -357,11 +357,39 @@ export default function ListarLancamentos({
                       user?.permissions.includes("ALL") ||
                       user?.permissions.includes("CREATE_PAGAMENTO")) &&
                       (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-                        <Button variant="secondary"
+                        /*<Button variant="secondary"
                           onClick={() => handleGerarBoleto(locacao)}
                           size={"sm"}>
                           <Receipt className="h-4 w-4" />Gerar Boleto
-                        </Button>
+                        </Button>*/
+
+                        <>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={(e) => {
+                                e.stopPropagation()
+                                //setSelectedTipo(tipo)
+                              }
+                              } title='Geração de Boleto'>
+                                <Receipt className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  'Isso irá confirmar os lançamentos para geração do boleto.'
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
+                                  'Sim, confirmar boleto.'
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </>
                       )}
                   </div>
                 </CardFooter>

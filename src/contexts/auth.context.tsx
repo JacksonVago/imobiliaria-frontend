@@ -15,6 +15,7 @@ interface UserInfo {
   permissions: Permission[]
   createdAt: string
   updatedAt?: string
+  empresaId:number;
 }
 
 export const STORAGE_ACCESS_TOKEN_KEY = '@my_application_access_token'
@@ -78,6 +79,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoadingUserData, setIsLoadingUserData] = useState(true)
   const [user, setUser] = useState<UserInfo>()
   const firstName = user?.name?.split?.(' ')[0] || 'Colaborador'
+  //Globals
+  const glb_params = useGlobalParams();  
+
 
   const isAuthenticated = !!user
   // Fetch user from storage on mount
@@ -98,6 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const userData = await getUserInfo()
       setUser(userData)
+      glb_params.updId_empresa(userData?.empresaId.toString() || '0');
+      
     } catch (error) {
       //TODO: handle error (logout, refresh token, etc)
       if (isAxiosError(error) && error?.response?.status === 401) {
@@ -144,9 +150,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     //remove tokens from storage
     destroyCookie(null, STORAGE_ACCESS_TOKEN_KEY, { path: '/' })
   }
-
-  //Globals
-  const glb_params = useGlobalParams();
 
   console.log(glb_params.id_empresa);
 

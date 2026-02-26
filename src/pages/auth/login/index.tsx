@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
+import { ROUTE } from '@/enums/routes.enum'
 
 interface LoginData {
   login: string
@@ -65,11 +67,13 @@ export const putUpdateUser = (id: string, datapwd: {
 type LoginSchema = z.infer<typeof loginSchema>
 
 export function Login() {
+  const navigate = useNavigate()
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [updPassword, setUpdPassword] = useState(false);
   const [loginUser, setLoginUser] = useState<User>();
-  const { login, logout } = useAuth()
+  const { login, logout } = useAuth();
 
   const {
     register,
@@ -89,7 +93,7 @@ export function Login() {
 
   const onSubmit = (data: LoginSchema) => {
     if (!updPassword) {
-      login(data)
+      login(data);
     } else {
       if (!data.newpassword || data.newpassword.length < 8) {
         setError('newpassword', { type: 'manual', message: 'New Password must be at least 8 characters.' });
@@ -146,13 +150,16 @@ export function Login() {
 
   const handlerGetUser = async (login: string) => {
     const response = await getUserLogin(login);
+    console.log('response getUserLogin', response);
     if (response && response.data) {
+      console.log('passou  ', response.data);
       setLoginUser(response.data);
       setError('login', {});
     }
     else {
       setLoginUser(undefined);
       setError('login', { type: 'manual', message: 'Usuário não encontrado.' });
+      navigate(`/bemvindo/${login}`);
     }
   }
 

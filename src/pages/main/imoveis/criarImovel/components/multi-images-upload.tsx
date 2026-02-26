@@ -9,7 +9,8 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-import { ImagePlus, X } from 'lucide-react'
+import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
+import { Download, ImagePlus, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
@@ -20,7 +21,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
 
   const { watch, setValue } = useFormContext()
-  const images = watch('images') || []
+  const images = watch('imovelPhotos') || []
   console.log('propter img', images)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -31,7 +32,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
         file,
         preview: URL.createObjectURL(file)
       }))
-      setValue('images', [...images, ...newImages], {
+      setValue('imovelPhotos', [...images, ...newImages], {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true
@@ -44,7 +45,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
     newImages.splice(index, 1)
     //set images to delete
 
-    setValue('images', newImages, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+    setValue('imovelPhotos', newImages, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
 
     //also for existant images, set the id to delete
     if (images[index]?.id) {
@@ -62,6 +63,21 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
   const handleAddImageClick = () => {
     fileInputRef.current?.click()
   }
+
+  const downloadDocument = async (index:number) => {
+    try {
+      console.log('images', images[index]);
+      const blobName = AZURE_BLOB_CONTAINER + images[index]?.file.name;
+      const a = document.createElement('a');
+      a.href = blobName;
+      a.download = images[index]?.file.name; // Desired filename for download
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
 
   return (
     <div className="mb-6 w-full space-y-4">
@@ -96,6 +112,13 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
                         alt={`Property image ${index + 1}`}
                         className="h-full w-full rounded-md object-cover"
                       />
+                        <Button                          
+                          className="absolute left-98 top-7 h-6 w-2 opacity-0 hover:opacity-75"
+                          onClick={() => downloadDocument(index)}
+                          type="button"
+                        >
+                          <Download/>
+                        </Button>
                       {!disabled && (
                         <Button
                           variant="destructive"

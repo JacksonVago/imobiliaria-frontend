@@ -97,11 +97,13 @@ export const DetalhesLocacaoForm = ({
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
-      const { data } = await api.get<Locacao>(`/locacoes/${id}`)
+      const { data } = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
       return data
     },
     enabled: !!id
   })
+
+  console.log(locacao);
 
   const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, locacao?.documentos],
@@ -157,6 +159,7 @@ export const DetalhesLocacaoForm = ({
     formData.append('numeroApolice', (data.seguroIncendio?.numeroApolice ? data.seguroIncendio?.numeroApolice.toString() : '0'));
     formData.append('vigenciaInicio', (data.seguroIncendio?.vigenciaInicio ? moment(data.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD') : ''));
     formData.append('vigenciaFim', (data.seguroIncendio?.vigenciaFim ? moment(data.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') : ''));
+    formData.append('empresaId', data.empresaId ? data.empresaId.toString() : '0');
 
     const newDocuments = data?.documentos?.filter((doc) => !doc.id)
     newDocuments?.forEach((doc) => {
@@ -181,6 +184,7 @@ export const DetalhesLocacaoForm = ({
   const defaultValues = React.useMemo(
     () => ({
       //...transformNullToUndefined(locacao || {}),
+      empresaId: locacao?.empresaId,
       dataInicio: moment(locacao?.dataInicio).format('YYYY-MM-DD'),
       dataFim: moment(locacao?.dataFim).format('YYYY-MM-DD'),
       valorAluguel: locacao?.valorAluguel,

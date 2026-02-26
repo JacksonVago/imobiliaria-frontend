@@ -66,6 +66,7 @@ import { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
 import { useAuth } from '@/hooks/auth/use-auth'
+import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 // Mock data for demonstration
 /*const cliente = {
@@ -118,9 +119,14 @@ const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
       try {
+        console.log('link',AZURE_BLOB_CONTAINER + doc.url);
+
         const response = await fetch(
-          'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + doc.url
+          //'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + doc.url
+          AZURE_BLOB_CONTAINER + doc.url
         )
+        console.log('response',response);
+
         if (!response.ok) {
           throw new Error('Erro ao buscar documento')
         }
@@ -132,7 +138,8 @@ const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
           name: doc.name,
           type: doc.type,
           // size: doc?.size,
-          id: doc.id
+          id: doc.id,
+          url: doc.url
         }
       } catch (error) {
         console.error(error)
@@ -170,9 +177,8 @@ export const DetalhesClienteForm = ({
   const { data: cliente } = useQuery({
     queryKey: ['cliente', id],
     queryFn: async () => {
-      const { data } = await api.get<Pessoa>(`/pessoas/${id}`)
-      console.log(data);
-      return data
+      const  data  = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
+      return data.data;
     },
     enabled: !!id
   })
@@ -388,7 +394,7 @@ export const DetalhesClienteForm = ({
           <div className="mt-4">
             {disabled && (
               <Button
-                className="w-full"
+                className=""
                 disabled={
                   !clienteMethods.formState.isDirty || !clienteMethods.formState.isValid
                 }
@@ -438,8 +444,10 @@ export default function DetalhesCliente() {
   const { data: cliente } = useQuery({
     queryKey: ['cliente', id],
     queryFn: async () => {
-      const { data } = await api.get<Pessoa>(`/pessoas/${id}`)
-      return data
+      console.log('antes de copmsul');
+      const  data = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
+      console.log(data.data);
+      return data.data;
     },
     enabled: !!id
   })

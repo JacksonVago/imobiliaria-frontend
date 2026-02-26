@@ -43,8 +43,8 @@ interface GetLocacoesParams {
 }
 
 // API & Query Logic
-export const getLocacoes = async ({ page, limit, search, status, exclude }: GetLocacoesParams) => {
-  return await api.get<BasePaginationData<Locacao>>('locacoes', {
+export const getLocacoes = async (empresaId:number, { page, limit, search, status, exclude }: GetLocacoesParams) => {
+  return await api.get<BasePaginationData<Locacao>>('locacoes/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -55,7 +55,7 @@ export const getLocacoes = async ({ page, limit, search, status, exclude }: GetL
   })
 }
 
-export const useGetLocacoesQueryOptions = ({
+export const useGetLocacoesQueryOptions = (empresaId:number, {
   search,
   page,
   limit,
@@ -73,8 +73,8 @@ export const useGetLocacoesQueryOptions = ({
   exclude?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['locacoes', { search, page, limit, status, exclude }, queryKeys],
-    queryFn: () => getLocacoes({ search, page, limit, status, exclude })
+    queryKey: ['locacoes', empresaId, { search, page, limit, status, exclude }, queryKeys],
+    queryFn: () => getLocacoes(empresaId, { search, page, limit, status, exclude })
   })
 }
 
@@ -116,7 +116,7 @@ export default function ListarLocacoes({
   console.log(isMobile);
 
   const { data, isLoading } = useQuery(
-    useGetLocacoesQueryOptions({
+    useGetLocacoesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
       page,
       limit,
       search,
@@ -278,7 +278,7 @@ export default function ListarLocacoes({
                   <dd className="truncate">{locacao?.diaVencimento || 'N/A'}</dd>
                   <dt className="font-semibold">Situacao:</dt>
                   <dd style={{
-                    fontSize: (isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                    fontSize: (isTablet ? '0.6rem' : isMobile ? '0.8rem' : '0.3rem'),
                   }}>{locacao?.status || 'N/A'}</dd>
                 </dl>
               </CardContent>

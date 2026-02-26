@@ -19,9 +19,12 @@ import { DocumentUpload } from './document-upload'
 import { Textarea } from '@/components/ui/textarea'
 import { useQuery } from '@tanstack/react-query'
 import { TipoImovel } from '@/interfaces/tipoimovel'
+import { useMediaQuery } from 'react-responsive'
+import { getCondominiosEmp } from '@/pages/main/condominios/requests'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
-export const getTipos = async () => {
-  return await api.get<TipoImovel[]>('tipoimovel')
+export const getTipos = async (empresaId: number) => {
+  return await api.get<TipoImovel[]>(`tipoimovel/${empresaId}`)
 }
 
 export const ImovelFormRoot = ({
@@ -43,18 +46,83 @@ export const ImovelFormContent = ({
   createImovelMethods: UseFormReturn<ImovelSchema>
   disabled?: boolean
 }) => {
+  //Globals
+  const glb_params = useGlobalParams();
+
+  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
+  const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 380px)' })
 
   //Consulta Tipo imóvel
   const {
     data: imovelTipo
   } = useQuery({
     queryKey: ['imovelTipo'],
-    queryFn: () => getTipos()
+    queryFn: () => getTipos(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0)
   });
 
-  console.log('imovel dados', createImovelMethods.formState.errors);
-  console.log('imovel dados', createImovelMethods.formState.isValid);
-  console.log('imovel dados', createImovelMethods.formState.isDirty);
+  //Carrega condomínios
+  //Consulta bloco
+  const {
+    data: condominios,
+  } = useQuery({
+    queryKey: ['condominios', createImovelMethods.getValues('empresaId')],
+    queryFn: () => getCondominiosEmp(createImovelMethods.getValues('empresaId'))
+  });
+
+  const handleChangeCondominio = async (value: string) => {
+    const cond = condominios?.filter(c => c.id.toString() === value.split(';')[0])[0];
+    if (cond) {
+      const bloco = cond.blocos?.filter(b => b.id.toString() === value.split(';')[1])[0];
+      if (bloco) {
+        createImovelMethods.setValue('condominioId', Number(cond.id));
+        createImovelMethods.setValue('blocoId', Number(bloco.id));
+        createImovelMethods.setValue('cep', cond.endereco.cep);
+        createImovelMethods.setValue('numero', Number(cond.endereco.numero));
+        createImovelMethods.setValue('complemento', bloco.name);
+
+        let cep = cond.endereco.cep.replace(/\D/g, '') // Remove caracteres não numéricos
+        const cleanedCep = cep
+        // Formata o CEP para o formato '#####-###'
+        if (cep.length > 5) {
+          cep = `${cep.slice(0, 5)}-${cep.slice(5, 8)}`
+          createImovelMethods.setValue('cep', cep)
+        }
+        if (cep?.replace(/\D/g, '')?.length === 8) {
+          try {
+            console.log(cep)
+            const response = await api.get<ApiCep>(`cep/${cleanedCep}`)
+            const data = response.data
+
+            if (data) {
+              // Preenche os campos com os dados retornados
+              createImovelMethods.setValue('logradouro', data.logradouro || '')
+              createImovelMethods.setValue('bairro', data.bairro || '')
+              createImovelMethods.setValue('cidade', data.localidade || '')
+              createImovelMethods.setValue('estado', data.estado || '')
+            } else {
+              // Caso o CEP seja inválido
+              createImovelMethods.setError('cep', {
+                type: 'manual',
+                message: 'CEP inválido'
+              })
+            }
+          } catch (error) {
+            createImovelMethods.setError('cep', {
+              type: 'manual',
+              message: 'Erro ao buscar o CEP'
+            })
+          }
+        }
+      }
+    }
+  }
+
+  console.log('imovel erros', createImovelMethods.formState.errors);
+  console.log('imovel valid', createImovelMethods.formState.isValid);
+  console.log('imovel dirty', createImovelMethods.formState.isDirty);
+  console.log('imovel dados', createImovelMethods.getValues());
+  console.log('imovel erro numero', createImovelMethods.getFieldState('numero'));
 
   return (
     <div className="space-y-4">
@@ -65,9 +133,53 @@ export const ImovelFormContent = ({
         </FormProvider>
       </div>
       <div className="space-y-4 font-[Poppins-Regular]">
+
+        <div className='mt-2'>
+          <Label className="text-base">
+            Condomínio/Bloco
+            <div className='mt-2'>
+              <Controller
+                name="condominioBloco"
+                control={createImovelMethods.control}
+                render={({ field }) => (
+                  <Select 
+                    disabled={disabled}
+                    onValueChange={(value) => {
+                      handleChangeCondominio(value);
+                      field.onChange(value);
+                    }}
+                    value={field.value}
+                  >
+                    <SelectTrigger className='col-start-1 row-start-1 appearance-none border-blue-50 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'>
+                      <SelectValue placeholder="Selecione o condomínio" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {condominios?.map((condominio) => (
+                        condominio.blocos ? (
+                          condominio.blocos.map((bloco) => (
+                            <SelectItem key={condominio.id.toString() + ';' + bloco.id.toString()} value={condominio.id.toString() + ';' + bloco.id.toString()}>
+                              {condominio.name + ' - ' + bloco.name}
+                            </SelectItem>))
+                        ) : (
+                          <SelectItem key={condominio.id.toString()} value={condominio.id.toString()}>
+                            {condominio.name}
+                          </SelectItem>
+                        )
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {createImovelMethods.formState?.errors?.condominioBloco?.message && (
+                <span>{createImovelMethods.formState?.errors?.condominioBloco?.message}</span>
+              )}
+            </div>
+          </Label>
+        </div>
         <div className='mt-2'>
           <Label htmlFor="description">Descrição</Label>
           <Textarea placeholder="Descrição principal do imóvel "
+            disabled={disabled}
             {...createImovelMethods.register('description')}
           />
         </div>
@@ -315,6 +427,88 @@ export const ImovelFormContent = ({
                   {createImovelMethods.formState.errors.tipoId.message}
                 </p>)}
             </div>
+          </Label>
+        </div>
+
+        <div className={(isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-2")}>
+          <Label>
+            Metragem (m²)
+            <Input
+              className="mt-2"
+              type="number"
+              step="any"
+              disabled={disabled}
+              placeholder="Metragem do imóvel"
+              {...createImovelMethods.register('metragem')}
+            />
+            {createImovelMethods.formState.errors.metragem?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.metragem.message}
+              </p>)}
+          </Label>
+          <Label>
+            Quartos
+            <Input
+              className="mt-2"
+              type="number"
+              disabled={disabled}
+              placeholder="Número de quartos"
+              {...createImovelMethods.register('quartos')}
+            />
+            {createImovelMethods.formState.errors.quartos?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.quartos.message}
+              </p>)}
+          </Label>
+        </div>
+
+        <div className={(isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-2")}>
+          <Label>
+            Banheiros
+            <Input
+              className="mt-2"
+              type="number"
+              step="any"
+              disabled={disabled}
+              placeholder="Número de banheiros"
+              {...createImovelMethods.register('banheiros')}
+            />
+            {createImovelMethods.formState.errors.banheiros?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.banheiros.message}
+              </p>)}
+          </Label>
+          <Label>
+            Vagas Garagem
+            <Input
+              className="mt-2"
+              type="number"
+              disabled={disabled}
+              placeholder="Número de vagas de estacionamento"
+              {...createImovelMethods.register('vagasEstacionamento')}
+            />
+            {createImovelMethods.formState.errors.vagasEstacionamento?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.vagasEstacionamento.message}
+              </p>)}
+          </Label>
+        </div>
+
+        <div className={(isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-2")}>
+          <Label>
+            Andar
+            <Input
+              className="mt-2"
+              type="number"
+              step="any"
+              disabled={disabled}
+              placeholder="Número do andar"
+              {...createImovelMethods.register('andar')}
+            />
+            {createImovelMethods.formState.errors.andar?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createImovelMethods.formState.errors.andar.message}
+              </p>)}
           </Label>
         </div>
 

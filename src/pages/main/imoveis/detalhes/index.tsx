@@ -60,6 +60,7 @@ import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { usdFormatter } from '@/utils/format-money'
+import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 //REFACTOR: move to another directory
 //const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
@@ -89,7 +90,8 @@ export interface CreateLocacaoData extends CreateLocacaoSchema {
 //Funções de acesso ao banco de dados
 //Consulta imóvel
 export const getImovel = async (id: number): Promise<Imovel> => {
-  const response = await api.get<Imovel>(`imoveis/${id}`)
+  const response = await api.get<Imovel>(`imoveis/findbyid/${id}`)
+  console.log('response', response);
   return response.data
 }
 
@@ -209,6 +211,7 @@ export const DetalhesImovel = () => {
   const [selPessoa, setSelPessoa] = useState<boolean>(false);
   const [openCli, setOpenCli] = useState<boolean>(false);
   const [openLoc, setOpenLoc] = useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(false);
 
   //Globals
   const glb_params = useGlobalParams();
@@ -234,17 +237,19 @@ export const DetalhesImovel = () => {
 
   //Altera Imóvel
   const updateMutation = useMutation({
-    mutationFn: (data: FormData) => updateImovel(id!, data),
+    mutationFn: (data: FormData) => updateImovel(id!, data),    
     onSuccess: () => {
       ;['imovel', id].forEach((key) =>
         queryClient.invalidateQueries({
           queryKey: [key]
         })
       )
+      setLoader(false);
       toast({ title: 'Imóvel atualizado com sucesso' })
       setIsEditingPersonalInfo(false)
     },
     onError: () => {
+      setLoader(false);
       toast({ title: 'Erro ao atualizar imóvel', variant: 'destructive' })
     }
   })
@@ -405,14 +410,23 @@ export const DetalhesImovel = () => {
 
     const imageFilesPromises = imovelPhotos.map(async (image) => {
       try {
-        const response = await fetch(
+        /*const response = await fetch(
           'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + image.url
+        )*/
+
+        console.log('link', AZURE_BLOB_CONTAINER + image.url);
+        const response = await fetch(
+          AZURE_BLOB_CONTAINER + image.url
         )
+        console.log('response', response);
         if (!response.ok) {
           throw new Error(`Erro ao buscar imagem: ${image.url}, Status: ${response.status}`)
         }
         const blob = await response.blob()
+        
         const file = new File([blob], image.url, { type: blob.type })
+        //const file = new File([blob], image.url, { type: 'application/png' })
+        console.log('blob', file);
         return {
           file,
           preview: URL.createObjectURL(file),
@@ -437,6 +451,7 @@ export const DetalhesImovel = () => {
   const defaultValues = {
     ...parsedData,
     //tipoId: imovel?.tipo.name,
+    empresaId: imovel?.empresaId,
     logradouro: enderecoData?.logradouro,
     numero: enderecoData?.numero ? enderecoData.numero : undefined,
     complemento: enderecoData?.complemento,
@@ -444,7 +459,11 @@ export const DetalhesImovel = () => {
     cidade: enderecoData?.cidade,
     cep: enderecoData?.cep,
     estado: enderecoData?.estado,
-    images: imageFiles
+    images: imageFiles,
+    condominioId: imovel?.condominioId,
+    blocoId: imovel?.blocoId,
+    condominioBloco: imovel?.condominioId + ';' + imovel?.blocoId,
+    imovelPhotos: imageFiles,
   }
 
   //Dados do imóvel schema de validação
@@ -516,7 +535,8 @@ export const DetalhesImovel = () => {
   }, [glb_params])
 
   //Validade dados do imóvel no caso de alteração
-  const onSubmitImovelData = (data: ImovelSchema) => {
+  const onSubmitImovelData = (data: ImovelSchema) => {    
+    setLoader(true);
     // Verifica se existem imagens novas ou se todas as imagens foram removidas
 
     // const newImages = data?.images?.find((imgData) => {
@@ -550,6 +570,22 @@ export const DetalhesImovel = () => {
       form.append('valorAluguel', data.valorAluguel.toString())
     }
 
+    if (data.metragem) {
+      form.append('metragem', data.metragem.toString())
+    }
+    if (data.quartos) {
+      form.append('quartos', data.quartos.toString())
+    }
+    if (data.banheiros) {
+      form.append('banheiros', data.banheiros.toString())
+    }
+    if (data.vagasEstacionamento) {
+      form.append('vagasEstacionamento', data.vagasEstacionamento.toString())
+    }
+    if (data.andar) {
+      form.append('andar', data.andar.toString())
+    }
+
     if (data.logradouro) {
       form.append('logradouro', data.logradouro)
     }
@@ -576,6 +612,10 @@ export const DetalhesImovel = () => {
 
     if (data.estado) {
       form.append('estado', data.estado)
+    }
+
+    if (data.empresaId) {
+      form.append('empresaId', data.empresaId.toString())
     }
 
     newImages?.forEach((image: any) => {
@@ -607,7 +647,7 @@ export const DetalhesImovel = () => {
       })
     }
 
-    updateMutation.mutate(form)
+    updateMutation.mutate(form)    
   }
 
   //Locação
@@ -636,7 +676,7 @@ export const DetalhesImovel = () => {
       valorDeposito: locacaoAtiva?.garantiaDepositoCalcao?.valorDeposito,
       quantidadeMeses: locacaoAtiva?.garantiaDepositoCalcao?.quantidadeMeses
     },
-    documentos: locacaoAtiva?.documentos
+    documentos: locacaoAtiva?.documentos,    
   }
 
 
@@ -1020,8 +1060,10 @@ export const DetalhesImovel = () => {
 
   if (isLoading) return <PageLoader />
 
-  return (
+  return (    
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+      {loader && (<PageLoader />)}
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Detalhes</h1>
         {activeTab === 'personal-info' && (

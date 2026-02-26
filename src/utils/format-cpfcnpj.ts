@@ -29,3 +29,15 @@ export const formatPhone = (phoneNumber: string): string => {
     return cleanedValue; // Return as-is or apply other logic
   }
 };
+
+export const formatCreditCard = (creditCardNumber: string): string => {
+  const cleanedValue = creditCardNumber.replace(/\D/g, ''); // Remove non-digits
+  const regex = /^(\d{4})(\d{4})(\d{4})(\d{4})$/; // Matches 16 digits
+
+  if (regex.test(cleanedValue)) {
+    return cleanedValue.replace(regex, '$1 $2 $3 $4');
+  } else {
+    // Handle other lengths or international formats
+    return cleanedValue; // Return as-is or apply other logic
+  }
+};

@@ -32,8 +32,8 @@ interface GetClientesParams {
 }
 
 // API & Query Logic
-export const getClientes = async ({ page, limit, search, exclude }: GetClientesParams) => {
-  return await api.get<BasePaginationData<Pessoa>>('pessoas', {
+export const getClientes = async (empresaId:number, { page, limit, search, exclude }: GetClientesParams) => {
+  return await api.get<BasePaginationData<Pessoa>>('pessoas/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -43,7 +43,7 @@ export const getClientes = async ({ page, limit, search, exclude }: GetClientesP
   })
 }
 
-export const useGetClientesQueryOptions = ({
+export const useGetClientesQueryOptions = (empresaId:number, {
   search,
   page,
   limit,
@@ -59,8 +59,8 @@ export const useGetClientesQueryOptions = ({
   exclude?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['clientes', { search, page, limit, exclude }, queryKeys],
-    queryFn: () => getClientes({ search, page, limit, exclude })
+    queryKey: ['clientes', empresaId, { search, page, limit, exclude }, queryKeys],
+    queryFn: () => getClientes(empresaId, { search, page, limit, exclude })
   })
 }
 
@@ -97,7 +97,7 @@ export default function ListarClientes({
   const search = searchParams.get('search') || '';
 
   const { data, isLoading } = useQuery(
-    useGetClientesQueryOptions({
+    useGetClientesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,

@@ -20,14 +20,14 @@ import { Switch, Thumb } from '@radix-ui/react-switch'
 
 
 // API & Query Logic
-export const getTipos = async () => {
-  return await api.get<TipoLancamento[]>('tipolancamento')
+export const getTipos = async (empresaId: number) => {
+  return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
-export const useGetTiposQueryOptions = () => {
+export const useGetTiposQueryOptions = (empresaId: number) => {
   return queryOptions({
-    queryKey: ['tipolancamento'],
-    queryFn: () => getTipos()
+    queryKey: ['tipolancamento',empresaId],
+    queryFn: () => getTipos(empresaId)
   })
 }
 
@@ -38,6 +38,7 @@ export const createTipo = ({
   parcelas,
   geraObservacao,
   valorFixo,
+  empresaId,
 }: {
   name: string,
   tipo: lancamentoTipo,
@@ -45,7 +46,7 @@ export const createTipo = ({
   parcelas: number,
   geraObservacao: string,
   valorFixo: number,
-
+  empresaId: number,
 }) => {
   return api.post('/tipolancamento', {
     name: name,
@@ -54,6 +55,7 @@ export const createTipo = ({
     parcelas: parcelas,
     geraObservacao: geraObservacao,
     valorFixo: valorFixo,
+    empresaId: empresaId
   })
 }
 
@@ -73,6 +75,7 @@ export const putUpdateTipo = (tipoData: {
   parcelas: number
   geraObservacao: string
   valorFixo: number
+  empresaId: number
 }) => {
   return api.put(`/tipolancamento/${tipoData.id}`,
     {
@@ -82,6 +85,7 @@ export const putUpdateTipo = (tipoData: {
       parcelas: tipoData.parcelas,
       geraObservacao: tipoData.geraObservacao,
       valorFixo: tipoData.valorFixo,
+      empresaId: tipoData.empresaId
     })
 }
 
@@ -101,13 +105,14 @@ export default function ListarTiposLancamento() {
       parcelas: 0,
       geraObservacao: 'N',
       valorFixo: 0,
+      empresaId: 0,
     }
   )
   //Globals
   const glb_params = useGlobalParams();
 
   const { data, isLoading } = useQuery(
-    useGetTiposQueryOptions()
+    useGetTiposQueryOptions(Number(glb_params.id_empresa))
   )
 
   const tipos = data?.data;
@@ -130,6 +135,7 @@ export default function ListarTiposLancamento() {
         parcelas: 0,
         geraObservacao: 'N',
         valorFixo: 0,
+        empresaId: Number(glb_params.id_empresa)
       }
       )
     },
@@ -215,6 +221,7 @@ export default function ListarTiposLancamento() {
         parcelas: newTipo.parcelas,
         geraObservacao: newTipo.geraObservacao,
         valorFixo: newTipo.valorFixo,
+        empresaId: Number(glb_params.id_empresa),
       });
     }
     else {
@@ -244,6 +251,7 @@ export default function ListarTiposLancamento() {
         parcelas: selectedTipo.parcelas,
         geraObservacao: selectedTipo.geraObservacao,
         valorFixo: selectedTipo.valorFixo,
+        empresaId: Number(glb_params.id_empresa),
       })
     }
   }
@@ -264,6 +272,7 @@ export default function ListarTiposLancamento() {
               parcelas: 0,
               geraObservacao: 'N',
               valorFixo: 0,
+              empresaId: Number(glb_params.id_empresa),
             }
             )
           }}

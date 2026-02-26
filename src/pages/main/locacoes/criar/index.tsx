@@ -39,7 +39,9 @@ export default function CriarLocacao (){
 
   const locacaoMethods = useForm<LocacaoSchema>({
     resolver: zodResolver(locacaoSchema),
-    defaultValues: {},
+    defaultValues: {
+      empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+    },
     mode: 'all'
   })
 
@@ -122,6 +124,9 @@ export default function CriarLocacao (){
     formData.append('vigenciaInicio', moment(data.seguroIncendio.vigenciaInicio).format('YYYY-MM-DD'));
     formData.append('vigenciaFim', moment(data.seguroIncendio.vigenciaFim).format('YYYY-MM-DD'));
     formData.append('pessoaId', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
+      if (data.empresaId) {
+        formData.append('empresaId', data.empresaId.toString())
+      }
 
     console.log(formData.values());
 

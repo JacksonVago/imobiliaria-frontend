@@ -35,7 +35,7 @@ export function NavMain({
 }) {
   //Globals
   const glb_params = useGlobalParams();
-  const isMobile = useMediaQuery({ query: '(min-width: 700px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
 
   return (
     <SidebarGroup className='font-[Poppins-Regular]'>
@@ -43,10 +43,10 @@ export function NavMain({
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem onClick={useSidebar().toggleSidebar}>
-              <SidebarMenuButton className="py-5" asChild tooltip={item.title}>
+              <SidebarMenuButton className={isMobile ? "py-5" : "py-3"} asChild tooltip={item.title}>
                 <Link to={item.url}>
                   <item.icon />
-                  <span style={{ "fontSize": isMobile ? "1rem" : "0.80rem" }}>{item.title}</span>
+                  <span style={{ "fontSize": isMobile ? ".80rem" : "0.80rem" }}>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (

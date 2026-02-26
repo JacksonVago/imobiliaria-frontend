@@ -45,7 +45,6 @@ import { Locacao } from '@/interfaces/locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
 //import { boolean } from 'zod';
 import { useMediaQuery } from 'react-responsive';
-import { Lancamento } from '@/interfaces/lancamentos'
 import { lancamentoSchema, LancamentoSchema } from '@/schemas/lancamentos.schema'
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
@@ -53,9 +52,10 @@ import axios from 'axios'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
+import { LancamentoLocacao } from '@/interfaces/lancamentos'
 
-export const getTipos = async () => {
-  return await api.get<TipoLancamento[]>('tipolancamento')
+export const getTipos = async (empresaId:number) => {
+  return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
 export const DetalhesLancamento = () => {
@@ -89,10 +89,11 @@ export const DetalhesLancamento = () => {
     enabled: !!id
   })
 
+  console.log(locacao);
   const createLancamento = useMutation({
     mutationFn: async (data: FormData) => {
 
-      return await api.post<Lancamento>(`/lancamentos`, data, {
+      return await api.post<LancamentoLocacao>(`/lancamentos`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     },
@@ -105,7 +106,7 @@ export const DetalhesLancamento = () => {
 
   const updateLancamento = useMutation({
     mutationFn: async (data: FormData) => {
-      return await api.put<Lancamento>(`/lancamentos/${data.get('id')}`, data, {
+      return await api.put<LancamentoLocacao>(`/lancamentos/${data.get('id')}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     },
@@ -283,10 +284,10 @@ export const DetalhesLancamento = () => {
     data: tipolancamento
   } = useQuery({
     queryKey: ['tipolancamento'],
-    queryFn: () => getTipos()
+    queryFn: () => getTipos(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0),
   });
 
-  const handleEditLancamento = (lancamento: Lancamento) => {
+  const handleEditLancamento = (lancamento: LancamentoLocacao) => {
     setTitulo("Alterar lançamento")
     setIsCreateDialogOpen(true);
     lancamentoMethods.setValue("id", lancamento.id);

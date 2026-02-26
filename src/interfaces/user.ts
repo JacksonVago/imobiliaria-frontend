@@ -1,13 +1,17 @@
+import { Empresa } from "./empresa"
+
 export interface User {
-  id: string
-  login: string
-  name: string
-  email: string
-  password:string
-  role: UserRole
-  permissions: Permission[]
-  createdAt: string
-  updatedAt?: string
+  id: string;
+  login: string;
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  permissions: Permission[];
+  createdAt: string;
+  updatedAt?: string;
+  empresa: Empresa;
+  empresaId: number;
 }
 
 export type Permission =
@@ -54,6 +58,19 @@ export type Permission =
   | 'UPDATE_PAGAMENTO'
   | 'DELETE_PAGAMENTO'
   | 'VIEW_PAGAMENTOS'
+  | 'CREATE_CONDOMINIO'
+  | 'UPDATE_CONDOMINIO'
+  | 'DELETE_CONDOMINIO'
+  | 'VIEW_CONDOMINIOS'
+  | 'CREATE_BLOCO'
+  | 'UPDATE_BLOCO'
+  | 'DELETE_BLOCO'
+  | 'VIEW_BLOCOS'
+  | 'CREATE_LANCAMENTO_CONDOMINIO'
+  | 'UPDATE_LANCAMENTO_CONDOMINIO'
+  | 'DELETE_LANCAMENTO_CONDOMINIO'
+  | 'VIEW_LANCAMENTOS_CONDOMINIOS'
+
 
 export const userPermissions: {
   [key in Permission]: string
@@ -101,6 +118,18 @@ export const userPermissions: {
   UPDATE_PAGAMENTO: 'Atualizar pagamento',
   DELETE_PAGAMENTO: 'Deletar pagamento',
   VIEW_PAGAMENTOS: 'Visualizar pagamentos',
+  CREATE_CONDOMINIO: 'Criar condomínio',
+  UPDATE_CONDOMINIO: 'Atualizar condomínio',
+  DELETE_CONDOMINIO: 'Deletar condomínio',
+  VIEW_CONDOMINIOS: 'Visualizar condomínios',
+  CREATE_BLOCO: 'Criar bloco',
+  UPDATE_BLOCO: 'Atualizar bloco',
+  DELETE_BLOCO: 'Deletar bloco',
+  VIEW_BLOCOS: 'Visualizar blocos',
+  CREATE_LANCAMENTO_CONDOMINIO: 'Criar lançamento condomínio',
+  UPDATE_LANCAMENTO_CONDOMINIO: 'Atualizar lançamento condomínio',
+  DELETE_LANCAMENTO_CONDOMINIO: 'Deletar lançamento condomínio',
+  VIEW_LANCAMENTOS_CONDOMINIOS: 'Visualizar lançamentos condomínios',
 
 }
 

@@ -31,15 +31,12 @@ export const DetalhesEmpresaForm = () => {
   //Globals
   const glb_params = useGlobalParams();
 
-  console.log(`/empresas/${glb_params.id_empresa ? glb_params.id_empresa : 0}`);
   const { data: empresa } = useQuery({
     queryKey: ['empresa', (glb_params.id_empresa ? glb_params.id_empresa : 0)],
     queryFn: async () => {
       try {
         const data = await api.get<Empresa>(`/empresas/${glb_params.id_empresa ? glb_params.id_empresa : 0}`)
         //console.log(data.data.id ? data.data.id.toString() : 'test');
-        console.log(data);
-        console.log(data.data);
         glb_params.updId_empresa(data.data.id ? data.data.id.toString() : '0')
         return data.data;
       }
@@ -86,7 +83,7 @@ export const DetalhesEmpresaForm = () => {
 
   const updateEmpresa = useMutation({
     mutationFn: async (data: FormData) => {
-      return await api.put<Empresa>(`/empresas/${id}`, data, {
+      return await api.put<Empresa>(`/empresas/${glb_params.id_empresa}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     },
@@ -286,6 +283,12 @@ export const DetalhesEmpresaForm = () => {
       empresaMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
     }
   }, [id, empresa])
+
+  
+  console.log('erro',empresaMethods.formState.errors);
+  console.log('erro',empresaMethods.formState.isDirty);
+  console.log('erro',empresaMethods.formState.isValid);
+  console.log('values',empresaMethods.getValues());
 
   return (
     <Card>

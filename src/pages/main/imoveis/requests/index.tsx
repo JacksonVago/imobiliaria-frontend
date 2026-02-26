@@ -23,6 +23,6 @@ export const createLocacao = async (data: CreateLocacaoData): Promise<void> => {
 }
 
 export const getImovel = async (id: number): Promise<Imovel> => {
-  const response = await api.get<Imovel>(`imoveis/${id}`)
+  const response = await api.get<Imovel>(`imoveis/findbyid/${id}`)
   return response.data
 }

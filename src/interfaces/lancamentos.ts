@@ -1,8 +1,9 @@
 import { LancamentoStatus } from "@/enums/locacao/enums-locacao"
 import { Locacao } from "./locacao"
 import { TipoLancamento } from "./lancamentotipo"
+import { Boleto } from "./boleto"
 
-export interface Lancamento {
+export interface LancamentoLocacao {
   id: number
   lancamentotipo: TipoLancamento
   tipoId:number
@@ -11,6 +12,8 @@ export interface Lancamento {
   vencimentoLancamento: string
   observacao?: string
   status:LancamentoStatus
-  locacao?: Locacao
+  locacao: Locacao
   locacaoId: number
+  boleto?: Boleto
+  boletoId?: number
 }

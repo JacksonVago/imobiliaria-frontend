@@ -1,0 +1,4 @@
+export enum FormaRateio {
+  IGUALITARIO = 'IGUALITARIO',
+  FRACAO_IDEAL = 'FRACAO_IDEAL'
+}

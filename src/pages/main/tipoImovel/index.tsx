@@ -24,24 +24,27 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 }*/
 
 // API & Query Logic
-export const getTipos = async () => {
-  return await api.get<TipoImovel[]>('tipoimovel')
+export const getTipos = async (empresaId: number) => {
+  return await api.get<TipoImovel[]>('tipoimovel/' + empresaId)
 }
 
-export const useGetTiposQueryOptions = () => {
+export const useGetTiposQueryOptions = (empresaId: number) => {
   return queryOptions({
-    queryKey: ['tipoimovel'],
-    queryFn: () => getTipos()
+    queryKey: ['tipoimovel', empresaId],
+    queryFn: () => getTipos(empresaId)
   })
 }
 
 export const createTipo = ({
   name,
+  empresaId,
 }: {
   name: string
+  empresaId: number
 }) => {
   return api.post('/tipoimovel', {
     name: name,
+    empresaId: empresaId
   })
 }
 
@@ -76,7 +79,7 @@ export default function ListarTipos() {
   const [selectedTipo, setSelectedTipo] = React.useState<TipoImovel | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [newTipo, setNewTipo] = React.useState({ name: '' })
+  const [newTipo, setNewTipo] = React.useState({ name: '', empresaId: 0 })
   //Globals
   const glb_params = useGlobalParams();
 
@@ -85,7 +88,7 @@ export default function ListarTipos() {
   //const limit = 3;
 
   const { data, isLoading } = useQuery(
-    useGetTiposQueryOptions()
+    useGetTiposQueryOptions(Number(glb_params.id_empresa))
   )
 
   const tipos = data?.data;  
@@ -101,7 +104,7 @@ export default function ListarTipos() {
         description: 'O novo tipo de imóvel foi criado com sucesso.',                
       })
       setIsCreateDialogOpen(false)
-      setNewTipo({ name: '' })
+      setNewTipo({ name: '', empresaId: Number(glb_params.id_empresa) })
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
@@ -179,6 +182,7 @@ export default function ListarTipos() {
     if (newTipo.name.trim() !== '') {
       createTipoMutation.mutate({
         name: newTipo.name,
+        empresaId: Number(glb_params.id_empresa),
       });
     }
     else {
@@ -216,7 +220,7 @@ export default function ListarTipos() {
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-            setNewTipo({ name: '' })
+            setNewTipo({ name: '', empresaId: Number(glb_params.id_empresa)})
           }}
         >
           <DialogTrigger asChild>

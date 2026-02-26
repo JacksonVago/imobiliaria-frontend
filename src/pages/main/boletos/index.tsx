@@ -350,7 +350,7 @@ export default function ListarBoletos({
                 <Label className="font-bold flex justify-end">
                   Aluguel R$ {boleto.locacao?.valorAluguel?.toLocaleString('pt-BR')}
                 </Label>
-                {(boleto.lancamentos && boleto.lancamentos?.length > 0) ? (
+                {(boleto.lanctoLocacao && boleto.lanctoLocacao?.length > 0) ? (
                   <>
                     <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
                     <div className='rounded-md border'>
@@ -365,7 +365,7 @@ export default function ListarBoletos({
                       </div>
 
                       <div className='grid grid-cols-5 m-2 gap-1' >
-                        {boleto.lancamentos?.map((lancamento) => (
+                        {boleto.lanctoLocacao?.map((lancamento) => (
                           <>
                             <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                             {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
@@ -381,7 +381,7 @@ export default function ListarBoletos({
                       <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
                       <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
                         {usdFormatter.format((boleto.locacao ? boleto.locacao.valorAluguel : 0) +
-                          boleto.lancamentos.reduce((total, lancamento) => {
+                          boleto.lanctoLocacao.reduce((total, lancamento) => {
                             return total + lancamento.valorLancamento;
                           }, 0))}
                       </Label>

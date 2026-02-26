@@ -4,6 +4,7 @@ import { GenericAnexo } from './generic-anexo'
 import { Imovel } from './imovel'
 import { Locatario } from './locatario'
 import { Lancamento } from './lancamentos'
+import { Empresa } from './empresa'
 
 export enum BackendGarantiaLocacaoTypes {
   SEGURO_FIANCA = 'SEGURO_FIANCA',
@@ -32,6 +33,9 @@ export interface Locacao {
   status: LocacaoStatus
   imovel?: Imovel
   imovelId: number
+
+  empresa:Empresa;
+  empresaId:number;
 
   documentos?:GenericAnexo[]
   
