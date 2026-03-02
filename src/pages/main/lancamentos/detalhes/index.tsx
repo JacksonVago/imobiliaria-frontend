@@ -53,7 +53,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { LancamentoLocacao } from '@/interfaces/lancamentos'
-import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
+import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt.js'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
