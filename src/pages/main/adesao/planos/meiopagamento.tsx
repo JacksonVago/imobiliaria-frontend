@@ -156,7 +156,7 @@ export const MeioPagamento = () => {
                 form.append('observacao', data.observacao);
             }
 
-            //form.append('encryptedCard', card.encryptedCard);
+            form.append('encryptedCard', card.encryptedCard);
 
             form.append('plano', plano?.data ? plano?.data.tipo : '');
             form.append('frequencia', plano?.data ? plano?.data.frequencia : 'MENSAL');
