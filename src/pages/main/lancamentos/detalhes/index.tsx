@@ -53,7 +53,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { LancamentoLocacao } from '@/interfaces/lancamentos'
-//import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt.js'
+import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -324,13 +324,13 @@ export const DetalhesLancamento = () => {
         if (/^\d+$/.test(linhaDigitavel)) {
           // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
           var dbl_valor = 0;
-          //var int_dig = 0;
-          //var int_modulo = (linhaDigitavel.substring(2,1) === '6' ? 11 : 10)
+          var int_dig = 0;
+          var int_modulo = (linhaDigitavel.substring(2,1) === '6' ? 11 : 10)
           var str_vencimento = '';
 
           //Validar digitos
           //Bloco 1
-          /*int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0,11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
             return true;
           }
@@ -351,7 +351,7 @@ export const DetalhesLancamento = () => {
           int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36,11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
             return true;
-          }*/
+          }
 
           if (linhaDigitavel.length == 44) {
             console.log(linhaDigitavel.substring(4, 13));
