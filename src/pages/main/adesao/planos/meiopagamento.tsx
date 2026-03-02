@@ -15,13 +15,13 @@ import { toast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { formatCpfCnpj, formatCreditCard } from '@/utils/format-cpfcnpj'
 import api from '@/services/axios/api'
-import { PAGSEGURO_PUIBLIC_KEY } from '@/constants/pagseguro'
+//import { PAGSEGURO_PUIBLIC_KEY } from '@/constants/pagseguro'
 import { Plano } from '@/interfaces/plano'
 import { useQuery } from '@tanstack/react-query'
 import { usdFormatter } from '@/utils/format-money'
 import { PagamentoAssinatura } from '@/interfaces/pagamentosassinaturas'
 import { useAuth } from '@/hooks/auth/use-auth'
-import  { encryptCardPagSeguro }  from '@/utils/pagseguro-ecrypt'
+//import  { encryptCardPagSeguro }  from '@/utils/pagseguro-ecrypt'
 
 export const getPlano = async (id: string) => {
     return await api.get<Plano>('assinatura/' + id)
@@ -104,14 +104,14 @@ export const MeioPagamento = () => {
     // Event Handlers
     const onSubmitPagamentoData = async (data: PagamentoSchema) => {
         try {
-            const card = encryptCardPagSeguro({
+            /*const card = encryptCardPagSeguro({
                 publicKey: PAGSEGURO_PUIBLIC_KEY,
                 holder: data.nome,
                 number: data.numeroCartao.toString().replace(/\s+/g, ''),
                 expMonth: data.expMes.toString(),
                 expYear: data.expAno.toString(),
                 securityCode: data.codigoSeguranca
-            });
+            });*/
 
             //console.log('card:', card);
 
@@ -156,7 +156,7 @@ export const MeioPagamento = () => {
                 form.append('observacao', data.observacao);
             }
 
-            form.append('encryptedCard', card.encryptedCard);
+            //form.append('encryptedCard', card.encryptedCard);
 
             form.append('plano', plano?.data ? plano?.data.tipo : '');
             form.append('frequencia', plano?.data ? plano?.data.frequencia : 'MENSAL');
