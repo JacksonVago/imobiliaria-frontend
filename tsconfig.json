@@ -7,8 +7,6 @@
   "compilerOptions": {
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "allowJs": true,
-    "checkJs": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
