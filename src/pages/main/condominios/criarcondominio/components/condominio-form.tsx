@@ -12,12 +12,9 @@ import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
 import api from '@/services/axios/api'
 import { Controller, FormProvider, UseFormReturn } from 'react-hook-form'
-import { PropertyImageUpload } from './multi-images-upload'
 import { Textarea } from '@/components/ui/textarea'
-import { useQuery } from '@tanstack/react-query'
 import { CondominioSchema } from '@/schemas/condominio.schema'
 import { DocumentUpload } from '@/pages/main/imoveis/criarImovel/components/document-upload'
-import { CONDOMINIO_FORMARATEIO } from '../../constants/condominio'
 import { FORMA_RATEIO_OPTIONS } from '@/constants/formarateio'
 
 export const CondominioFormRoot = ({

@@ -12,14 +12,12 @@ import {
 } from '@/components/ui/pagination'
 import { ROUTE } from '@/enums/routes.enum'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
-import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
+import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Bloco } from '@/interfaces/bloco'
-import { Condominio } from '@/interfaces/condominio'
-import { Endereco } from '@/interfaces/endereco'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, MapPin, Plus, Search, Table } from 'lucide-react'
+import { IdCard, Plus, Search, Table } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -117,7 +115,7 @@ export default function ListarBlocos({
   const blocos = data?.data?.data || []
   const totalPages = data?.data?.totalPages
   //const googleMaps = "https://www.google.com/maps/place/R.+Jo%C3%A3o+Kopke,+236+-+Bom+Retiro,+S%C3%A3o+Paulo+-+SP,+01124-030";
-  const googleMaps = "https://www.google.com/maps/place/";
+  //const googleMaps = "https://www.google.com/maps/place/";
 
   //const hasTotalPages = !!totalPages
   //const canGoToNextPage = hasTotalPages && page < totalPages
@@ -187,11 +185,7 @@ export default function ListarBlocos({
     navigate(`${ROUTE.BLOCOS}/${id}`)
   }
 
-  const handlerClickMaps = (endereco: Endereco) => {
-    const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
-    window.open(urlGoogleMaps);
-  }
-
+  
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}

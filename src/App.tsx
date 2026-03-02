@@ -14,7 +14,7 @@ function App() {
   const script = document.createElement("script");
   script.src = "https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js";
   script.async = true;
-  document.head.appendChild(script);
+  document.body.appendChild(script);
 
   return (
     <>

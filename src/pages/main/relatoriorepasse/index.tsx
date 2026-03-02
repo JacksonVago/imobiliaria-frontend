@@ -1,6 +1,3 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Pagination,
@@ -9,28 +6,21 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
-import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { FileDown, MapPin, Receipt, Search, Trash } from 'lucide-react'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { FileDown, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
-import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { Endereco } from '@/interfaces/endereco'
+import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/services/react-query/query-client'
 import { Boleto } from '@/interfaces/boleto'
-import { cn } from '@/lib/utils'
-import { BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
-import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { usdFormatter } from '@/utils/format-money'
 import { relatorioRepasse } from '@/utils/rel-repasse'
@@ -92,8 +82,6 @@ export default function ListarRepasses({
   limitView: number
   exclude: string
 }) {
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -181,19 +169,8 @@ export default function ListarRepasses({
     })
   }
 
-  const handleClickVerDetalhes = (id: number) => {
-    navigate(`${ROUTE.PAGAMENTOS}/${id}`)
-  }
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && repasses?.length === 0)
-
-  const googleMaps = "https://www.google.com/maps/place/";
-  const handlerClickMaps = (endereco: Endereco | undefined) => {
-    if (endereco) {
-      const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
-      window.open(urlGoogleMaps);
-    }
-  }
 
   const handlerChangeTipo = (tipo: string) => {
     navigate({

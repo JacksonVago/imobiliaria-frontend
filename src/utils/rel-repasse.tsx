@@ -2,7 +2,6 @@
 import { pdf, Document, Page, Text, View, Image, StyleSheet, Font } from '@react-pdf/renderer';
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado';
 import logo from '../assets/logo-molina.png';
-import PoppinsBold from '../fonts/Poppins-Bold.ttf';
 import PoppinsRegular from '../fonts/Poppins-Regular.ttf';
 import moment from 'moment';
 
@@ -162,7 +161,7 @@ export const relatorioRepasse = async (fileName: string, data: any) => {
                     </View>
 
                     {/*Produtos*/}
-                    {data.map((item: any, index: number) => (
+                    {data.map((item: any) => (
                         <View style={stylesTab.row} key={item.id.toString()} wrap={false}>
                             <Text style={stylesTab.imovel}>{(item.locacao?.imovel?.proprietarios ? item.locacao?.imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(item.locacao?.imovel?.endereco)}</Text>
                             <Text style={stylesTab.aluguel}>{real.format(item.locacao ? item.locacao.valorAluguel : 0)}</Text>

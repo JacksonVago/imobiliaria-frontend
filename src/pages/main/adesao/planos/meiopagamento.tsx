@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { usdFormatter } from '@/utils/format-money'
 import { PagamentoAssinatura } from '@/interfaces/pagamentosassinaturas'
 import { useAuth } from '@/hooks/auth/use-auth'
+import  { encryptCardPagSeguro }  from '@/utils/pagseguro-ecrypt'
 
 export const getPlano = async (id: string) => {
     return await api.get<Plano>('assinatura/' + id)
@@ -102,9 +103,8 @@ export const MeioPagamento = () => {
     console.log('planoId', plano?.data);
     // Event Handlers
     const onSubmitPagamentoData = async (data: PagamentoSchema) => {
-        console.log('data pagamento:', data);
         try {
-            const card = PagSeguro.encryptCard({
+            const card = encryptCardPagSeguro({
                 publicKey: PAGSEGURO_PUIBLIC_KEY,
                 holder: data.nome,
                 number: data.numeroCartao.toString().replace(/\s+/g, ''),
@@ -112,6 +112,18 @@ export const MeioPagamento = () => {
                 expYear: data.expAno.toString(),
                 securityCode: data.codigoSeguranca
             });
+
+            //console.log('card:', card);
+
+            /*const card = PagSeguro.encryptCard({
+                publicKey: PAGSEGURO_PUIBLIC_KEY,
+                holder: data.nome,
+                number: data.numeroCartao.toString().replace(/\s+/g, ''),
+                expMonth: data.expMes.toString(),
+                expYear: data.expAno.toString(),
+                securityCode: data.codigoSeguranca
+            });
+            console.log('card:', card);*/
 
             const form = new FormData()
 

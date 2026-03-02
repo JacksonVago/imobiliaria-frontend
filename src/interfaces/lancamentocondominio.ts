@@ -11,6 +11,7 @@ export interface LancamentoCondominio {
   valorLancamento:number;
   dataLancamento:Date;
   vencimentoLancamento:Date;
+  linhaDigitavel:string;
   observacao:string;
   rateia:string;
   status:LancamentoStatus;

@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -115,12 +114,12 @@ export function DocumentUpload({
     return <File className="h-12 w-12" />
   }
 
-  const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
+  //const supabaseUrl = "https://jrseqfittadsxfbmlwvz.supabase.co";
   //SUPABASE_URL="https://jrseqfittadsxfbmlwvz.supabase.co"
   //SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg"
-  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
+  //const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyc2VxZml0dGFkc3hmYm1sd3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg3ODIxNzAsImV4cCI6MjA0NDM1ODE3MH0.37dIwEoJYD-btVZCyEjq1ESY8TN2J3uJlD5nTqw2Hmg";
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  //const supabase = createClient(supabaseUrl, supabaseAnonKey);
   
   const downloadDocument = async (index:number) => {
     try {

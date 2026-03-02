@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Loader } from '@/components/ui/loader'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@radix-ui/react-label'
 import { useMediaQuery } from 'react-responsive'
 import { Input } from '@/components/ui/input'
-import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { Plano } from '@/interfaces/plano'
 import { useQuery } from '@tanstack/react-query'
@@ -33,7 +31,7 @@ export const Planos = () => {
     const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
     const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
 
-    const [rows, setRows] = useState<IPlanosLista[]>([]);
+    //const [rows, setRows] = useState<IPlanosLista[]>([]);
     const [rowsFilter, setRowsFilter] = useState<IPlanosLista[]>([]);
 
     const cardStyle = {
@@ -54,10 +52,10 @@ export const Planos = () => {
     });
 
     useEffect(() => {
-        setRows(planos?.data.map((plano) => ({
+        /*setRows(planos?.data.map((plano) => ({
             ...plano,
             checked: false
-        })) || []);
+        })) || []);*/
 
         setRowsFilter(planos?.data.filter(x => x.frequencia === FrequenciaAssinatura.MENSAL).map((plano) => ({
             ...plano,
@@ -74,7 +72,7 @@ export const Planos = () => {
     const handlerSelPlano = (id: number) => {
 
         //setExpanded(!expanded);
-        const checkeds = rowsFilter.map((c, i) => {
+        const checkeds = rowsFilter.map((c) => {
             if (id === c.id) {
 
                 c.checked = !c.checked;

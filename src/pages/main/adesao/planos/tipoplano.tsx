@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Loader } from '@/components/ui/loader'
-import { Check, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@radix-ui/react-label'
 import { useMediaQuery } from 'react-responsive'
 import { Input } from '@/components/ui/input'
 import { ROUTE } from '@/enums/routes.enum'
-import { Badge } from '@/components/ui/badge'
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import api from '@/services/axios/api'
 import { Plano } from '@/interfaces/plano'
 import { useQuery } from '@tanstack/react-query'
 import { TipoAssinatura } from '@/enums/assinatura/TipoAssinatura'
 import { usdFormatter } from '@/utils/format-money'
+import { Info } from 'lucide-react'
 
 export const getPlanos = async () => {
     return await api.get<Plano[]>('assinatura')
@@ -40,12 +38,12 @@ export const PlanoTipo = () => {
     const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
     const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
 
-    const [rows, setRows] = useState<IPlanosLista[]>([]);
+    //const [rows, setRows] = useState<IPlanosLista[]>([]);
     const [rowsFilter, setRowsFilter] = useState<IPlanosLista[]>([]);
 
-    const [selMensal, setSelMensal] = useState(false);
-    const [selSemestral, setSelSemestral] = useState(false);
-    const [selAnual, setSelAnual] = useState(false);
+    //const [selMensal, setSelMensal] = useState(false);
+    //const [selSemestral, setSelSemestral] = useState(false);
+    //const [selAnual, setSelAnual] = useState(false);
     const [openAss, setOpenAss] = useState(false);
 
     const cardStyle = {
@@ -72,10 +70,10 @@ export const PlanoTipo = () => {
         queryFn: () => getPlanos()
     });
     useEffect(() => {
-        setRows(planos?.data.map((plano) => ({
+        /*setRows(planos?.data.map((plano) => ({
             ...plano,
             checked: false
-        })) || []);
+        })) || []);*/
 
         setRowsFilter(planos?.data.filter(x => x.tipo === plano?.data?.tipo).map((plano) => ({
             ...plano,
@@ -93,7 +91,7 @@ export const PlanoTipo = () => {
     const handlerSelPlanoTipo = (id: number) => {
 
         //setExpanded(!expanded);
-        const checkeds = rowsFilter.map((c, i) => {
+        const checkeds = rowsFilter.map((c) => {
             if (id === c.id) {
 
                 c.checked = !c.checked;
@@ -101,7 +99,7 @@ export const PlanoTipo = () => {
             } else {
                 c.checked = false;
                 return c;
-            }
+            }            
         });
 
         console.log(checkeds);

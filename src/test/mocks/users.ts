@@ -1,7 +1,7 @@
-import { User, UserRole } from '@/interfaces/user'
+//import { User, UserRole } from '@/interfaces/user'
 
 // Mocked user data
-export const mockedUsers: User[] = [
+/*export const mockedUsers: User[] = [
   {
     id: '1',
     name: 'John Doe',
@@ -32,4 +32,4 @@ export const mockedUsers: User[] = [
     createdAt: '2021-09-01T12:00:00Z',
     permissions: ['ALL']
   }
-]
+]*/

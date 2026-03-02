@@ -8,12 +8,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Controller, FormProvider, useFieldArray, UseFormReturn } from 'react-hook-form'
+import { Controller, FormProvider, UseFormReturn } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
 import { DocumentUpload } from '@/pages/main/imoveis/criarImovel/components/document-upload'
 import { BlocoSchema } from '@/schemas/bloco.schema'
-import { useState } from 'react'
-import { useMediaQuery } from 'react-responsive'
 import { getCondominiosEmp } from '@/pages/main/condominios/requests'
 import { useQuery } from '@tanstack/react-query'
 
@@ -37,12 +35,12 @@ export const BlocoFormContent = ({
   disabled?: boolean
 }) => {
 
-  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
-  const [selCondominio, setSelCondominio] = useState<boolean>(false);
+  //const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
+  //const [selCondominio, setSelCondominio] = useState<boolean>(false);
 
-  const handlerSelCondominio = () => {
+  /*const handlerSelCondominio = () => {
     setSelCondominio(true);
-  }
+  }*/
 
   //Carrega condomínios
     //Consulta bloco
@@ -89,7 +87,7 @@ export const BlocoFormContent = ({
 
   return (
     <div className="space-y-4">
-      <div style={{ display: ((!selCondominio) ? 'block' : 'none') }}>
+      <div>
         <FormProvider {...createBlocoMethods}>
           <DocumentUpload disabled={disabled} downloadDocuments={true} />
           {/*<PropertyImageUpload disabled={disabled} />*/}

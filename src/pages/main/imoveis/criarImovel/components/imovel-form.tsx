@@ -49,8 +49,8 @@ export const ImovelFormContent = ({
   //Globals
   const glb_params = useGlobalParams();
 
-  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
-  const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
+  //const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
+  //const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 380px)' })
 
   //Consulta Tipo imóvel

@@ -41,20 +41,17 @@ import { Pencil, Plus, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
-import { Locacao } from '@/interfaces/locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
 //import { boolean } from 'zod';
 import { useMediaQuery } from 'react-responsive';
-import { LancamentoCondominioSchema, lancamentoSchema, LancamentoSchema, lancCondominioSchema } from '@/schemas/lancamentos.schema'
+import { LancamentoCondominioSchema, lancCondominioSchema } from '@/schemas/lancamentos.schema'
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
-import { LancamentoLocacao } from '@/interfaces/lancamentos'
 import { LancamentoCondominio } from '@/interfaces/lancamentocondominio'
-import { Condominio } from '@/interfaces/condominio'
 import { Bloco } from '@/interfaces/bloco'
 import { useState } from 'react'
 
@@ -87,6 +84,8 @@ export const DetalhesLancamentoCondominio = () => {
     queryKey: ['bloco', id],
     queryFn: async () => {
       const { data } = await api.get<Bloco>(`/condominios/lancamentos/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
+      setdataInicial(moment.utc(dataInicial).format("YYYY-MM-DD"));
+      setdataFinal(moment.utc(dataInicial).format("YYYY-MM-DD"));
       return data
     },
     enabled: !!id
@@ -139,6 +138,10 @@ export const DetalhesLancamentoCondominio = () => {
   const onSubmitLancamentoData = async (data: LancamentoCondominioSchema) => {
     try {
       const form = new FormData()
+
+      if (data?.linhaDigitavel) {
+        form.append('linhaDigitavel', data.linhaDigitavel)
+      }
 
       if (data?.dataLancamento) {
         form.append('dataLancamento', data.dataLancamento)
@@ -389,6 +392,19 @@ export const DetalhesLancamentoCondominio = () => {
                         </div>
                       </Label>
                     </div>
+                    
+                    <div className='mt-2'>
+                      <Label htmlFor="description">Código de Barras
+                      <Input 
+                        type='text'
+                        disabled={disabled}
+                        placeholder="Código de barras "
+                        {...lancamentoMethods.register('linhaDigitavel')}
+                      />
+                      {lancamentoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
+                      </Label>
+                    </div>
+
                     <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
                       <Label className="text-base">
                         Data do Lançamento

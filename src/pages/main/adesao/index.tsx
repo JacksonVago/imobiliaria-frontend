@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Loader } from '@/components/ui/loader'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ROUTE } from '@/enums/routes.enum'
 
 //Bem vindo
 export const Adesao = () => {

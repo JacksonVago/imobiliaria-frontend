@@ -18,6 +18,7 @@ export interface Empresa {
   porcentagemComissao: number
   emiteBoleto:string
   valorTaxaBoleto: number
+  tipoLancamento: number
   emissaoBoletoAntecedencia: number
   porcentagemMultaAtraso: number
   porcentagemJurosAtraso: number

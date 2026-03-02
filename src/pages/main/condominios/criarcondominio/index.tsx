@@ -1,22 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { ROUTE } from '@/enums/routes.enum'
 import { useToast } from '@/hooks/use-toast'
-import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as React from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  getCondominio,
-} from '../requests'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { CondominioForm } from './components/condominio-form'
-import { Condominio } from '@/interfaces/condominio'
 import { condominioSchema, CondominioSchema } from '@/schemas/condominio.schema'
-import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
 
 
-const CONDOMINIO_KNOWN_ERRORS = ['Condomínio já cadastrado']
+//const CONDOMINIO_KNOWN_ERRORS = ['Condomínio já cadastrado']
 //TODO: create a interface for created imovel
 
 export const CriarCondominio = () => {
@@ -27,7 +20,7 @@ export const CriarCondominio = () => {
 
   //TODO: create the created imovel state
   //======CREATE IMOVEL METHODS======
-  const [createdCondominio, setCreatedCondominio] = React.useState<Condominio | undefined>()
+  /*const [createdCondominio, setCreatedCondominio] = React.useState<Condominio | undefined>()
   const condominioId = createdCondominio?.id
 
   const { data: condominio } = useQuery({
@@ -37,7 +30,7 @@ export const CriarCondominio = () => {
   })
 
   //by priority, react query imovel is the updated imovel data
-  const imovelData = condominio || createdCondominio
+  const imovelData = condominio || createdCondominio*/
 
   const createCondominioMethods = useForm<CondominioSchema>({
     resolver: zodResolver(condominioSchema),
@@ -97,11 +90,11 @@ export const CriarCondominio = () => {
       const jsonData = JSON.stringify(dataObject);
       console.log(jsonData);
 
-      const response = await api.post('condominios', form, {
+      /*const response = await api.post('condominios', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      })*/
 
-      setCreatedCondominio(response.data)
+      //setCreatedCondominio(response.data)
       //setCompletedSteps(new Set([currentStep]))
       //setCurrentStep('proprietario')
 

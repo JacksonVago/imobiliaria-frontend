@@ -1,20 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { ROUTE } from '@/enums/routes.enum'
 import { useToast } from '@/hooks/use-toast'
-import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import {  useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { Bloco } from '@/interfaces/bloco'
-import { getBloco } from '../requests'
 import { blocoSchema, BlocoSchema } from '@/schemas/bloco.schema'
 import { BlocoForm } from './components/bloco-form'
 
 
-const CONDOMINIO_KNOWN_ERRORS = ['Bloco já cadastrado']
 //TODO: create a interface for created imovel
 
 export const CriarBloco = () => {
@@ -25,7 +19,7 @@ export const CriarBloco = () => {
 
   //TODO: create the created imovel state
   //======CREATE IMOVEL METHODS======
-  const [createdBloco, setCreatedBloco] = React.useState<Bloco | undefined>()
+  /*const [createdBloco, setCreatedBloco] = React.useState<Bloco | undefined>()
   const blocoId = createdBloco?.id
 
   const { data: bloco } = useQuery({
@@ -35,7 +29,8 @@ export const CriarBloco = () => {
   })
 
   //by priority, react query imovel is the updated imovel data
-  const blocoData = bloco || createdBloco
+  const blocoData = bloco || createdBloco*/
+
   const createBlocoMethods = useForm<BlocoSchema>({
     resolver: zodResolver(blocoSchema),
     defaultValues: {
@@ -85,11 +80,11 @@ export const CriarBloco = () => {
       const jsonData = JSON.stringify(dataObject);
       console.log(jsonData);
 
-      const response = await api.post('blocos', form, {
+      /*const response = await api.post('blocos', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      })*/
 
-      setCreatedBloco(response.data)
+      //setCreatedBloco(response.data)
       //setCompletedSteps(new Set([currentStep]))
       //setCurrentStep('proprietario')
 

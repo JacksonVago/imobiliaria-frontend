@@ -10,6 +10,7 @@ export interface LancamentoLocacao {
   valorLancamento: number
   dataLancamento: string
   vencimentoLancamento: string
+  linhaDigitavel:string;
   observacao?: string
   status:LancamentoStatus
   locacao: Locacao

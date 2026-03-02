@@ -16,7 +16,6 @@ import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-ender
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Condominio } from '@/interfaces/condominio'
 import { Endereco } from '@/interfaces/endereco'
-import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { IdCard, MapPin, Plus, Search, Table } from 'lucide-react'
 import { useEffect, useState } from 'react'

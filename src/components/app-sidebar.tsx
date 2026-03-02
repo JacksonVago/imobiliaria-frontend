@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, Building, Building2, CircleDollarSign, Cog, House,  HousePlus, KeyRound, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
+import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 import logo  from '../assets/logo-molina.png';
 

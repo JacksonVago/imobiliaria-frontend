@@ -30,7 +30,6 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CondominioForm } from '../criarcondominio/components/condominio-form'
-import { GarantiaLocacao } from '@/enums/locacao/enums-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { usdFormatter } from '@/utils/format-money'
@@ -113,10 +112,6 @@ export const DetalhesCondominio = () => {
   //const [selectedLocatario, setSelectedLocatario] = useState<Locatario | null>(null)
   const { toast } = useToast()
 
-  const [selGarantia, setSelGarantia] = useState<GarantiaLocacao>();
-  const [selFiador, setSelFiador] = useState<boolean>(false);
-  const [selPessoa, setSelPessoa] = useState<boolean>(false);
-
   //Globals
   const glb_params = useGlobalParams();
 
@@ -179,20 +174,22 @@ export const DetalhesCondominio = () => {
 
   //Altera Condomínio
   const updateMutation = useMutation({
-    mutationFn: (data: FormData) => updateCondominio(id!, data),
+    mutationFn: async (data: FormData) => {
+      return await api.put<Condominio>(`/condominios/${data.get('id')}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    },
     onSuccess: () => {
-      ;['condominio', 'documentFiles', id].forEach((key) =>
+      ['condominio', 'documentFiles', id].forEach((key) =>
         queryClient.invalidateQueries({
           queryKey: [key]
         })
       )
       toast({ title: 'Condomínio atualizado com sucesso' })
       setIsEditingPersonalInfo(false)
-    },
-    onError: () => {
-      toast({ title: 'Erro ao atualizar condomínio', variant: 'destructive' })
     }
-  });
+  })
+
 
   //Dados do condomínio schema de validação
   const condominioMethods = useForm<CondominioSchema>({
@@ -550,7 +547,5 @@ export const DetalhesCondominio = () => {
     </div >
   )
 }
-function updateCondominio(arg0: number, data: FormData): Promise<unknown> {
-  throw new Error('Function not implemented.')
-}
+
 

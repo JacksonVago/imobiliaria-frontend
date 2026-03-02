@@ -20,20 +20,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Bath, Bed, Car, Edit, Mail, Pencil, Phone, Plus, Search, Trash2, X } from 'lucide-react'
+import { Bath, Bed, Car, Edit, Pencil,  Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Controller,  useForm } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
 
 import { ROUTE } from '@/enums/routes.enum'
-import { Locacao, LocacaoStatus } from '@/interfaces/locacao'
-//import { Locatario } from '@/interfaces/locatario'
-import { Proprietario } from '@/interfaces/proprietario'
 import { PageLoader } from '@/pages/assistant/page-loader'
 import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Select,
   SelectContent,
@@ -41,16 +38,12 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { GarantiaLocacao, LancamentoStatus } from '@/enums/locacao/enums-locacao'
+import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { Textarea } from '@/components/ui/textarea'
-import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
-import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
-import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
+import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
-import { usdFormatter } from '@/utils/format-money'
 import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 import React from 'react'
-import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { BlocoForm } from '../criarbloco/components/bloco-form'
 import { Bloco } from '@/interfaces/bloco'
 import { blocoSchema, BlocoSchema } from '@/schemas/bloco.schema'
@@ -195,6 +188,8 @@ export const DetalhesBloco = () => {
   const createLancamento = useMutation({
     mutationFn: async (data: FormData) => {
 
+      setdataInicial(moment(data.get('dataLancamento') as string).format("YYYY-MM-DD"));
+      setdataFinal(moment(data.get('dataLancamento') as string).format("YYYY-MM-DD"));
       return await api.post<LancamentoCondominio>(`/lancamentosCondominios`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })

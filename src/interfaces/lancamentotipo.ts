@@ -1,7 +1,8 @@
 import { lancamentoTipo } from "@/enums/locacao/enums-locacao";
 import { PessoaStatus } from "@/enums/pessoal/status-pesoa";
-import { Lancamento } from "./lancamentos";
+import { LancamentoLocacao } from "./lancamentos";
 import { Empresa } from "./empresa";
+import { LancamentoCondominio } from "./lancamentocondominio";
 
 export interface TipoLancamento {
     id: number;
@@ -14,7 +15,8 @@ export interface TipoLancamento {
     status: PessoaStatus
     createdAt: string;
     updatedAt?: string;
-    lancamentos: Lancamento[];
+    lancamentosLocacoes: LancamentoLocacao[];
+    lancamentosCondominio: LancamentoCondominio[];
     empresa: Empresa;
     empresaId: number;
 }

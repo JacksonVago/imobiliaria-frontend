@@ -7,10 +7,10 @@ export const getCondominio = async (id: number): Promise<Condominio> => {
 }
 
 //Altera condominio
-const updateCondominio = async (id: number, data: FormData): Promise<Condominio> => {
+/*const updateCondominio = async (id: number, data: FormData): Promise<Condominio> => {
   const response = await api.put<Condominio>(`condominios/${id}`, data)
   return response.data
-}
+}*/
 
 // Types
 interface GetCondominiosParams {

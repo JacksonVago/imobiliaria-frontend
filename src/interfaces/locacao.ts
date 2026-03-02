@@ -3,7 +3,7 @@ import { Fiador } from './fiador'
 import { GenericAnexo } from './generic-anexo'
 import { Imovel } from './imovel'
 import { Locatario } from './locatario'
-import { Lancamento } from './lancamentos'
+import { LancamentoLocacao } from './lancamentos'
 import { Empresa } from './empresa'
 
 export enum BackendGarantiaLocacaoTypes {
@@ -58,7 +58,7 @@ export interface Locacao {
   updatedAt: string
 
   locatarios?:Locatario[]
-  lancamentos?: Lancamento[]
+  lancamentos?: LancamentoLocacao[]
 }
 
 export interface SeguroFianca {

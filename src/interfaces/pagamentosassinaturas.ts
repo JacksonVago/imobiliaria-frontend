@@ -1,4 +1,3 @@
-import { Assinatura } from "@/interfaces/assinatura"
 import { PagamentoLinks } from "./pagamentolinks"
 import { EmpresaAssinatura } from "./empresaassinatura"
 

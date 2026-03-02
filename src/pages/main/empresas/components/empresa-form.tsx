@@ -58,6 +58,7 @@ export const EmpresaFormContent = ({
     queryFn: () => getTipos(Number(glb_params.id_empresa))
   });
 
+  console.log(tipoLancamento);
   return (
     <>
       <div className="space-y-4 font-[Poppins-Regular]">

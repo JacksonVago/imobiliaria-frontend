@@ -259,6 +259,7 @@ export const DetalhesEmpresaForm = () => {
       cidade: enderecoData?.cidade,
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
+      tipoId : empresa?.tipoLancamento,
     }),
     [empresa]
   )

@@ -318,7 +318,7 @@ export const DetalhesBoleto = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {(boleto?.lancamentos && boleto.lancamentos.length > 0) ? (
+            {(boleto?.lanctoLocacao && boleto.lanctoLocacao.length > 0) ? (
               <div className=''>
 
                 <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Lançamentos </Label>
@@ -332,7 +332,7 @@ export const DetalhesBoleto = () => {
                   </div>
 
                   <div className='grid grid-cols-5 m-2' >
-                    {boleto.lancamentos?.map((lancamento) => (
+                    {boleto.lanctoLocacao?.map((lancamento) => (
                       <>
                         <Label className={!isMobile ? 'flex items-center mb-1' : 'flex items-center col-span-2 mb-1'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                         {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}

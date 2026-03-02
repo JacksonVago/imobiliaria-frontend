@@ -1,5 +1,4 @@
 import { FormaRateio } from '@/enums/condominio/FormaRateio'
-import { ImovelTipo, ImovelFinalidade, ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size'
 import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types'
 import { z } from 'zod'

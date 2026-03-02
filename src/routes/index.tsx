@@ -15,7 +15,7 @@ import DetalhesLocatario from '@/pages/main/locatarios/detalhes'
 import ListarProprietarios from '@/pages/main/proprietarios'
 import { CriarProprietario } from '@/pages/main/proprietarios/criar'
 import DetalhesProprietario from '@/pages/main/proprietarios/detalhes'
-import { Outlet, Route, Routes } from 'react-router-dom'
+import { Outlet, Route } from 'react-router-dom'
 import SlideRoutes from 'react-slide-routes';
 import { AuthenticatedRoutesGuard } from './guards/authenticated-routes-guard'
 import { UnauthenticatedRoutesGuard } from './guards/unauthenticated-routes-guard'
