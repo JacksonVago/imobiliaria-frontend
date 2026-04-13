@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, CircleDollarSign, Cog, House,  HousePlus, Lock, LogOut, Shapes, Users } from 'lucide-react'
+import { Banknote, CircleDollarSign, Cog, House,  HousePlus, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 import logo  from '../assets/logo-molina.png';
 
@@ -60,6 +60,11 @@ const data = {
       url: ROUTE.PAGAMENTOS,
       icon: CircleDollarSign
     },
+    {
+      title: 'Relatório de Repasse',
+      url: ROUTE.REPASSES,
+      icon: ReceiptText
+    },
     /*{
       title: 'Proprietários',
       url: ROUTE.PROPRIETARIOS,
@@ -100,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.url === ROUTE.LANCAMENTOS && user?.permissions.includes('VIEW_LANCAMENTOS')) {
         return true
       }
-      if (item.url === ROUTE.PAGAMENTOS && user?.permissions.includes('VIEW_PAGAMENTOS')) {
+      if ((item.url === ROUTE.PAGAMENTOS || item.url === ROUTE.REPASSES) && user?.permissions.includes('VIEW_PAGAMENTOS')) {
         return true
       }
       if (item.url === ROUTE.PROPRIETARIOS && user?.permissions.includes('VIEW_PROPRIETARIOS')) {

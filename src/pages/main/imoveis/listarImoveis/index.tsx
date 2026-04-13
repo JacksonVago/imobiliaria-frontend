@@ -314,6 +314,7 @@ export default function ListarImoveis({
             <Loader />
           </div>
         ) :
+        
           (
             showcard ?
               (

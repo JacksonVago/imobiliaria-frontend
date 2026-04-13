@@ -531,6 +531,7 @@ export default function ListarTiposLancamento() {
                 <Input
                   id="name"
                   type="number"
+                  step="any"
                   placeholder="Valor Fixo"
                   value={selectedTipo?.valorFixo}
                   onChange={(e) => setSelectedTipo((prev) => ({ ...prev!, valorFixo: Number(e.target.value)}))}

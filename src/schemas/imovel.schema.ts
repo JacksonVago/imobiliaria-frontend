@@ -127,7 +127,7 @@ export const imovelSchema = z.object({
   finalidade: z.enum(Object.values(ImovelFinalidade) as [string, ...string[]],{required_error:'Finalidade é obrigatório'}),
   porcentagemLucroImobiliaria: z
     .union([
-      z.number({invalid_type_error:'Taxa administrativa é obrigatório'}).min(1, {message: 'Taxa administrativa é obrigatório'}),
+      z.number({invalid_type_error:'Taxa administrativa é obrigatório'}).min(0, {message: 'Taxa administrativa é obrigatório'}),
       z
         .string()
         .min(1, {message: 'Taxa administrativa é obrigatório'})

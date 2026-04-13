@@ -349,6 +349,7 @@ export const ImovelFormContent = ({
             <Input
               className="mt-2"
               type="number"
+              step="any"
               disabled={disabled}
               placeholder="Valor do aluguel"
               {...createImovelMethods.register('valorAluguel')}

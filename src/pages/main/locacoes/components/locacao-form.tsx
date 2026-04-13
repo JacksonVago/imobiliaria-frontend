@@ -435,6 +435,7 @@ export const LocacaoFormContent = ({
                   Valor do Aluguel
                   <Input
                     type="number"
+                    step="any"
                     className="mt-1"
                     disabled={disabled}
                     placeholder="Valor do Aluguel"

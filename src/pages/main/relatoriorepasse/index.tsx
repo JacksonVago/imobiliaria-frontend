@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Pagination,
@@ -8,32 +6,27 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
-import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { MapPin, Pencil, Receipt, Search } from 'lucide-react'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { FileDown, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
-import { Lancamento } from '@/interfaces/lancamentos'
-import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
-import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { Locacao } from '@/interfaces/locacao'
-import { Endereco } from '@/interfaces/endereco'
+import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/services/react-query/query-client'
-import { usdFormatter } from '@/utils/format-money'
-import { useAuth } from '@/hooks/auth/use-auth'
+import { Boleto } from '@/interfaces/boleto'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { Loader } from '@/components/ui/loader'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { usdFormatter } from '@/utils/format-money'
+import { relatorioRepasse } from '@/utils/rel-repasse'
 
 // Types
-interface GetLancamentosParams {
+interface GetRepassesParams {
   search?: string
   page?: number
   limit?: number
@@ -44,8 +37,8 @@ interface GetLancamentosParams {
 }
 
 // API & Query Logic
-export const getLancamentos = async ({ page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
-  return await api.get<BasePaginationData<Locacao>>('lancamentos', {
+export const getRepasses = async ({ page, limit, search, status, exclude, dataInicial, dataFinal }: GetRepassesParams) => {
+  return await api.get<BasePaginationData<Boleto>>('repasses', {
     params: {
       page,
       limit,
@@ -58,7 +51,7 @@ export const getLancamentos = async ({ page, limit, search, status, exclude, dat
   })
 }
 
-export const useGetLancamentosQueryOptions = ({
+export const useGetRepasses = ({
   search,
   page,
   limit,
@@ -77,23 +70,20 @@ export const useGetLancamentosQueryOptions = ({
   dataFinal?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['lancamentos', { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
-    queryFn: () => getLancamentos({ search, page, limit, status, exclude, dataInicial, dataFinal })
+    queryKey: ['repasses', { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
+    queryFn: () => getRepasses({ search, page, limit, status, exclude, dataInicial, dataFinal })
   })
 }
 //lancamentos
-export default function ListarLancamentos({
+export default function ListarRepasses({
   limitView,
   exclude,
-  onSelectLancamento
 }: {
   limitView: number
   exclude: string
-  onSelectLancamento: ((lancamento: Lancamento) => void) | undefined
 }) {
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
-
+  //const { user } = useAuth();
+  //const isAdmin = user?.role === 'ADMIN';
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
@@ -115,7 +105,7 @@ export default function ListarLancamentos({
   const [dataFinal, setdataFinal] = useState(moment(new Date()).format("YYYY-MM-DD"));
 
   const { data, isLoading } = useQuery(
-    useGetLancamentosQueryOptions({
+    useGetRepasses({
       page,
       limit,
       search,
@@ -126,27 +116,26 @@ export default function ListarLancamentos({
     })
   )
 
-  const locacoes = data?.data?.data || []
+  const repasses = data?.data?.data || []
   const totalPages = data?.data?.totalPages
 
-  console.log(locacoes);
+  console.log(repasses);
 
-  const gerarBoleto = useMutation({
-    mutationFn: async (locacao: Locacao) => {
-      return await api.post('/lancamentos/gerar-boleto', locacao)
+  /*const confirmarBoleto = useMutation({
+    mutationFn: async (boleto: Boleto) => {
+      return await api.put(`/pagamentos/statusPagamento/${boleto.id}`, boleto)
     },
     onSuccess: () => {
-      ['lancamentos'].forEach((key) => {
+      ['boletos'].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
 
       toast({
-        title: 'Geração de Boleto',
+        title: 'Emissão de Boleto',
         description: `Boleto gerado com sucesso`
       })
     }
-  })
-
+  })*/
 
   // const hasTotalPages = !!totalPages
   // const canGoToNextPage = hasTotalPages && page < totalPages
@@ -154,9 +143,7 @@ export default function ListarLancamentos({
   //always that we go to out of the total pages, we will go to the first page
 
   useEffect(() => {
-    if (!onSelectLancamento) {
-      glb_params.updTitle_form('Lançamentos de Locações');
-    }
+    glb_params.updTitle_form('Relatório de Repasses');
     if (totalPages && page > totalPages) {
       navigate({
         search: `?page=1&limit=${limit}&search=${search}`
@@ -184,27 +171,30 @@ export default function ListarLancamentos({
     })
   }
 
-  const handleClickVerDetalhes = (id: number) => {
-    navigate(`${ROUTE.LANCAMENTOS}/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
-  }
+  /*const handleClickVerDetalhes = (id: number) => {
+    navigate(`${ROUTE.PAGAMENTOS}/${id}`)
+  }*/
   // UI Logic
-  const hasSearchResults = Boolean(!isLoading && search && locacoes?.length === 0)
+  const hasSearchResults = Boolean(!isLoading && search && repasses?.length === 0)
 
-  const googleMaps = "https://www.google.com/maps/place/";
+  /*const googleMaps = "https://www.google.com/maps/place/";
   const handlerClickMaps = (endereco: Endereco | undefined) => {
     if (endereco) {
       const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
       window.open(urlGoogleMaps);
     }
+  }*/
+
+  const handlerChangeTipo = (tipo: string) => {
+    navigate({
+      search: `?page=1&limit=${limit}&search=${search}&status=${tipo}`
+    })
   }
 
-  const handleGerarBoleto = async (locacao: Locacao) => {
-    try {
-      gerarBoleto.mutateAsync(locacao);
-    } catch (error) {
-      toast({ title: 'Erro ao gerar boleto.', variant: 'destructive' });
+    const handlerPDF = () => {
+        relatorioRepasse("repasses.pdf", repasses);
     }
-  }
+
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
@@ -212,7 +202,7 @@ export default function ListarLancamentos({
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
-          <h1 className="text-2xl font-bold">Lançamentos de Locações</h1>
+          <h1 className="text-2xl font-bold">Pagamentos</h1>
         )}
       </div>
 
@@ -226,7 +216,7 @@ export default function ListarLancamentos({
           <Input
             onChange={handleSearchChange}
             value={search}
-            placeholder="Buscar lançamentos"
+            placeholder="Buscar repasses"
             className="pl-8"
           />
         </div>
@@ -234,7 +224,7 @@ export default function ListarLancamentos({
           {(isPortrait || isTablet || isBigScreen)
             ? "grid grid-cols-3 gap-4 mb-2"
             : "grid grid-cols-1 gap-4 mb-2"}>
-          <h1 className='flex items-center'>Período</h1>
+          <h1 className='flex items-center'>Período de Vencimento</h1>
           <div className="flex justify-between gap-2">
             <Label className="text-base flex items-center">
               De</Label>
@@ -257,47 +247,105 @@ export default function ListarLancamentos({
               value={dataFinal}
               onChange={(e) => setdataFinal(e.target.value)}
             />
-
           </div>
+        </div>
+        <div className="flex gap-2">
+          <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
+            <SelectTrigger className="h-4 w-[160px]">
+              <SelectValue placeholder="Situação" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_BOLETO_OPTIONS.map((value) => (
+                <SelectItem key={value.label} value={value.value}>
+                  {value.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className='flex gap-2'> 
+              <span title='Baixar PDF'>
+              <FileDown className="h-5 w-5 cursor-pointer text-blue-600"
+                onClick={handlerPDF}                                
+              /> 
+              </span>
         </div>
       </div>
 
-      {/* lancamentos Grid */}
+      {/* pagamentos Grid */}
       <div className={limit === 1 ? "grid gap-6 grid-cols-1" : "grid gap-6 sm:grid-cols-1 lg:grid-cols-3"}>
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">
-            Nenhum lançamento encontrado para a busca atual.
+            Nenhum pagamento encontrado para a busca atual.
           </p>
         )}
 
-        {/*Card das locações/lançamentos */}
-
-        {isLoading ? (
-          <div className="bg-transparent flex justify-center items-center col-span-full">
-            <Loader />
+        {/*Card das locações/pagamentos */}
+        {(repasses.length === 0 && !hasSearchResults) && (
+          <div className="col-span-3 flex flex-col items-center justify-center w-full">
+            <p className="text-center text-muted-foreground">
+              Nenhum boleto disponível para este período.
+            </p>
           </div>
-        ) :
+        )}
+        {isLoading ?
           (
-            locacoes.map((locacao) => (
-              <Card key={locacao.id} className="">
+            <div className="bg-transparent flex justify-center items-center col-span-full">
+              <Loader />
+            </div>
+          ) :
+          (
+            <div className='col-span-3'>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="border-b p-2 text-left">Imóvel</th>
+                    <th className="border-b p-2 text-left">Valor Aluguel</th>
+                    <th className="border-b p-2 text-left">Taxa</th>
+                    <th className="border-b p-2 text-left">Valor Repasse</th>
+                    <th className="border-b p-2 text-left"></th>
+                  </tr>
+                </thead>
+                <tbody>
+              {repasses.map((repasse) => (
+                        <tr key={repasse.id} className="hover:bg-gray-100">
+                          <td className="border-b p-2">
+                            {(repasse.locacao?.imovel?.proprietarios ? repasse.locacao?.imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(repasse.locacao?.imovel?.endereco)}
+                          </td>
+                          <td className="border-b p-2">
+                            {usdFormatter.format(repasse.locacao ? repasse.locacao.valorAluguel : 0)}
+                          </td>
+                          <td className="border-b p-2">
+                            {repasse.locacao?.imovel ? repasse.locacao.imovel?.porcentagemLucroImobiliaria.toString() : '0'}%
+                          </td>
+                          <td className="border-b p-2">
+                            {usdFormatter.format(repasse.locacao?.imovel 
+                              ? 
+                              repasse.locacao.valorAluguel * ((100 - repasse.locacao.imovel?.porcentagemLucroImobiliaria) /100)
+                              : 
+                              0)}
+                          </td>
+                        </tr>                
+                  /*<Card key={repasse.id} className="">
                 <CardHeader className="flex flex-row justify-between">
+  
                   <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
                     <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
                       <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                        onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
+                        onClick={() => { handlerClickMaps(repasse.locacao?.imovel?.endereco) }}
                         color='green'
                       />
-                      {getEnderecoFormatado(locacao.imovel?.endereco)}
+                      {getEnderecoFormatado(repasse.locacao?.imovel?.endereco)}
                     </p>
-
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Label className="font-bold flex justify-end">
-                    Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
+                    Aluguel R$ {repasse.locacao?.valorAluguel?.toLocaleString('pt-BR')}
                   </Label>
-                  {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
+                  {(repasse.lancamentos && repasse.lancamentos?.length > 0) ? (
                     <>
                       <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
                       <div className='rounded-md border'>
@@ -310,100 +358,96 @@ export default function ListarLancamentos({
                           <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
                           <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
                         </div>
-
+  
                         <div className='grid grid-cols-5 m-2 gap-1' >
-                          {locacao.lancamentos?.map((lancamento) => (
+                          {repasse.lancamentos?.map((lancamento) => (
                             <>
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
-                              {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                              <Label className={repasse.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                              {!isMobile ? (<Label className={repasse.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
                                 : (<></>)
                               }
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? (!isMobile ? 'text-red-600' : 'text-red-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                              <Label className={repasse.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                              <Label className={repasse.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
                             </>
                           ))}
                         </div>
                       </div>
                       <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
-                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                          {usdFormatter.format(locacao.valorAluguel +
-                            locacao.lancamentos.reduce((total, lancamento) => {
+                        <Label className={repasse.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
+                        <Label className={repasse.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                          {usdFormatter.format((repasse.locacao ? repasse.locacao.valorAluguel : 0) +
+                            repasse.lancamentos.reduce((total, lancamento) => {
                               return total + lancamento.valorLancamento;
                             }, 0))}
                         </Label>
                       </div>
+                      <div className='flex justify-end'>
+                        <Badge
+                          variant="secondary"
+                          className={cn('mt-2 text-xs', {
+                            'bg-green-50 text-green-800': repasse.status === BoletoStatus.PENDENTE,
+                            'bg-red-50 text-red-800': repasse.status === BoletoStatus.ATRASADO,
+                            'bg-blue-50 text-blue-800': repasse.status === BoletoStatus.PAGO
+                          })}
+                        >
+                          {repasse.status}
+                        </Badge>
+                      </div>
+  
                     </>
                   )
                     : (<p className="text-center text-muted-foreground mt-5">
-                      Não há lançamentos para essa locação
+                      Não há lançamentos para esse boleto
                     </p>
                     )
                   }
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                  <div className='grid grid-cols-2 gap-10'>
-                    {((isAdmin ||
+                  <div className=
+                    {cn('grid gap-10', {
+                      'grid-cols-3': repasse.status === BoletoStatus.PENDENTE,
+                      'grid-cols-2': repasse.status === BoletoStatus.ATRASADO || repasse.status === BoletoStatus.PAGO,
+                    })}
+                  >
+                    {(isAdmin ||
                       user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("UPDATE_LANCAMENTO")) &&
-                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-
+                      user?.permissions.includes("UPDATE_PAGAMENTO")
+                    ) && (
+  
                         <Button variant="secondary"
-                          onClick={() => handleClickVerDetalhes(locacao?.id)}
+                          onClick={() => handleClickVerDetalhes(repasse.id ? repasse.id : 0)}
                           size={"sm"}>
-                          <Pencil className='h4 w4' /> Lançamentos
+                          Detalhes
                         </Button>
                       )}
                     {((isAdmin ||
                       user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("CREATE_PAGAMENTO")) &&
-                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-                        /*<Button variant="secondary"
-                          onClick={() => handleGerarBoleto(locacao)}
-                          size={"sm"}>
-                          <Receipt className="h-4 w-4" />Gerar Boleto
-                        </Button>*/
-
+                      user?.permissions.includes("DELETE_PAGAMENTO")
+                    ) && (repasse.status === BoletoStatus.PENDENTE)) && (
                         <>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={(e) => {
-                                e.stopPropagation()
-                                //setSelectedTipo(tipo)
-                              }
-                              } title='Geração de Boleto'>
-                                <Receipt className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  'Isso irá confirmar os lançamentos para geração do boleto.'
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
-                                  'Sim, confirmar boleto.'
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <Button variant="destructive"
+                            size={"sm"}>
+                            <Trash className="h-4 w-4" />Excluir
+                          </Button>
+                          <Button variant="secondary"
+                            size={"sm"}>
+                            <Receipt className="h-4 w-4" />Emitir Boleto
+                          </Button>
                         </>
                       )}
                   </div>
                 </CardFooter>
-              </Card>
-            )
-            )
-          )
-        }
+              </Card>*/
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
       </div>
 
       {/* Pagination */}
       <Pagination>
-        <PaginationContent>
+        <PaginationContent className={repasses.length > 0 ? "" : "hidden"}>
           {/* Previous & Next Buttons */}
           <PaginationItem>
             <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
@@ -417,6 +461,8 @@ export default function ListarLancamentos({
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
     </div>
   )
 }
+

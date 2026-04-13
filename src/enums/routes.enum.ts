@@ -61,6 +61,9 @@ export enum ROUTE {
   PAGAMENTOS_CRIAR = '/pagamentos/criar',
   PAGAMENTOS_DETALHES = '/pagamentos/:id',
 
+  //Repasse routes
+  REPASSES = '/repasses',
+
   // Error routes
   NOT_FOUND = '*',
   UNAUTHORIZED = '/unauthorized'

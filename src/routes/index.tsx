@@ -34,6 +34,7 @@ import ListarTiposLancamento from '@/pages/main/tipolancamento'
 import { DetalhesLancamento } from '@/pages/main/lancamentos/detalhes'
 import { DetalhesBoleto } from '@/pages/main/boletos/detalhes'
 import ListarBoletos from '@/pages/main/boletos'
+import ListarRepasses from '@/pages/main/relatoriorepasse'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -241,6 +242,16 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
                 <DetalhesBoleto />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Repasses */}
+          <Route
+            path={ROUTE.REPASSES}
+            element={
+              <ProtectedRoute permission="VIEW_PAGAMENTOS">
+                <ListarRepasses exclude='' limitView={3}/>
               </ProtectedRoute>
             }
           />
